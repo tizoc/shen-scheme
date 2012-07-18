@@ -491,3 +491,9 @@
               result
               (loop (- position 1)
                     (cons (bytevector-u8-ref bytes position) result))))))))
+
+(define ($$variable? maybe-sym)
+  (and (and (symbol? maybe-sym)
+       (let* ((str (symbol->string maybe-sym))
+             (ch (string-ref str 0)))
+         (char-upper-case? ch)))))

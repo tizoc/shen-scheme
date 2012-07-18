@@ -98,4 +98,7 @@
     (defun integer? (Val)
       ($$integer? Val))
 
+    (defun variable? (Val)
+      ($$variable? Val))
+
     (cd "")))

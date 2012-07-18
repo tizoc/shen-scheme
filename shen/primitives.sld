@@ -14,6 +14,7 @@
    $$toggle-tracing!
    $$read-file-as-bytelist
    $$read-file-as-string
+   $$variable?
    $$eval-in-shen
    kl:if
    kl:and
