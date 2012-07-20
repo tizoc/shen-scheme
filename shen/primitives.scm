@@ -397,10 +397,13 @@
                     (quote-expression body scope))
               (quote-cond-clauses rest scope)))))
 
+(define (unbound-symbol? maybe-sym scope)
+  (and (symbol? maybe-sym)
+       (not (memq maybe-sym scope))))
+
 (define (quote-expression expr scope)
-  (define (unbound-symbol? maybe-sym)
-    (and (symbol? maybe-sym)
-         (not (memq maybe-sym scope))))
+  (define (unbound-in-current-scope? maybe-sym)
+    (unbound-symbol? maybe-sym scope))
 
   (match expr
     ((? null?) '($$quote ()))
@@ -410,7 +413,7 @@
     ('|}| '($$quote |}|))
     ('|;| '($$quote |;|))
     ((? hazard-symbol? sym) (safe-symbol sym))
-    ((? unbound-symbol? sym) `($$quote ,(safe-symbol sym)))
+    ((? unbound-in-current-scope? sym) `($$quote ,(safe-symbol sym)))
     (('let var value body)
      `(let ,var ,(quote-expression value scope)
         ,(quote-expression body (cons var scope))))
@@ -429,13 +432,31 @@
           (defun ,name ,(map safe-symbol args)
             ,(quote-expression body args))))))
     ((op param ...)
-     (cons (cond ((pair? op) `($$function-binding ,(quote-expression op scope)))
-                 ((unbound-symbol? op) (safe-symbol op))
-                 (else `($$function-binding ,(safe-symbol op))))
-           (map (lambda (exp)
-                  (quote-expression exp scope))
-                param)))
+     (left-to-right
+      (cons (function-binding op scope)
+            (map (lambda (exp) (quote-expression exp scope))
+                 param))))
     (else expr)))
+
+(define (function-binding expr scope)
+  (cond
+   ((pair? expr) `($$function-binding ,(quote-expression expr scope)))
+   ((unbound-symbol? expr scope) (safe-symbol expr))
+   (else `($$function-binding ,(safe-symbol expr)))))
+
+;; Enforce left-to-right evaluation if needed
+(define (left-to-right expr)
+  (if (or (memq (car expr) '(trap-error set and or if))
+          (< (length (filter pair? expr)) 2))
+      expr
+      `($$l2r ,expr ())))
+
+(define-syntax $$l2r
+  (syntax-rules ()
+    ((_ () ?expr) ?expr)
+    ((_ (?op ?params ...) (?expr ...))
+     (let ((f ?op))
+       ($$l2r (?params ...) (?expr ... f))))))
 
 (define (lowercase-symbol? maybe-sym)
   (and (symbol? maybe-sym)

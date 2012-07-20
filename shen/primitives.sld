@@ -4,6 +4,7 @@
           (srfi 69)
           (chibi match)
           (only (scheme) call-with-output-string)
+          (only (srfi 1) filter)
           (only (chibi pathname) make-path)
           (only (chibi filesystem) file-exists?)
           (only (chibi io) port->string read-u8))
@@ -16,6 +17,7 @@
    $$read-file-as-string
    $$variable?
    $$eval-in-shen
+   $$l2r
    kl:if
    kl:and
    kl:or
