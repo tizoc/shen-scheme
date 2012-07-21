@@ -101,4 +101,9 @@
     (defun variable? (Val)
       ($$variable? Val))
 
+    (defun shen-sysfunc? (Val)
+      ($$shen-sysfunc? Val))
+
+    ($$init-*system*)
+
     (cd "")))

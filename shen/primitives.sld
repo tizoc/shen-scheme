@@ -18,6 +18,10 @@
    $$variable?
    $$eval-in-shen
    $$l2r
+
+   $$shen-sysfunc?
+   $$init-*system*
+
    kl:if
    kl:and
    kl:or

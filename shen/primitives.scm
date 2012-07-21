@@ -446,7 +446,7 @@
 
 ;; Enforce left-to-right evaluation if needed
 (define (left-to-right expr)
-  (if (or (memq (car expr) '(trap-error set and or if))
+  (if (or (memq (car expr) '(trap-error set and or if freeze thaw))
           (< (length (filter pair? expr)) 2))
       expr
       `($$l2r ,expr ())))
@@ -518,3 +518,13 @@
        (let* ((str (symbol->string maybe-sym))
              (ch (string-ref str 0)))
          (char-upper-case? ch)))))
+
+(define shen-*system* (make-hash-table eq?))
+
+(define ($$init-*system*)
+  (for-each
+   (lambda (sym) (hash-table-set! shen-*system* sym #t))
+   (kl:value 'shen-*system*)))
+
+(define ($$shen-sysfunc? val)
+  (hash-table-ref/default shen-*system* val #f))
