@@ -104,6 +104,9 @@
     (defun shen-sysfunc? (Val)
       ($$shen-sysfunc? Val))
 
+    (defun symbol? (Val)
+      ($$symbol? Val))
+
     ($$init-*system*)
 
     (cd "")))
