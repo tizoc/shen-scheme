@@ -308,13 +308,9 @@
   (case-lambda
     ((string) (kl:pr string (kl:value '*stoutput*)))
     ((string out)
-     ;; Override out because Shen sends *stinput*
-     (let ((out (if (eq? out (kl:value '*stinput*))
-                    (kl:value '*stoutput*)
-                    out)))
-       (display string out)
-       (flush-output-port out)
-       string))))
+     (display string out)
+     (flush-output-port out)
+     string)))
 
 (define kl:read-byte read-u8)
 
@@ -423,8 +419,8 @@
      `(lambda ,var ,(quote-expression body (cons var scope))))
     (('do expr1 expr2)
      `($$begin ,(quote-expression expr1 scope) ,(quote-expression expr2 scope)))
-    (('map 'shen-linearise exp) ;; Workaround for map with symbol in core.kl
-     `(map shen-linearise ,exp))
+    (('function function-name)
+     function-name)
     (`(defun ,name ,args ,body)
      (let ((name (safe-symbol name)))
        `($$eval-in-shen
