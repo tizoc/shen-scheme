@@ -17,6 +17,8 @@ Shen is a portable functional programming language by `Mark Tarver <http://www.l
 Running
 -------
 
+Version 0.6 of chibi-scheme is needed to run chibi-shen. Other versions may work, but testing and development are done against that version.
+
 Copy all the .kl files to this directory and run::
 
     chibi-scheme -xshen -e'(shen-shen)'
