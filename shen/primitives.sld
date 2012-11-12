@@ -12,15 +12,20 @@
   (export
    $$set-shen-environment!
    $$function-binding
-   $$toggle-tracing!
    $$read-file-as-bytelist
    $$read-file-as-string
-   $$variable?
+   $$shen-variable?
+   $$segvar?
+   $$grammar_symbol?
    $$eval-in-shen
    $$l2r
 
    $$shen-sysfunc?
    $$init-*system*
+
+   $$hash
+   $$shen-walk
+   $$macroexpand
 
    kl:if
    kl:and

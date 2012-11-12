@@ -69,25 +69,17 @@
 
     ($$eval-kl-file "toplevel.kl")
     ($$eval-kl-file "core.kl")
+
+    (defun shen-sysfunc? (Val)
+      ($$shen-sysfunc? Val))
+
     ($$eval-kl-file "sys.kl")
-    ($$eval-kl-file "sequent.kl")
-    ($$eval-kl-file "yacc.kl")
-    ($$eval-kl-file "reader.kl")
-    ($$eval-kl-file "prolog.kl")
-    ($$eval-kl-file "track.kl")
-    ($$eval-kl-file "load.kl")
-    ($$eval-kl-file "writer.kl")
-    ($$eval-kl-file "macros.kl")
-    ($$eval-kl-file "declarations.kl")
-    ($$eval-kl-file "types.kl") 
-    ($$eval-kl-file "t-star.kl")
 
-    ;; Overrides
-    (defun read-file-as-bytelist (Filename)
-      ($$read-file-as-bytelist Filename))
+    (defun hash (Val Bound)
+      ($$hash Val Bound))
 
-    (defun read-file-as-string (Filename)
-      ($$read-file-as-string Filename))
+    (defun not (Val)
+      ($$not Val))
 
     (defun boolean? (Val)
       ($$or ($$eq? Val #f)
@@ -99,14 +91,51 @@
       ($$integer? Val))
 
     (defun variable? (Val)
-      ($$variable? Val))
-
-    (defun shen-sysfunc? (Val)
-      ($$shen-sysfunc? Val))
+      ($$shen-variable? Val))
 
     (defun symbol? (Val)
       ($$symbol? Val))
 
+    (defun shen-walk (Func Val)
+      ($$shen-walk ($$function-binding Func) Val))
+
+    ($$eval-kl-file "sequent.kl")
+    ($$eval-kl-file "yacc.kl")
+
+    (defun shen-segvar? (Val)
+      ($$segvar? Val))
+
+    (defun shen-grammar_symbol? (Val)
+      ($$grammar_symbol? Val))
+
+    ($$eval-kl-file "reader.kl")
+    ($$eval-kl-file "prolog.kl")
+    ($$eval-kl-file "track.kl")
+    ($$eval-kl-file "load.kl")
+    ($$eval-kl-file "writer.kl")
+    ($$eval-kl-file "macros.kl")
+
+    (defun macroexpand (E)
+      ($$macroexpand E))
+
+    ($$eval-kl-file "declarations.kl")
+
+    ;; Overrides
+    (defun read-file-as-bytelist (Filename)
+      ($$read-file-as-bytelist Filename))
+
+    (defun read-file-as-string (Filename)
+      ($$read-file-as-string Filename))
+
+    (defun shen-digit-byte? (N)
+      (and (>= N 48) (<= N 57)))
+
+    (defun shen-byte->digit (N)
+      (- N 48))
+
     ($$init-*system*)
+
+    ($$eval-kl-file "types.kl")
+    ($$eval-kl-file "t-star.kl")
 
     (cd "")))

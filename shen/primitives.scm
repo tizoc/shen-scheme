@@ -2,14 +2,9 @@
 ;;
 
 (define *shen-environment* #f)
-(define *tracing-enabled* #f)
 
 (define ($$set-shen-environment! env)
   (set! *shen-environment* env))
-
-(define ($$toggle-tracing!)
-  (set! *tracing-enabled* (not *tracing-enabled*))
-  *tracing-enabled*)
 
 (define partial
   (case-lambda
@@ -31,14 +26,6 @@
 (define (full-path-for-file filename)
   (make-path (kl:value '*home-directory*)
              filename))
-
-(define symbol-character-translations
-  '((#\# . "$sharp$")
-    (#\{ . "$openbrace$")
-    (#\} . "$closebrace$")
-    (#\; . "$semicolon$")
-    (#\` . "$backquote$")
-    (#\' . "$quote$")))
 
 ;; Boolean Operators
 ;;
@@ -93,7 +80,7 @@
 ;;
 
 (define (kl:intern name)
-  (string->symbol (safe-symbol-name name)))
+  (string->symbol name))
 
 ;; Strings
 ;;
@@ -126,7 +113,7 @@
 ;; Assignments
 ;;
 
-(define *shen-globals* (make-hash-table))
+(define *shen-globals* (make-hash-table eq?))
 
 (define kl:set
   (case-lambda
@@ -228,11 +215,19 @@
     ((_ ?name ?body)
      (define ?name ?body))))
 
+;; symbol->function registry
+(define *shen-functions* (make-hash-table eq?))
+
+(define (register-function name function)
+  (hash-table-set! *shen-functions* name function))
+
 (define-syntax kl:defun
   (syntax-rules ()
     ((_ ?f (?args ...) ?expr)
      (begin
-       (define-curried (?f ?args ...) ?expr)
+       (define-curried (?f ?args ...)
+         ?expr)
+       (register-function '?f ?f)
        '?f))))
 
 (define-syntax kl:lambda
@@ -244,20 +239,26 @@
     ((_ ?name ?value ?expr)
      (let ((?name ?value)) ?expr))))
 
+(define (vector=? a b)
+  (let ((minlen (min (vector-length a) (vector-length b))))
+    (and (= (vector-length a) (vector-length b))
+         (do ((i 0 (+ i 1)))
+             ((or (= i minlen)
+                  (not (kl:= (vector-ref a i)
+                             (vector-ref b i))))
+              (= i minlen))))))
+
 (define-curried (kl:= a b)
-  (cond ((and (number? a) (number? b))
-         (= a b))        
-        ((null? a)
-         (null? b))
-        ((and (symbol? a) (symbol? b))
-         (eq? a b))
+  (cond ((eq? a b) #t) ;; fast path
+        ((and (number? a) (number? b))
+         (= a b))
+        ;; if eq? was false none of these can result in #t
+        ((or (null? a) (null? b) (symbol? a) (symbol? b)) #f)
         ((and (pair? a) (pair? b))
          (and (kl:= (car a) (car b))
               (kl:= (cdr a) (cdr b))))
-        ((and (string? a) (string? b))
-         (string=? a b))
-        ((and (vector? a) (vector? b)) ;; TODO: avoid intermediate list
-         (kl:= (vector->list a) (vector->list b)))
+        ((and (vector? a) (vector? b))
+         (vector=? a b))
         (else (equal? a b))))
 
 (define ($$eval-in-shen expr)
@@ -274,10 +275,9 @@
 
 (define ($$function-binding maybe-symbol)
   (if (symbol? maybe-symbol)
-      (case maybe-symbol
-        ((or) or-function)
-        ((and) and-function)
-        (else (eval maybe-symbol *shen-environment*)))
+      (hash-table-ref *shen-functions* maybe-symbol
+                      (lambda () (error "undefined function: "
+                                        maybe-symbol)))
       maybe-symbol))
 
 (define-syntax kl:freeze
@@ -291,7 +291,7 @@
 ;;
 
 (define (kl:absvector size)
-  (make-vector size 'fail!))
+  (make-vector size 'shen-fail!))
 
 (define kl:<-address vector-ref)
 
@@ -371,6 +371,49 @@
 
 (define kl:number? number?)
 
+;; register functions for binding resolution
+
+(map (lambda (name+ref) (apply register-function name+ref))
+     `((intern ,kl:intern)
+       (pos ,kl:pos)
+       (tlstr ,kl:tlstr)
+       (cn ,kl:cn)
+       (str ,kl:str)
+       (string? ,kl:string?)
+       (string->n ,kl:string->n)
+       (n->string ,kl:n->string)
+       (set ,kl:set)
+       (value ,kl:value)
+       (simple-error ,kl:simple-error)
+       (error-to-string ,kl:error-to-string)
+       (cons ,kl:cons)
+       (hd ,kl:hd)
+       (tl ,kl:tl)
+       (cons? ,kl:cons?)
+       (= ,kl:=)
+       (eval-kl ,kl:eval-kl)
+       (type ,kl:type)
+       (absvector ,kl:absvector)
+       (<-address ,kl:<-address)
+       (address-> ,kl:address->)
+       (absvector? ,kl:absvector?)
+       (pr ,kl:pr)
+       (read-byte ,kl:read-byte)
+       (open ,kl:open)
+       (close ,kl:close)
+       (get-time ,kl:get-time)
+       (+ ,kl:+)
+       (- ,kl:-)
+       (* ,kl:*)
+       (/ ,kl:/)
+       (> ,kl:>)
+       (< ,kl:<)
+       (>= ,kl:>=)
+       (<= ,kl:<=)
+       (number? ,kl:number?)
+       (or ,or-function)
+       (and ,and-function)))
+
 ;; Kl to Scheme translator
 ;;
 
@@ -408,8 +451,7 @@
     ('|{| '($$quote |{|))
     ('|}| '($$quote |}|))
     ('|;| '($$quote |;|))
-    ((? hazard-symbol? sym) (safe-symbol sym))
-    ((? unbound-in-current-scope? sym) `($$quote ,(safe-symbol sym)))
+    ((? unbound-in-current-scope? sym) `($$quote ,sym))
     (('let var value body)
      `(let ,var ,(quote-expression value scope)
         ,(quote-expression body (cons var scope))))
@@ -419,14 +461,16 @@
      `(lambda ,var ,(quote-expression body (cons var scope))))
     (('do expr1 expr2)
      `($$begin ,(quote-expression expr1 scope) ,(quote-expression expr2 scope)))
+    (`(defun ,name ,args ,body)
+     `($$eval-in-shen
+       ($$quote
+        (defun ,name ,args
+          ,(quote-expression body args)))))
     (('function function-name)
      function-name)
-    (`(defun ,name ,args ,body)
-     (let ((name (safe-symbol name)))
-       `($$eval-in-shen
-         ($$quote
-          (defun ,name ,(map safe-symbol args)
-            ,(quote-expression body args))))))
+    ;; inlines fail compares
+    (('= expr '(fail)) `($$eq? ,(quote-expression expr scope) ($$quote shen-fail!)))
+    (('fail) '($$quote shen-fail!))
     ((op param ...)
      (left-to-right
       (cons (function-binding op scope)
@@ -437,8 +481,8 @@
 (define (function-binding expr scope)
   (cond
    ((pair? expr) `($$function-binding ,(quote-expression expr scope)))
-   ((unbound-symbol? expr scope) (safe-symbol expr))
-   (else `($$function-binding ,(safe-symbol expr)))))
+   ((unbound-symbol? expr scope) expr)
+   (else `($$function-binding ,expr))))
 
 ;; Enforce left-to-right evaluation if needed
 (define (left-to-right expr)
@@ -454,42 +498,11 @@
      (let ((f ?op))
        ($$l2r (?params ...) (?expr ... f))))))
 
-(define (lowercase-symbol? maybe-sym)
-  (and (symbol? maybe-sym)
-       (let* ((str (symbol->string maybe-sym))
-             (ch (string-ref str 0)))
-         (not (char-upper-case? ch)))))
-
-(define hazard-chars (string->list "#`'"))
-
-(define (hazard-symbol? maybe-sym)
-  (and (symbol? maybe-sym)
-       (let* ((str (symbol->string maybe-sym))
-              (ch (string-ref str 0)))
-         (member ch hazard-chars))))
-
-(define (safe-symbol-name name)
-  (call-with-output-string
-    (lambda (out)
-      (map (lambda (c)
-             (let ((mapping (memv c symbol-character-translations)))
-               (display (if mapping
-                            (cdr mapping)
-                            (string c))
-                        out)))
-           (string->list name)))))
-
-(define (safe-symbol sym)
-  (if (hazard-symbol? sym)
-      (string->symbol (safe-symbol-name (symbol->string sym)))
-      sym))
-
 (define (kl->scheme expr)
   (match expr
     (`(defun ,name ,args ,body)
-     (let ((name (safe-symbol name)))
-       `(defun ,name ,(map safe-symbol args)
-          ,(quote-expression body args))))
+     `(defun ,name ,args
+        ,(quote-expression body args)))
     (else (quote-expression expr '()))))
 
 ;; Overrides
@@ -509,11 +522,19 @@
               (loop (- position 1)
                     (cons (bytevector-u8-ref bytes position) result))))))))
 
-(define ($$variable? maybe-sym)
-  (and (and (symbol? maybe-sym)
-       (let* ((str (symbol->string maybe-sym))
-             (ch (string-ref str 0)))
-         (char-upper-case? ch)))))
+(define ($$shen-variable? maybe-sym)
+  (and (symbol? maybe-sym)
+       (char-upper-case? (string-ref (symbol->string maybe-sym) 0))))
+
+(define ($$segvar? maybe-sym)
+  (and (symbol? maybe-sym)
+       (equal? #\? (string-ref (symbol->string maybe-sym) 0))))
+
+(define ($$grammar_symbol? maybe-sym)
+  (and (symbol? maybe-sym)
+       (let ((strsym (symbol->string maybe-sym)))
+         (and (equal? #\< (string-ref strsym 0))
+              (equal? #\> (string-ref strsym (- (string-length strsym) 1)))))))
 
 (define shen-*system* (make-hash-table eq?))
 
@@ -524,3 +545,28 @@
 
 (define ($$shen-sysfunc? val)
   (hash-table-ref/default shen-*system* val #f))
+
+(define ($$hash val bound)
+  (let ((res (hash val bound)))
+    (if (eq? 0 res) 1 res)))
+
+(define ($$shen-walk func val)
+  (if (pair? val)
+      (func (map (lambda (subexp) ($$shen-walk func subexp)) val))
+      (func val)))
+
+(define (compose funcs value)
+  (if (null? funcs)
+      value
+      (compose (cdr funcs) ((car funcs) value))))
+
+(define ($$macroexpand expr)
+  (define macros (map $$function-binding (kl:value '*macros*)))
+
+  (define (expand expr)
+    (let ((transformed (compose macros expr)))
+      (if (eq? expr transformed)
+          expr
+          ($$shen-walk expand transformed))))
+
+  (expand expr))
