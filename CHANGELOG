@@ -2,15 +2,22 @@
 
 	* Improved performance and compatibility. Cleanup some dead code. Fixes
 
-	* Overrides are now done after loading the file that defines that function. This improves load time and memory usage by using the improved versions when still loading Shen.
+	* Overrides are now done after loading the file that defines that function. This
+	improves load time and memory usage by using the improved versions when still
+	loading Shen.
 
-	* Added new overrides (macroexpand, shen-walk, hash, shen-digit-byte?, shen-byte->digit, symbol?, not, shen-segvar?, shen-grammar_symbol?.
+	* Added new overrides (macroexpand, shen-walk, hash, shen-digit-byte?,
+	shen-byte->digit, symbol?, not, shen-segvar?, shen-grammar_symbol?.
 
-	* Better '=' function, with fast-path for references that are 'eq?' and vector compare without converting vectors to lists first.
+	* Better '=' function, with fast-path for references that are 'eq?' and vector
+	compare without converting vectors to lists first.
 
 	* Removed safe symbol conversions, with a custom reader they are not needed.
 
-	* A much improved method of symbol->function resolution which uses a hash table instead of `eval`.
+	* A much improved method of symbol->function resolution which uses a hash table
+	instead of `eval`.
 
-	* Fix default fill value for absvectors (was 'fail!' when it should have been 'shen-fail!')
+	* Fix default fill value for absvectors (was 'fail!' when it should have been
+	'shen-fail!')
+
 	* Inline compares to '(fail)'.
