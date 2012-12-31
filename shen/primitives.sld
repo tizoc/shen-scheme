@@ -1,8 +1,8 @@
 (define-library (shen primitives)
-  (import (scheme base) (scheme case-lambda) (scheme eval)
+  (import (scheme base) (scheme eval)
           (scheme write) (scheme file) (scheme time) (scheme char)
           (srfi 69)
-          (chibi match)
+          (chibi match) (chibi string)
           (only (scheme) call-with-output-string)
           (only (srfi 1) filter)
           (only (chibi pathname) make-path)
@@ -19,6 +19,10 @@
    $$grammar_symbol?
    $$eval-in-shen
    $$l2r
+   $$call-nested
+   $$nest-lambda
+   $$function-arity
+   $$function
 
    $$shen-sysfunc?
    $$init-*system*

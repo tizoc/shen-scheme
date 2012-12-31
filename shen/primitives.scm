@@ -6,15 +6,6 @@
 (define ($$set-shen-environment! env)
   (set! *shen-environment* env))
 
-(define partial
-  (case-lambda
-    ((proc) (lambda args (apply proc args)))
-    ((proc arg1) (lambda args (apply proc arg1 args)))
-    ((proc arg1 arg2) (lambda args (apply proc arg1 arg2 args)))
-    ((proc arg1 arg2 arg3) (lambda args (apply proc arg1 arg2 arg3 args)))
-    ((proc arg1 arg2 arg3 . more-args)
-     (lambda args (apply proc arg1 arg2 arg3 (append more-args args))))))
-
 (define-syntax assert-boolean
   (syntax-rules ()
     ((_ ?value)
@@ -32,15 +23,6 @@
 
 (define-syntax kl:if
   (syntax-rules ()
-    ((_ ?test)
-     (let ((test ?test))
-       (case-lambda
-         ((then else)
-          (kl:if test then else))
-         ((then)
-          (kl:if test then)))))
-    ((_ ?test ?then)
-     (partial (kl:if ?test) ?then))
     ((_ ?test ?then ?else)
      (if (assert-boolean ?test) ?then ?else))))
 
@@ -50,11 +32,7 @@
      (let ((value1 ?value1))
        (lambda (value2) (kl:and value1 value2))))
     ((_ ?value1 ?value2)
-     (and (assert-boolean ?value1) (assert-boolean ?value2)))
-    ((_ ?value1 ?value2 ?value3 ?more ...)
-     (let ((value1 ?value1))
-       (and (assert-boolean value1)
-            (kl:and ?value2 ?value3 ?more ...))))))
+     (and (assert-boolean ?value1) (assert-boolean ?value2)))))
 
 (define-syntax kl:or
   (syntax-rules ()
@@ -62,11 +40,7 @@
      (let ((value1 ?value1))
        (lambda (value2) (kl:or value1 value2))))
     ((_ ?value1 ?value2)
-     (or (assert-boolean ?value1) (assert-boolean ?value2)))
-    ((_ ?value1 ?value2 ?value3 ?more ...)
-     (let ((value1 ?value1))
-       (or (assert-boolean value1)
-           (kl:or ?value2 ?value3 ?more ...))))))
+     (or (assert-boolean ?value1) (assert-boolean ?value2)))))
 
 (define-syntax kl:cond
   (syntax-rules ()
@@ -115,12 +89,9 @@
 
 (define *shen-globals* (make-hash-table eq?))
 
-(define kl:set
-  (case-lambda
-    ((key) (partial kl:set key))
-    ((key val)
-     (hash-table-set! *shen-globals* key val)
-     val)))
+(define (kl:set key val)
+  (hash-table-set! *shen-globals* key val)
+  val)
 
 (define (kl:value key)
   (hash-table-ref *shen-globals*
@@ -148,10 +119,7 @@
 ;; Lists
 ;;
 
-(define kl:cons
-  (case-lambda
-    ((x) (partial cons x))
-    ((x y) (cons x y))))
+(define kl:cons cons)
 
 (define (kl:hd pair)
   (if (null? pair)
@@ -168,66 +136,29 @@
 ;; Generic Functions
 ;;
 
-;; curried lambda
-(define-syntax curried
-  (syntax-rules ()
-    ((_ () ?body)
-     (lambda () ?body))
-    ((_ (?arg) ?body)
-     (letrec
-         ((partial-application
-           (case-lambda
-             (() partial-application)
-             ((?arg) ?body))))
-       partial-application))
-    ((_ (?arg ?last) ?body)
-     (letrec
-         ((partial-application
-           (case-lambda
-             (() partial-application)
-             ((?arg) (curried (?last) (partial-application ?arg ?last)))
-             ((?arg ?last) ?body))))
-       partial-application))
-    ((_ (?arg ?args ... ?last) ?body)
-     (letrec
-         ((max-args (length '(?arg ?args ... ?last)))
-          (partial-application
-           (case-lambda
-             ((?arg ?args ... ?last) ?body)
-             ((?arg ?args ...)
-              (curried (?last) (partial-application ?arg ?args ... ?last)))
-             (() partial-application)
-             (args
-              (if (> (length args) max-args)
-                  (error "Too many args" (length args))
-                  (lambda more-args
-                    (let ((all-args (append args more-args)))
-                      (if (> (length all-args) max-args)
-                          (error "Too many args" (length all-args))
-                          (apply partial-application all-args)))))))))
-       partial-application))))
-
-;; curried defines
-(define-syntax define-curried
-  (syntax-rules ()
-    ((_ (?name ?args ...) ?body)
-     (define ?name (curried (?args ...) ?body)))
-    ((_ ?name ?body)
-     (define ?name ?body))))
-
 ;; symbol->function registry
 (define *shen-functions* (make-hash-table eq?))
+(define *shen-function-arities* (make-hash-table eq?))
 
 (define (register-function name function)
   (hash-table-set! *shen-functions* name function))
+
+(define (register-function-arity name arity)
+  (hash-table-set! *shen-function-arities* name arity))
+
+(define ($$function-arity name)
+  (if (symbol? name)
+      (hash-table-ref/default *shen-function-arities* name -1)
+      -1))
 
 (define-syntax kl:defun
   (syntax-rules ()
     ((_ ?f (?args ...) ?expr)
      (begin
-       (define-curried (?f ?args ...)
+       (define (?f ?args ...)
          ?expr)
        (register-function '?f ?f)
+       (register-function-arity '?f (length '(?args ...)))
        '?f))))
 
 (define-syntax kl:lambda
@@ -248,7 +179,7 @@
                              (vector-ref b i))))
               (= i minlen))))))
 
-(define-curried (kl:= a b)
+(define (kl:= a b)
   (cond ((eq? a b) #t) ;; fast path
         ((and (number? a) (number? b))
          (= a b))
@@ -267,10 +198,10 @@
 (define (kl:eval-kl expr)
   ($$eval-in-shen (kl->scheme expr)))
 
-(define-curried (or-function a b)
+(define (or-function a b)
   (kl:or a b))
 
-(define-curried (and-function a b)
+(define (and-function a b)
   (kl:and a b))
 
 (define ($$function-binding maybe-symbol)
@@ -304,13 +235,10 @@
 ;; Streams and I/O
 ;;
 
-(define kl:pr
-  (case-lambda
-    ((string) (kl:pr string (kl:value '*stoutput*)))
-    ((string out)
-     (display string out)
-     (flush-output-port out)
-     string)))
+(define (kl:pr string out)
+  (display string out)
+  (flush-output-port out)
+  string)
 
 (define kl:read-byte read-u8)
 
@@ -351,23 +279,14 @@
         (inexact res)
         res)))
 
-(define-syntax define-partial-op
-  (syntax-rules ()
-    ((_ ?alias ?op)
-     (define ?alias
-       (case-lambda
-         (() ?alias)
-         ((x) (partial ?alias x))
-         ((x y) (?op x y)))))))
-
-(define-partial-op kl:+ +)
-(define-partial-op kl:- -)
-(define-partial-op kl:* *)
-(define-partial-op kl:/ inexact-/)
-(define-partial-op kl:> >)
-(define-partial-op kl:< <)
-(define-partial-op kl:>= >=)
-(define-partial-op kl:<= <=)
+(define kl:/ inexact-/)
+(define (kl:+ a b) (+ a b))
+(define (kl:- a b) (- a b))
+(define (kl:* a b) (* a b))
+(define (kl:> a b) (> a b))
+(define (kl:< a b) (< a b))
+(define (kl:>= a b) (>= a b))
+(define (kl:<= a b) (<= a b))
 
 (define kl:number? number?)
 
@@ -410,9 +329,39 @@
        (< ,kl:<)
        (>= ,kl:>=)
        (<= ,kl:<=)
-       (number? ,kl:number?)
        (or ,or-function)
-       (and ,and-function)))
+       (and ,and-function)
+       (number? ,kl:number?)))
+
+(define (initialize-arity-table entries)
+  (if (null? entries)
+      'done
+      (let ((name (car entries))
+            (arity (cadr entries)))
+        (register-function-arity name arity)
+        (initialize-arity-table (cddr entries)))))
+
+(initialize-arity-table
+ '(adjoin 2 and 2 append 2 arity 1 assoc 2 boolean? 1 cd 1 compile 3 concat 2 cons 2
+   cons? 1 cn 2 declare 2 destroy 1 difference 2 do 2 element? 2 empty? 1
+   enable-type-theory 1 interror 2 eval 1 eval-kl 1 explode 1
+   external 1 fail-if 2 fail 0 fix 2 findall 5 freeze 1 fst 1 gensym 1 get 3
+   address-> 3 <-address 2 <-vector 2 > 2
+   >= 2 = 2 hd 1 hdv 1 hdstr 1 head 1 if 3 integer? 1 identical 4 inferences 1
+   intoutput 2 make-string 2 intersection 2 length 1 lineread 0 load 1 < 2 <= 2
+   vector 1 macroexpand 1 map 2 mapcan 2 intmake-string 2
+   maxinferences 1 not 1 nth 2 n->string 1 number? 1 output 2 occurs-check 1
+   occurrences 2 occurs-check 1 or 2 package 3 pos 2 print 1 profile 1
+   profile-results 1 ps 1 preclude 1 preclude-all-but 1 protect 1 address-> 3
+   put 4 reassemble 2 read-file-as-string 1 read-file 1 read-byte 1 remove 2
+   reverse 1 set 2 simple-error 1 snd 1 specialise 1
+   spy 1 step 1 stinput 1 stoutput 1 string->n 1 string? 1 strong-warning 1
+   subst 3 symbol? 1 tail 1 tl 1 tc 1 tc? 1 thaw 1
+   track 1 trap-error 2 tuple? 1 type 1 return 3 unprofile 1 unify 4 unify! 4
+   union 2 untrack 1 unspecialise 1 vector 1
+   vector-> 3 value 1 variable? 1 version 1 warn 1 write-to-file 2 y-or-n? 1
+   + 2 * 2 / 2 - 2 == 2 <1> 1 <e> 1
+   @p 2 @v 2 @s 2 preclude 1 include 1 preclude-all-but 1 include-all-but 1 where 2))
 
 ;; Kl to Scheme translator
 ;;
@@ -440,6 +389,12 @@
   (and (symbol? maybe-sym)
        (not (memq maybe-sym scope))))
 
+(define *gensym-counter* 0)
+
+(define (gensym prefix)
+  (set! *gensym-counter* (+ 1 *gensym-counter*))
+  (string->symbol (string-append prefix (number->string *gensym-counter*))))
+
 (define (quote-expression expr scope)
   (define (unbound-in-current-scope? maybe-sym)
     (unbound-symbol? maybe-sym scope))
@@ -466,23 +421,55 @@
        ($$quote
         (defun ,name ,args
           ,(quote-expression body args)))))
-    (('function function-name)
-     function-name)
     ;; inlines fail compares
     (('= expr '(fail)) `($$eq? ,(quote-expression expr scope) ($$quote shen-fail!)))
     (('fail) '($$quote shen-fail!))
     ((op param ...)
-     (left-to-right
-      (cons (function-binding op scope)
-            (map (lambda (exp) (quote-expression exp scope))
-                 param))))
+     (let* ((arity ($$function-arity op))
+            (partial-call? (not (or (= arity -1) (= arity (length param)))))
+            (args (map (lambda (exp) (quote-expression exp scope))
+                       param))
+            (args-list (left-to-right `($$list ,@args))))
+       (cond (partial-call?
+              `($$call-nested ,($$nest-lambda op arity) ,args-list))
+             ((or (pair? op) (not (unbound-in-current-scope? op)))
+              (left-to-right
+               `($$call-nested ($$function ,(quote-expression op scope)) ,args-list)))
+             (else
+              (left-to-right (cons op args))))))
     (else expr)))
 
-(define (function-binding expr scope)
-  (cond
-   ((pair? expr) `($$function-binding ,(quote-expression expr scope)))
-   ((unbound-symbol? expr scope) expr)
-   (else `($$function-binding ,expr))))
+(define ($$nest-lambda callable arity)
+  (define (merge-args f arg)
+    (if (pair? f)
+        (append f (list arg))
+        (list f arg)))
+
+  (if (<= arity 0)
+      callable
+      (let ((aname (gensym "Y")))
+        `(lambda ,aname
+           ,($$nest-lambda (merge-args callable aname) (- arity 1))))))
+
+(define ($$call-nested f args)
+  (if (null? args)
+      f
+      ($$call-nested (f (car args)) (cdr args))))
+
+(define (arity-error? e)
+  (string-prefix? "not enough args" (error-object-message e)))
+
+(define ($$function f)
+  (if (not (symbol? f))
+      f
+      (lambda args
+        (guard
+         (exn
+          ((and (arity-error? exn)
+                (> ($$function-arity f) (length args)))
+           ($$call-nested
+            (kl:eval-kl ($$nest-lambda f ($$function-arity f))) args)))
+         (apply ($$function-binding f) args)))))
 
 ;; Enforce left-to-right evaluation if needed
 (define (left-to-right expr)

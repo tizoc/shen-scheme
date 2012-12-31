@@ -75,6 +75,9 @@
 
     ($$eval-kl-file "sys.kl")
 
+    (defun thaw (Freeze)
+      (Freeze))
+
     (defun hash (Val Bound)
       ($$hash Val Bound))
 
