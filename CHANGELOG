@@ -1,3 +1,8 @@
+0.4
+
+	* Switched to curry-on-demand strategy for partial function applications. This
+	improves performance considerably.
+
 0.3
 
 	* Improved performance and compatibility. Cleanup some dead code. Fixes
