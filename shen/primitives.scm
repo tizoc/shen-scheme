@@ -106,8 +106,12 @@
 (define-syntax kl:trap-error
   (syntax-rules ()
     ((_ ?expression ?handler)
-     (guard (exn (else (?handler exn)))
-       ?expression))))
+     (let ((handler ?handler))
+       (call-with-current-continuation
+        (lambda (exit)
+          (with-exception-handler
+           (lambda (exn) (exit (handler exn)))
+           (lambda () ?expression))))))))
 
 (define (kl:error-to-string e)
   (call-with-output-string
@@ -459,17 +463,21 @@
 (define (arity-error? e)
   (string-prefix? "not enough args" (error-object-message e)))
 
+(define (handle-arity-error exn f args)
+  (if (and (arity-error? exn) (> ($$function-arity f) (length args)))
+      ($$call-nested
+       (kl:eval-kl ($$nest-lambda f ($$function-arity f))) args)
+      (raise exn)))
+
 (define ($$function f)
   (if (not (symbol? f))
       f
       (lambda args
-        (guard
-         (exn
-          ((and (arity-error? exn)
-                (> ($$function-arity f) (length args)))
-           ($$call-nested
-            (kl:eval-kl ($$nest-lambda f ($$function-arity f))) args)))
-         (apply ($$function-binding f) args)))))
+        (call-with-current-continuation
+         (lambda (exit)
+           (with-exception-handler
+            (lambda (exn) (exit (handle-arity-error exn f args)))
+            (lambda () (apply ($$function-binding f) args))))))))
 
 ;; Enforce left-to-right evaluation if needed
 (define (left-to-right expr)
