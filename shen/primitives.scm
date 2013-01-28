@@ -125,15 +125,9 @@
 
 (define kl:cons cons)
 
-(define (kl:hd pair)
-  (if (null? pair)
-      pair
-      (car pair)))
+(define kl:hd car)
 
-(define (kl:tl pair)
-  (if (null? pair)
-      pair
-      (cdr pair)))
+(define kl:tl cdr)
 
 (define kl:cons? pair?)
 
