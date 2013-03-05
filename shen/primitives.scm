@@ -529,7 +529,11 @@
 
 (define ($$init-*system*)
   (for-each
-   (lambda (sym) (hash-table-set! shen-*system* sym #t))
+   (lambda (sym) (hash-table-set! shen-*system*
+                                  (case sym
+                                    ((#t) 'true)
+                                    ((#f) 'false)
+                                    (else sym)) #t))
    (kl:value 'shen-*system*)))
 
 (define ($$shen-sysfunc? val)
