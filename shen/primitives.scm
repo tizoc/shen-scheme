@@ -244,12 +244,12 @@
   (case type
     ((file)
      (let ((full-path (full-path-for-file filename)))
-       (if (file-exists? full-path)
-           (case direction
-             ((in) (open-input-file full-path))
-             ((out) (open-output-file full-path))
-             (else (error "Invalid direction" direction)))
-           (error "File does not exist" full-path))))
+       (case direction
+         ((in) (if (file-exists? full-path)
+                   (open-input-file full-path)
+                   (error "File does not exist" full-path)))
+         ((out) (open-output-file full-path))
+         (else (error "Invalid direction" direction)))))
     (else (error "Invalid stream type" type))))
 
 (define (kl:close stream)
