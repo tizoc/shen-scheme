@@ -140,4 +140,4 @@
     ($$eval-kl-file "types.kl")
     ($$eval-kl-file "t-star.kl")
 
-    (cd "")))
+    (cd ".")))
