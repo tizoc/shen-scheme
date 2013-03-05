@@ -428,7 +428,8 @@
             (args (map (lambda (exp) (quote-expression exp scope))
                        param))
             (args-list (left-to-right `($$list ,@args))))
-       (cond (partial-call?
+       (cond ((null? args) `(($$function-binding ,(quote-expression op scope))))
+             (partial-call?
               `($$call-nested ,($$nest-lambda op arity) ,args-list))
              ((or (pair? op) (not (unbound-in-current-scope? op)))
               (left-to-right
