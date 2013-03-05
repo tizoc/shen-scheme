@@ -94,7 +94,9 @@
       ($$shen-variable? Val))
 
     (defun symbol? (Val)
-      ($$symbol? Val))
+      (and ($$symbol? Val)
+           (not (or ($$eq? Val ($$quote true))
+                    ($$eq? Val ($$quote false))))))
 
     (defun shen-walk (Func Val)
       ($$shen-walk ($$function-binding Func) Val))
