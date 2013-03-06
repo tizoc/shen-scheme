@@ -54,7 +54,9 @@
 ;;
 
 (define (kl:intern name)
-  (string->symbol name))
+  (cond ((equal? name "true") #t)
+        ((equal? name "false") #f)
+        (else (string->symbol name))))
 
 ;; Strings
 ;;

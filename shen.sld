@@ -83,9 +83,7 @@
 
     (defun boolean? (Val)
       ($$or ($$eq? Val #f)
-            ($$eq? Val #t)
-            ($$eq? Val ($$quote true))
-            ($$eq? Val ($$quote false))))
+            ($$eq? Val #t)))
 
     (defun integer? (Val)
       ($$integer? Val))
@@ -94,9 +92,7 @@
       ($$shen-variable? Val))
 
     (defun symbol? (Val)
-      (and ($$symbol? Val)
-           (not (or ($$eq? Val ($$quote true))
-                    ($$eq? Val ($$quote false))))))
+      ($$symbol? Val))
 
     (defun shen-walk (Func Val)
       ($$shen-walk ($$function-binding Func) Val))
