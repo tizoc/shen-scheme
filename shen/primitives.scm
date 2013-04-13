@@ -222,7 +222,7 @@
 ;;
 
 (define (kl:absvector size)
-  (make-vector size 'shen-fail!))
+  (make-vector size 'shen.fail!))
 
 (define kl:<-address vector-ref)
 
@@ -237,7 +237,6 @@
 
 (define (kl:pr string out)
   (display string out)
-  (flush-output-port out)
   string)
 
 (define kl:read-byte read-u8)
@@ -422,8 +421,10 @@
         (defun ,name ,args
           ,(quote-expression body args)))))
     ;; inlines fail compares
-    (('= expr '(fail)) `($$eq? ,(quote-expression expr scope) ($$quote shen-fail!)))
-    (('fail) '($$quote shen-fail!))
+    (('= expr '(fail)) `($$eq? ,(quote-expression expr scope) ($$quote shen.fail!)))
+    (('fail) '($$quote shen.fail!))
+    (('$native exp) exp)
+    (('$native . exps) `($$begin ,@exps))
     ((op param ...)
      (let* ((arity ($$function-arity op))
             (partial-call? (not (or (= arity -1) (= arity (length param)))))
@@ -537,7 +538,8 @@
                                     ((#t) 'true)
                                     ((#f) 'false)
                                     (else sym)) #t))
-   (kl:value 'shen-*system*)))
+   (($$function-binding 'get)
+    'shen 'shen.external-symbols (kl:value '*property-vector*))))
 
 (define ($$shen-sysfunc? val)
   (hash-table-ref/default shen-*system* val #f))
@@ -561,7 +563,8 @@
 
   (define (expand expr)
     (let ((transformed (compose macros expr)))
-      (if (eq? expr transformed)
+      (if (or (eq? expr transformed)
+              (and (pair? expr) (eq? (car expr) '$native)))
           expr
           ($$shen-walk expand transformed))))
 

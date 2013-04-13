@@ -1,3 +1,9 @@
+0.5
+
+	* Works with Shen 9
+
+	* Support for $native expressions.
+
 0.4
 
 	* Switched to curry-on-demand strategy for partial function applications. This

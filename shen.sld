@@ -56,9 +56,9 @@
    (prefix (scheme read) $$)
    (prefix (scheme write) $$)
    (prefix (scheme eval) $$)
-   (prefix (only (scheme) current-environment) $$))
+   (prefix (only (scheme) current-environment import) $$))
 
-  (export shen-shen)
+  (export shen.shen)
 
   (include "init.scm")
 
@@ -70,7 +70,7 @@
     ($$eval-kl-file "toplevel.kl")
     ($$eval-kl-file "core.kl")
 
-    (defun shen-sysfunc? (Val)
+    (defun shen.sysfunc? (Val)
       ($$shen-sysfunc? Val))
 
     ($$eval-kl-file "sys.kl")
@@ -94,16 +94,13 @@
     (defun symbol? (Val)
       ($$symbol? Val))
 
-    (defun shen-walk (Func Val)
+    (defun shen.walk (Func Val)
       ($$shen-walk ($$function-binding Func) Val))
 
     ($$eval-kl-file "sequent.kl")
     ($$eval-kl-file "yacc.kl")
 
-    (defun shen-segvar? (Val)
-      ($$segvar? Val))
-
-    (defun shen-grammar_symbol? (Val)
+    (defun shen.grammar_symbol? (Val)
       ($$grammar_symbol? Val))
 
     ($$eval-kl-file "reader.kl")
@@ -125,10 +122,10 @@
     (defun read-file-as-string (Filename)
       ($$read-file-as-string Filename))
 
-    (defun shen-digit-byte? (N)
+    (defun shen.numbyte? (N)
       (and (>= N 48) (<= N 57)))
 
-    (defun shen-byte->digit (N)
+    (defun shen.byte->digit (N)
       (- N 48))
 
     ($$init-*system*)

@@ -21,7 +21,7 @@ Version 0.6 of chibi-scheme is needed to run chibi-shen. Other versions may work
 
 Copy all the .kl files to this directory and run::
 
-    chibi-scheme -xshen -e'(shen-shen)'
+    chibi-scheme -xshen -e'(shen.shen)'
 
 This will launch a Shen REPL running on top of chibi-scheme.
 
