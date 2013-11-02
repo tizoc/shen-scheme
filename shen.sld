@@ -34,8 +34,8 @@
      (kl:<-address        <-address)
      (kl:address->        address->)
      (kl:absvector?       absvector?)
-     (kl:pr               pr)
      (kl:read-byte        read-byte)
+     (kl:write-byte       write-byte)
      (kl:open             open)
      (kl:close            close)
      (kl:get-time         get-time)
@@ -62,7 +62,7 @@
 
   (include "init.scm")
 
-  (begin      
+  (begin
     ($$define ($$eval-kl-file filename)
       ($$for-each $$display ($$list "Loading " filename " ...\n"))
       ($$for-each eval-kl ($$read-kl-file filename)))

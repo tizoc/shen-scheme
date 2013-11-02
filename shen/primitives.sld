@@ -63,8 +63,8 @@
    kl:<-address
    kl:address->
    kl:absvector?
-   kl:pr
    kl:read-byte
+   kl:write-byte
    kl:open
    kl:close
    kl:get-time
