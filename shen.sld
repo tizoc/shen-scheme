@@ -67,6 +67,9 @@
       ($$for-each $$display ($$list "Loading " filename " ...\n"))
       ($$for-each eval-kl ($$read-kl-file filename)))
 
+    ;; Avoid warning about shen.demod not being defined yet
+    (defun shen.demod (Val) Val)
+
     ($$eval-kl-file "toplevel.kl")
     ($$eval-kl-file "core.kl")
 
