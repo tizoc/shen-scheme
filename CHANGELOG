@@ -1,3 +1,7 @@
+0.8
+
+	* Fixes issue with functions that partially apply themselves.
+
 0.7
 
 	* Works with Shen 15.
