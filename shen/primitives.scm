@@ -478,6 +478,9 @@
 (define (kl->scheme expr)
   (match expr
     (`(defun ,name ,args ,body)
+     ;; pre-register arity in case the function is recursive
+     ;; and partially-calls itself
+     (register-function-arity name (length args))
      `(defun ,name ,args
         ,(quote-expression body args)))
     (else (quote-expression expr '()))))
