@@ -404,11 +404,6 @@
      `(lambda ,var ,(quote-expression body (cons var scope))))
     (('do expr1 expr2)
      `($$begin ,(quote-expression expr1 scope) ,(quote-expression expr2 scope)))
-    (`(defun ,name ,args ,body)
-     `($$eval-in-shen
-       ($$quote
-        (defun ,name ,args
-          ,(quote-expression body args)))))
     ;; inlines fail compares
     (('= expr '(fail)) `($$eq? ,(quote-expression expr scope) ($$quote shen.fail!)))
     (('fail) '($$quote shen.fail!))
