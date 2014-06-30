@@ -1,5 +1,6 @@
 (define-library (shen reader)
-  (import (scheme base) (scheme char) (scheme file)
-          (only (scheme) call-with-input-string))
+  (import (except (scheme base) read-string)
+          (scheme char) (scheme file)
+          (only (chibi) call-with-input-string))
   (export read-kl read-kl-file)
   (include "reader.scm"))

@@ -56,7 +56,7 @@
    (prefix (scheme read) $$)
    (prefix (scheme write) $$)
    (prefix (scheme eval) $$)
-   (prefix (only (scheme) current-environment import) $$))
+   (prefix (only (chibi) current-environment import) $$))
 
   (export shen.shen)
 
