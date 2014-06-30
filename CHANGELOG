@@ -2,6 +2,8 @@
 
 	* Fixes issue with functions that partially apply themselves.
 
+	* Updated for chibi-scheme 0.7.
+
 0.7
 
 	* Works with Shen 15.
