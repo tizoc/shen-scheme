@@ -1,4 +1,4 @@
-(define-library (generate-scm)
+(define-library (precompile)
   (import (shen reader)
           (shen primitives)
           (scheme base)
