@@ -49,8 +49,6 @@
      (kl:<=               <=)
      (kl:number?          number?))
 
-   (prefix (shen reader) $$)
-
    (prefix (scheme base) $$)
    (prefix (scheme file) $$)
    (prefix (scheme read) $$)
@@ -63,21 +61,19 @@
   (include "init.scm")
 
   (begin
-    ($$define ($$eval-kl-file filename)
-      ($$for-each $$display ($$list "Loading " filename " ...\n"))
-      ($$for-each eval-kl ($$read-kl-file filename)))
-
     ;; Avoid warning about shen.demod not being defined yet
-    (defun shen.demod (Val) Val)
+    (defun shen.demod (Val) Val))
 
-    ($$eval-kl-file "toplevel.kl")
-    ($$eval-kl-file "core.kl")
+  (include "compiled/toplevel.kl.scm")
+  (include "compiled/core.kl.scm")
 
+  (begin
     (defun shen.sysfunc? (Val)
-      ($$shen-sysfunc? Val))
+      ($$shen-sysfunc? Val)))
 
-    ($$eval-kl-file "sys.kl")
+  (include "compiled/sys.kl.scm")
 
+  (begin
     (defun hash (Val Bound)
       ($$hash Val Bound))
 
@@ -98,26 +94,29 @@
       ($$symbol? Val))
 
     (defun shen.walk (Func Val)
-      ($$shen-walk ($$function-binding Func) Val))
+      ($$shen-walk ($$function-binding Func) Val)))
 
-    ($$eval-kl-file "sequent.kl")
-    ($$eval-kl-file "yacc.kl")
+  (include "compiled/sequent.kl.scm")
+  (include "compiled/yacc.kl.scm")
 
+  (begin
     (defun shen.grammar_symbol? (Val)
-      ($$grammar_symbol? Val))
+      ($$grammar_symbol? Val)))
 
-    ($$eval-kl-file "reader.kl")
-    ($$eval-kl-file "prolog.kl")
-    ($$eval-kl-file "track.kl")
-    ($$eval-kl-file "load.kl")
-    ($$eval-kl-file "writer.kl")
-    ($$eval-kl-file "macros.kl")
+  (include "compiled/reader.kl.scm")
+  (include "compiled/prolog.kl.scm")
+  (include "compiled/track.kl.scm")
+  (include "compiled/load.kl.scm")
+  (include "compiled/writer.kl.scm")
+  (include "compiled/macros.kl.scm")
 
+  (begin
     (defun macroexpand (E)
-      ($$macroexpand E))
+      ($$macroexpand E)))
 
-    ($$eval-kl-file "declarations.kl")
+  (include "compiled/declarations.kl.scm")
 
+  (begin
     ;; Overrides
     (defun read-file-as-bytelist (Filename)
       ($$read-file-as-bytelist Filename))
@@ -131,9 +130,10 @@
     (defun shen.byte->digit (N)
       (- N 48))
 
-    ($$init-*system*)
+    ($$init-*system*))
 
-    ($$eval-kl-file "types.kl")
-    ($$eval-kl-file "t-star.kl")
+  (include "compiled/types.kl.scm")
+  (include "compiled/t-star.kl.scm")
 
+  (begin
     (cd ".")))

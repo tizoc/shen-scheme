@@ -1,0 +1,42 @@
+(define-library (generate-scm)
+  (import (shen reader)
+          (shen primitives)
+          (scheme base)
+          (scheme process-context)
+          (scheme file)
+          (scheme write))
+
+  (export compile)
+
+  (begin
+    (define (write-kl expr out)
+      (cond ((pair? expr)
+             (display "(" out)
+             (for-each (lambda (expr)
+                         (write-kl expr out)
+                         (display " " out))
+                       expr)
+             (display ")" out))
+            ((memq expr '(|{| |}| |;| |[| |]|))
+             (display (string-append "|" (symbol->string expr) "|") out))
+            (else (write expr out))))
+
+    (define (dump-scm exprs out)
+      (for-each (lambda (expr)
+                  (write-kl expr out)
+                  (newline out)
+                  (newline out))
+                exprs))
+
+    (define (compile-kl-file in out)
+      (let read-loop ((res '()))
+        (let ((exp (read-kl in)))
+          (if (eof-object? exp)
+              (dump-scm (map kl->scheme (reverse res))
+                        out)
+              (read-loop (cons exp res))))))
+
+    (define (compile)
+      (compile-kl-file (current-input-port) (current-output-port)))
+
+    ))
