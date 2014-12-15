@@ -28,11 +28,9 @@ Running
 
 Version 0.7 of chibi-scheme is needed to run chibi-shen. Other versions may work, but testing and development are done against that version.
 
-Copy all the .kl files to this directory and run::
+To launch the Shen REPL do::
 
     chibi-scheme -h 500M -xshen -e'(shen.shen)'
-
-This will launch a Shen REPL running on top of chibi-scheme.
 
 License
 -------
