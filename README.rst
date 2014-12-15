@@ -14,6 +14,15 @@ Shen is a portable functional programming language by `Mark Tarver <http://www.l
 - an integrated fully functional Prolog,
 - and an inbuilt compiler-compiler.
 
+Building
+--------
+
+To precompile the `.kl` files into Scheme code run::
+
+    make
+
+The resulting code will live under the `compiled/` directory.
+  
 Running
 -------
 
@@ -21,7 +30,7 @@ Version 0.7 of chibi-scheme is needed to run chibi-shen. Other versions may work
 
 Copy all the .kl files to this directory and run::
 
-    chibi-scheme -xshen -e'(shen.shen)'
+    chibi-scheme -h 500M -xshen -e'(shen.shen)'
 
 This will launch a Shen REPL running on top of chibi-scheme.
 
