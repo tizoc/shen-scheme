@@ -8,6 +8,8 @@
 
 	* Add optimized 'shen.pvar?' overwrite. Makes prolog and typechecking considerably faster.
 
+	* Add a fast-path for the common case of trap-error
+
 	* Shen sources are precompiled now instead of being compiled on the fly on startup, this provides better startup times.
 
 0.7
