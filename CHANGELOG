@@ -1,10 +1,12 @@
 0.8 (unreleased)
 
-	* Fixes issue with functions that partially apply themselves.
+	* Works with Shen 16.
 
 	* Updated for chibi-scheme 0.7.
 
-	* Works with Shen 16.
+	* Fixes issue with functions that partially apply themselves.
+
+	* Add optimized 'shen.pvar?' overwrite. Makes prolog and typechecking considerably faster.
 
 	* Shen sources are precompiled now instead of being compiled on the fly on startup, this provides better startup times.
 
