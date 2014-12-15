@@ -105,6 +105,13 @@
 
   (include "compiled/reader.kl.scm")
   (include "compiled/prolog.kl.scm")
+
+  (begin
+    (defun shen.pvar? (V)
+       ($$and (absvector? V)
+            (> ($$vector-length V) 0)
+            ($$eq? (<-address V 0) ($$quote shen.pvar)))))
+
   (include "compiled/track.kl.scm")
   (include "compiled/load.kl.scm")
   (include "compiled/writer.kl.scm")
