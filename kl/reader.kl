@@ -1,0 +1,218 @@
+"**********************************************************************************
+*                           The License						                                      *
+* 										                                                                  *
+* The user is free to produce commercial applications with the software, to 	          *
+* distribute these applications in source or binary  form, and to charge monies         *
+* for them as he sees fit and in concordance with the laws of the land subject 	        *
+* to the following license.							                                                *
+*										                                                                    * 
+* 1. The license applies to all the software and all derived software and 	            *
+*    must appear on such.							                                                  *
+*										                                                                    *
+* 2. It is illegal to distribute the software without this license attached	            *
+*    to it and use of the software implies agreement with the license as such.          *
+*    It is illegal for anyone who is not the copyright holder to tamper with 	          *
+*    or change the license.							                                                *
+*										                                                                    *
+* 3. Neither the names of Lambda Associates or the copyright holder may be used         *
+*    to endorse or promote products built using the software without specific 	        *
+*    prior written permission from the copyright holder.		                            *
+*										                                                                    *
+* 4. That possession of this license does not confer on the copyright holder 	          *
+*    any special contractual obligation towards the user. That in no event 	            * 
+*    shall the copyright holder be liable for any direct, indirect, incidental,        *   
+*    special, exemplary or consequential damages (including but not limited             *
+*    to procurement of substitute goods or services, loss of use, data, 	              * 
+*    interruption), however caused and on any theory of liability, whether in	          * 
+*    contract, strict liability or tort (including negligence) arising in any         	*
+*    way out of the use of the software, even if advised of the possibility of         	*
+*    such damage.						                                                        		* 
+*										                                                                    *
+* 5. It is permitted for the user to change the software, for the purpose of 	          *
+*    improving performance, correcting an error, or porting to a new platform, 	        *
+*    and distribute the derived version of Shen provided the resulting program 	        *
+*    conforms in all respects to the Shen standard and is issued under that             * 
+*    title. The user must make it clear with his distribution that he/she is 	          *
+*    the author of the changes and what these changes are and why. 		                  *
+*										                                                                    *
+* 6. Derived versions of this software in whatever form are subject to the same         *
+*    restrictions. In particular it is not permitted to make derived copies of          *
+*    this software which do not conform to the Shen standard or appear under a          *
+*    different title.								                                                    *
+*										                                                                    *
+*    It is permitted to distribute versions of Shen which incorporate libraries,        *
+*    graphics or other facilities which are not part of the Shen standard.	            *
+*										                                                                    *
+* For an explication of this license see www.shenlanguage.org/license.htm which         *
+* explains this license in full.                                                        *
+*				 						                                                                    *
+*****************************************************************************************
+"(defun read-file-as-bytelist (V1348) (let Stream (open V1348 in) (let Byte (read-byte Stream) (let Bytes (shen.read-file-as-bytelist-help Stream Byte ()) (let Close (close Stream) (reverse Bytes))))))
+
+(defun shen.read-file-as-bytelist-help (V1349 V1350 V1351) (cond ((= -1 V1350) V1351) (true (shen.read-file-as-bytelist-help V1349 (read-byte V1349) (cons V1350 V1351)))))
+
+(defun read-file-as-string (V1352) (let Stream (open V1352 in) (shen.rfas-h Stream (read-byte Stream) "")))
+
+(defun shen.rfas-h (V1353 V1354 V1355) (cond ((= -1 V1354) (do (close V1353) V1355)) (true (shen.rfas-h V1353 (read-byte V1353) (cn V1355 (n->string V1354))))))
+
+(defun input (V1356) (eval-kl (read V1356)))
+
+(defun input+ (V1357 V1358) (let Mono? (shen.monotype V1357) (let Input (read V1358) (if (= false (shen.typecheck Input (shen.demodulate V1357))) (simple-error (cn "type error: " (shen.app Input (cn " is not of type " (shen.app V1357 "
+" shen.r)) shen.r))) (eval-kl Input)))))
+
+(defun shen.monotype (V1359) (cond ((cons? V1359) (map (lambda X1337 (shen.monotype X1337)) V1359)) (true (if (variable? V1359) (simple-error (cn "input+ expects a monotype: not " (shen.app V1359 "
+" shen.a))) V1359))))
+
+(defun read (V1360) (hd (shen.read-loop V1360 (read-byte V1360) ())))
+
+(defun it () (value shen.*it*))
+
+(defun shen.read-loop (V1365 V1366 V1367) (cond ((= 94 V1366) (simple-error "read aborted")) ((= -1 V1366) (if (empty? V1367) (simple-error "error: empty stream") (compile (lambda X1338 (shen.<st_input> X1338)) V1367 (lambda E E)))) ((shen.terminator? V1366) (let AllBytes (append V1367 (cons V1366 ())) (let Read (compile (lambda X1339 (shen.<st_input> X1339)) (shen.record-it AllBytes) (lambda E shen.nextbyte)) (if (or (= Read shen.nextbyte) (empty? Read)) (shen.read-loop V1365 (read-byte V1365) AllBytes) Read)))) (true (shen.read-loop V1365 (read-byte V1365) (append V1367 (cons V1366 ()))))))
+
+(defun shen.terminator? (V1368) (element? V1368 (cons 9 (cons 10 (cons 13 (cons 32 (cons 34 (cons 41 (cons 93 ())))))))))
+
+(defun lineread (V1369) (shen.lineread-loop (read-byte V1369) () V1369))
+
+(defun shen.lineread-loop (V1371 V1372 V1373) (cond ((= -1 V1371) (if (empty? V1372) (simple-error "empty stream") (compile (lambda X1340 (shen.<st_input> X1340)) V1372 (lambda E E)))) ((= V1371 (shen.hat)) (simple-error "line read aborted")) ((element? V1371 (cons (shen.newline) (cons (shen.carriage-return) ()))) (let Line (compile (lambda X1341 (shen.<st_input> X1341)) (shen.record-it V1372) (lambda E shen.nextline)) (if (or (= Line shen.nextline) (empty? Line)) (shen.lineread-loop (read-byte V1373) (append V1372 (cons V1371 ())) V1373) Line))) (true (shen.lineread-loop (read-byte V1373) (append V1372 (cons V1371 ())) V1373))))
+
+(defun shen.record-it (V1374) (do (set shen.*it* (shen.cn-all (map (lambda X1342 (n->string X1342)) V1374))) V1374))
+
+(defun shen.cn-all (V1375) (cond ((= () V1375) "") ((cons? V1375) (cn (hd V1375) (shen.cn-all (tl V1375)))) (true (shen.sys-error shen.cn-all))))
+
+(defun read-file (V1376) (let Bytelist (read-file-as-bytelist V1376) (compile (lambda X1343 (shen.<st_input> X1343)) Bytelist (lambda X1344 (shen.read-error X1344)))))
+
+(defun read-from-string (V1377) (let Ns (map (lambda X1345 (string->n X1345)) (explode V1377)) (compile (lambda X1346 (shen.<st_input> X1346)) Ns (lambda X1347 (shen.read-error X1347)))))
+
+(defun shen.read-error (V1384) (cond ((and (cons? V1384) (and (cons? (hd V1384)) (and (cons? (tl V1384)) (= () (tl (tl V1384)))))) (simple-error (cn "read error here:
+
+ " (shen.app (shen.compress-50 50 (hd V1384)) "
+" shen.a)))) (true (simple-error "read error
+"))))
+
+(defun shen.compress-50 (V1389 V1390) (cond ((= () V1390) "") ((= 0 V1389) "") ((cons? V1390) (cn (n->string (hd V1390)) (shen.compress-50 (- V1389 1) (tl V1390)))) (true (shen.sys-error shen.compress-50))))
+
+(defun shen.<st_input> (V1395) (let Result (let Parse_shen.<lsb> (shen.<lsb> V1395) (if (not (= (fail) Parse_shen.<lsb>)) (let Parse_shen.<st_input1> (shen.<st_input1> Parse_shen.<lsb>) (if (not (= (fail) Parse_shen.<st_input1>)) (let Parse_shen.<rsb> (shen.<rsb> Parse_shen.<st_input1>) (if (not (= (fail) Parse_shen.<rsb>)) (let Parse_shen.<st_input2> (shen.<st_input2> Parse_shen.<rsb>) (if (not (= (fail) Parse_shen.<st_input2>)) (shen.pair (hd Parse_shen.<st_input2>) (cons (macroexpand (shen.cons_form (shen.hdtl Parse_shen.<st_input1>))) (shen.hdtl Parse_shen.<st_input2>))) (fail))) (fail))) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<lrb> (shen.<lrb> V1395) (if (not (= (fail) Parse_shen.<lrb>)) (let Parse_shen.<st_input1> (shen.<st_input1> Parse_shen.<lrb>) (if (not (= (fail) Parse_shen.<st_input1>)) (let Parse_shen.<rrb> (shen.<rrb> Parse_shen.<st_input1>) (if (not (= (fail) Parse_shen.<rrb>)) (let Parse_shen.<st_input2> (shen.<st_input2> Parse_shen.<rrb>) (if (not (= (fail) Parse_shen.<st_input2>)) (shen.pair (hd Parse_shen.<st_input2>) (shen.package-macro (macroexpand (shen.hdtl Parse_shen.<st_input1>)) (shen.hdtl Parse_shen.<st_input2>))) (fail))) (fail))) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<lcurly> (shen.<lcurly> V1395) (if (not (= (fail) Parse_shen.<lcurly>)) (let Parse_shen.<st_input> (shen.<st_input> Parse_shen.<lcurly>) (if (not (= (fail) Parse_shen.<st_input>)) (shen.pair (hd Parse_shen.<st_input>) (cons { (shen.hdtl Parse_shen.<st_input>))) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<rcurly> (shen.<rcurly> V1395) (if (not (= (fail) Parse_shen.<rcurly>)) (let Parse_shen.<st_input> (shen.<st_input> Parse_shen.<rcurly>) (if (not (= (fail) Parse_shen.<st_input>)) (shen.pair (hd Parse_shen.<st_input>) (cons } (shen.hdtl Parse_shen.<st_input>))) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<bar> (shen.<bar> V1395) (if (not (= (fail) Parse_shen.<bar>)) (let Parse_shen.<st_input> (shen.<st_input> Parse_shen.<bar>) (if (not (= (fail) Parse_shen.<st_input>)) (shen.pair (hd Parse_shen.<st_input>) (cons bar! (shen.hdtl Parse_shen.<st_input>))) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<semicolon> (shen.<semicolon> V1395) (if (not (= (fail) Parse_shen.<semicolon>)) (let Parse_shen.<st_input> (shen.<st_input> Parse_shen.<semicolon>) (if (not (= (fail) Parse_shen.<st_input>)) (shen.pair (hd Parse_shen.<st_input>) (cons ; (shen.hdtl Parse_shen.<st_input>))) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<colon> (shen.<colon> V1395) (if (not (= (fail) Parse_shen.<colon>)) (let Parse_shen.<equal> (shen.<equal> Parse_shen.<colon>) (if (not (= (fail) Parse_shen.<equal>)) (let Parse_shen.<st_input> (shen.<st_input> Parse_shen.<equal>) (if (not (= (fail) Parse_shen.<st_input>)) (shen.pair (hd Parse_shen.<st_input>) (cons := (shen.hdtl Parse_shen.<st_input>))) (fail))) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<colon> (shen.<colon> V1395) (if (not (= (fail) Parse_shen.<colon>)) (let Parse_shen.<minus> (shen.<minus> Parse_shen.<colon>) (if (not (= (fail) Parse_shen.<minus>)) (let Parse_shen.<st_input> (shen.<st_input> Parse_shen.<minus>) (if (not (= (fail) Parse_shen.<st_input>)) (shen.pair (hd Parse_shen.<st_input>) (cons :- (shen.hdtl Parse_shen.<st_input>))) (fail))) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<colon> (shen.<colon> V1395) (if (not (= (fail) Parse_shen.<colon>)) (let Parse_shen.<st_input> (shen.<st_input> Parse_shen.<colon>) (if (not (= (fail) Parse_shen.<st_input>)) (shen.pair (hd Parse_shen.<st_input>) (cons : (shen.hdtl Parse_shen.<st_input>))) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<comma> (shen.<comma> V1395) (if (not (= (fail) Parse_shen.<comma>)) (let Parse_shen.<st_input> (shen.<st_input> Parse_shen.<comma>) (if (not (= (fail) Parse_shen.<st_input>)) (shen.pair (hd Parse_shen.<st_input>) (cons (intern ",") (shen.hdtl Parse_shen.<st_input>))) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<comment> (shen.<comment> V1395) (if (not (= (fail) Parse_shen.<comment>)) (let Parse_shen.<st_input> (shen.<st_input> Parse_shen.<comment>) (if (not (= (fail) Parse_shen.<st_input>)) (shen.pair (hd Parse_shen.<st_input>) (shen.hdtl Parse_shen.<st_input>)) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<atom> (shen.<atom> V1395) (if (not (= (fail) Parse_shen.<atom>)) (let Parse_shen.<st_input> (shen.<st_input> Parse_shen.<atom>) (if (not (= (fail) Parse_shen.<st_input>)) (shen.pair (hd Parse_shen.<st_input>) (cons (macroexpand (shen.hdtl Parse_shen.<atom>)) (shen.hdtl Parse_shen.<st_input>))) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<whitespaces> (shen.<whitespaces> V1395) (if (not (= (fail) Parse_shen.<whitespaces>)) (let Parse_shen.<st_input> (shen.<st_input> Parse_shen.<whitespaces>) (if (not (= (fail) Parse_shen.<st_input>)) (shen.pair (hd Parse_shen.<st_input>) (shen.hdtl Parse_shen.<st_input>)) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_<e> (<e> V1395) (if (not (= (fail) Parse_<e>)) (shen.pair (hd Parse_<e>) ()) (fail))) (if (= Result (fail)) (fail) Result)) Result)) Result)) Result)) Result)) Result)) Result)) Result)) Result)) Result)) Result)) Result)) Result)) Result)))
+
+(defun shen.<lsb> (V1400) (let Result (if (and (cons? (hd V1400)) (= 91 (hd (hd V1400)))) (shen.pair (hd (shen.pair (tl (hd V1400)) (shen.hdtl V1400))) shen.skip) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<rsb> (V1405) (let Result (if (and (cons? (hd V1405)) (= 93 (hd (hd V1405)))) (shen.pair (hd (shen.pair (tl (hd V1405)) (shen.hdtl V1405))) shen.skip) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<lcurly> (V1410) (let Result (if (and (cons? (hd V1410)) (= 123 (hd (hd V1410)))) (shen.pair (hd (shen.pair (tl (hd V1410)) (shen.hdtl V1410))) shen.skip) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<rcurly> (V1415) (let Result (if (and (cons? (hd V1415)) (= 125 (hd (hd V1415)))) (shen.pair (hd (shen.pair (tl (hd V1415)) (shen.hdtl V1415))) shen.skip) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<bar> (V1420) (let Result (if (and (cons? (hd V1420)) (= 124 (hd (hd V1420)))) (shen.pair (hd (shen.pair (tl (hd V1420)) (shen.hdtl V1420))) shen.skip) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<semicolon> (V1425) (let Result (if (and (cons? (hd V1425)) (= 59 (hd (hd V1425)))) (shen.pair (hd (shen.pair (tl (hd V1425)) (shen.hdtl V1425))) shen.skip) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<colon> (V1430) (let Result (if (and (cons? (hd V1430)) (= 58 (hd (hd V1430)))) (shen.pair (hd (shen.pair (tl (hd V1430)) (shen.hdtl V1430))) shen.skip) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<comma> (V1435) (let Result (if (and (cons? (hd V1435)) (= 44 (hd (hd V1435)))) (shen.pair (hd (shen.pair (tl (hd V1435)) (shen.hdtl V1435))) shen.skip) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<equal> (V1440) (let Result (if (and (cons? (hd V1440)) (= 61 (hd (hd V1440)))) (shen.pair (hd (shen.pair (tl (hd V1440)) (shen.hdtl V1440))) shen.skip) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<minus> (V1445) (let Result (if (and (cons? (hd V1445)) (= 45 (hd (hd V1445)))) (shen.pair (hd (shen.pair (tl (hd V1445)) (shen.hdtl V1445))) shen.skip) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<lrb> (V1450) (let Result (if (and (cons? (hd V1450)) (= 40 (hd (hd V1450)))) (shen.pair (hd (shen.pair (tl (hd V1450)) (shen.hdtl V1450))) shen.skip) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<rrb> (V1455) (let Result (if (and (cons? (hd V1455)) (= 41 (hd (hd V1455)))) (shen.pair (hd (shen.pair (tl (hd V1455)) (shen.hdtl V1455))) shen.skip) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<atom> (V1460) (let Result (let Parse_shen.<str> (shen.<str> V1460) (if (not (= (fail) Parse_shen.<str>)) (shen.pair (hd Parse_shen.<str>) (shen.control-chars (shen.hdtl Parse_shen.<str>))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<number> (shen.<number> V1460) (if (not (= (fail) Parse_shen.<number>)) (shen.pair (hd Parse_shen.<number>) (shen.hdtl Parse_shen.<number>)) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<sym> (shen.<sym> V1460) (if (not (= (fail) Parse_shen.<sym>)) (shen.pair (hd Parse_shen.<sym>) (if (= (shen.hdtl Parse_shen.<sym>) "<>") (cons vector (cons 0 ())) (intern (shen.hdtl Parse_shen.<sym>)))) (fail))) (if (= Result (fail)) (fail) Result)) Result)) Result)))
+
+(defun shen.control-chars (V1461) (cond ((= () V1461) "") ((and (cons? V1461) (and (= "c" (hd V1461)) (and (cons? (tl V1461)) (= "#" (hd (tl V1461)))))) (let CodePoint (shen.code-point (tl (tl V1461))) (let AfterCodePoint (shen.after-codepoint (tl (tl V1461))) (@s (n->string (shen.decimalise CodePoint)) (shen.control-chars AfterCodePoint))))) ((cons? V1461) (@s (hd V1461) (shen.control-chars (tl V1461)))) (true (shen.sys-error shen.control-chars))))
+
+(defun shen.code-point (V1464) (cond ((and (cons? V1464) (= ";" (hd V1464))) "") ((and (cons? V1464) (element? (hd V1464) (cons "0" (cons "1" (cons "2" (cons "3" (cons "4" (cons "5" (cons "6" (cons "7" (cons "8" (cons "9" (cons "0" ()))))))))))))) (cons (hd V1464) (shen.code-point (tl V1464)))) (true (simple-error (cn "code point parse error " (shen.app V1464 "
+" shen.a))))))
+
+(defun shen.after-codepoint (V1469) (cond ((= () V1469) ()) ((and (cons? V1469) (= ";" (hd V1469))) (tl V1469)) ((cons? V1469) (shen.after-codepoint (tl V1469))) (true (shen.sys-error shen.after-codepoint))))
+
+(defun shen.decimalise (V1470) (shen.pre (reverse (shen.digits->integers V1470)) 0))
+
+(defun shen.digits->integers (V1475) (cond ((and (cons? V1475) (= "0" (hd V1475))) (cons 0 (shen.digits->integers (tl V1475)))) ((and (cons? V1475) (= "1" (hd V1475))) (cons 1 (shen.digits->integers (tl V1475)))) ((and (cons? V1475) (= "2" (hd V1475))) (cons 2 (shen.digits->integers (tl V1475)))) ((and (cons? V1475) (= "3" (hd V1475))) (cons 3 (shen.digits->integers (tl V1475)))) ((and (cons? V1475) (= "4" (hd V1475))) (cons 4 (shen.digits->integers (tl V1475)))) ((and (cons? V1475) (= "5" (hd V1475))) (cons 5 (shen.digits->integers (tl V1475)))) ((and (cons? V1475) (= "6" (hd V1475))) (cons 6 (shen.digits->integers (tl V1475)))) ((and (cons? V1475) (= "7" (hd V1475))) (cons 7 (shen.digits->integers (tl V1475)))) ((and (cons? V1475) (= "8" (hd V1475))) (cons 8 (shen.digits->integers (tl V1475)))) ((and (cons? V1475) (= "9" (hd V1475))) (cons 9 (shen.digits->integers (tl V1475)))) (true ())))
+
+(defun shen.<sym> (V1480) (let Result (let Parse_shen.<alpha> (shen.<alpha> V1480) (if (not (= (fail) Parse_shen.<alpha>)) (let Parse_shen.<alphanums> (shen.<alphanums> Parse_shen.<alpha>) (if (not (= (fail) Parse_shen.<alphanums>)) (shen.pair (hd Parse_shen.<alphanums>) (@s (shen.hdtl Parse_shen.<alpha>) (shen.hdtl Parse_shen.<alphanums>))) (fail))) (fail))) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<alphanums> (V1485) (let Result (let Parse_shen.<alphanum> (shen.<alphanum> V1485) (if (not (= (fail) Parse_shen.<alphanum>)) (let Parse_shen.<alphanums> (shen.<alphanums> Parse_shen.<alphanum>) (if (not (= (fail) Parse_shen.<alphanums>)) (shen.pair (hd Parse_shen.<alphanums>) (@s (shen.hdtl Parse_shen.<alphanum>) (shen.hdtl Parse_shen.<alphanums>))) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_<e> (<e> V1485) (if (not (= (fail) Parse_<e>)) (shen.pair (hd Parse_<e>) "") (fail))) (if (= Result (fail)) (fail) Result)) Result)))
+
+(defun shen.<alphanum> (V1490) (let Result (let Parse_shen.<alpha> (shen.<alpha> V1490) (if (not (= (fail) Parse_shen.<alpha>)) (shen.pair (hd Parse_shen.<alpha>) (shen.hdtl Parse_shen.<alpha>)) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<num> (shen.<num> V1490) (if (not (= (fail) Parse_shen.<num>)) (shen.pair (hd Parse_shen.<num>) (shen.hdtl Parse_shen.<num>)) (fail))) (if (= Result (fail)) (fail) Result)) Result)))
+
+(defun shen.<num> (V1495) (let Result (if (cons? (hd V1495)) (let Parse_Byte (hd (hd V1495)) (if (shen.numbyte? Parse_Byte) (shen.pair (hd (shen.pair (tl (hd V1495)) (shen.hdtl V1495))) (n->string Parse_Byte)) (fail))) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.numbyte? (V1500) (cond ((= 48 V1500) true) ((= 49 V1500) true) ((= 50 V1500) true) ((= 51 V1500) true) ((= 52 V1500) true) ((= 53 V1500) true) ((= 54 V1500) true) ((= 55 V1500) true) ((= 56 V1500) true) ((= 57 V1500) true) (true false)))
+
+(defun shen.<alpha> (V1505) (let Result (if (cons? (hd V1505)) (let Parse_Byte (hd (hd V1505)) (if (shen.symbol-code? Parse_Byte) (shen.pair (hd (shen.pair (tl (hd V1505)) (shen.hdtl V1505))) (n->string Parse_Byte)) (fail))) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.symbol-code? (V1506) (or (= V1506 126) (or (and (> V1506 94) (< V1506 123)) (or (and (> V1506 59) (< V1506 91)) (or (and (> V1506 41) (and (< V1506 58) (not (= V1506 44)))) (or (and (> V1506 34) (< V1506 40)) (= V1506 33)))))))
+
+(defun shen.<str> (V1511) (let Result (let Parse_shen.<dbq> (shen.<dbq> V1511) (if (not (= (fail) Parse_shen.<dbq>)) (let Parse_shen.<strcontents> (shen.<strcontents> Parse_shen.<dbq>) (if (not (= (fail) Parse_shen.<strcontents>)) (let Parse_shen.<dbq> (shen.<dbq> Parse_shen.<strcontents>) (if (not (= (fail) Parse_shen.<dbq>)) (shen.pair (hd Parse_shen.<dbq>) (shen.hdtl Parse_shen.<strcontents>)) (fail))) (fail))) (fail))) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<dbq> (V1516) (let Result (if (cons? (hd V1516)) (let Parse_Byte (hd (hd V1516)) (if (= Parse_Byte 34) (shen.pair (hd (shen.pair (tl (hd V1516)) (shen.hdtl V1516))) Parse_Byte) (fail))) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<strcontents> (V1521) (let Result (let Parse_shen.<strc> (shen.<strc> V1521) (if (not (= (fail) Parse_shen.<strc>)) (let Parse_shen.<strcontents> (shen.<strcontents> Parse_shen.<strc>) (if (not (= (fail) Parse_shen.<strcontents>)) (shen.pair (hd Parse_shen.<strcontents>) (cons (shen.hdtl Parse_shen.<strc>) (shen.hdtl Parse_shen.<strcontents>))) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_<e> (<e> V1521) (if (not (= (fail) Parse_<e>)) (shen.pair (hd Parse_<e>) ()) (fail))) (if (= Result (fail)) (fail) Result)) Result)))
+
+(defun shen.<byte> (V1526) (let Result (if (cons? (hd V1526)) (let Parse_Byte (hd (hd V1526)) (shen.pair (hd (shen.pair (tl (hd V1526)) (shen.hdtl V1526))) (n->string Parse_Byte))) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<strc> (V1531) (let Result (if (cons? (hd V1531)) (let Parse_Byte (hd (hd V1531)) (if (not (= Parse_Byte 34)) (shen.pair (hd (shen.pair (tl (hd V1531)) (shen.hdtl V1531))) (n->string Parse_Byte)) (fail))) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<number> (V1536) (let Result (let Parse_shen.<minus> (shen.<minus> V1536) (if (not (= (fail) Parse_shen.<minus>)) (let Parse_shen.<number> (shen.<number> Parse_shen.<minus>) (if (not (= (fail) Parse_shen.<number>)) (shen.pair (hd Parse_shen.<number>) (- 0 (shen.hdtl Parse_shen.<number>))) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<plus> (shen.<plus> V1536) (if (not (= (fail) Parse_shen.<plus>)) (let Parse_shen.<number> (shen.<number> Parse_shen.<plus>) (if (not (= (fail) Parse_shen.<number>)) (shen.pair (hd Parse_shen.<number>) (shen.hdtl Parse_shen.<number>)) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<predigits> (shen.<predigits> V1536) (if (not (= (fail) Parse_shen.<predigits>)) (let Parse_shen.<stop> (shen.<stop> Parse_shen.<predigits>) (if (not (= (fail) Parse_shen.<stop>)) (let Parse_shen.<postdigits> (shen.<postdigits> Parse_shen.<stop>) (if (not (= (fail) Parse_shen.<postdigits>)) (let Parse_shen.<E> (shen.<E> Parse_shen.<postdigits>) (if (not (= (fail) Parse_shen.<E>)) (let Parse_shen.<log10> (shen.<log10> Parse_shen.<E>) (if (not (= (fail) Parse_shen.<log10>)) (shen.pair (hd Parse_shen.<log10>) (* (shen.expt 10 (shen.hdtl Parse_shen.<log10>)) (+ (shen.pre (reverse (shen.hdtl Parse_shen.<predigits>)) 0) (shen.post (shen.hdtl Parse_shen.<postdigits>) 1)))) (fail))) (fail))) (fail))) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<digits> (shen.<digits> V1536) (if (not (= (fail) Parse_shen.<digits>)) (let Parse_shen.<E> (shen.<E> Parse_shen.<digits>) (if (not (= (fail) Parse_shen.<E>)) (let Parse_shen.<log10> (shen.<log10> Parse_shen.<E>) (if (not (= (fail) Parse_shen.<log10>)) (shen.pair (hd Parse_shen.<log10>) (* (shen.expt 10 (shen.hdtl Parse_shen.<log10>)) (shen.pre (reverse (shen.hdtl Parse_shen.<digits>)) 0))) (fail))) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<predigits> (shen.<predigits> V1536) (if (not (= (fail) Parse_shen.<predigits>)) (let Parse_shen.<stop> (shen.<stop> Parse_shen.<predigits>) (if (not (= (fail) Parse_shen.<stop>)) (let Parse_shen.<postdigits> (shen.<postdigits> Parse_shen.<stop>) (if (not (= (fail) Parse_shen.<postdigits>)) (shen.pair (hd Parse_shen.<postdigits>) (+ (shen.pre (reverse (shen.hdtl Parse_shen.<predigits>)) 0) (shen.post (shen.hdtl Parse_shen.<postdigits>) 1))) (fail))) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<digits> (shen.<digits> V1536) (if (not (= (fail) Parse_shen.<digits>)) (shen.pair (hd Parse_shen.<digits>) (shen.pre (reverse (shen.hdtl Parse_shen.<digits>)) 0)) (fail))) (if (= Result (fail)) (fail) Result)) Result)) Result)) Result)) Result)) Result)))
+
+(defun shen.<E> (V1541) (let Result (if (and (cons? (hd V1541)) (= 101 (hd (hd V1541)))) (shen.pair (hd (shen.pair (tl (hd V1541)) (shen.hdtl V1541))) shen.skip) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<log10> (V1546) (let Result (let Parse_shen.<minus> (shen.<minus> V1546) (if (not (= (fail) Parse_shen.<minus>)) (let Parse_shen.<digits> (shen.<digits> Parse_shen.<minus>) (if (not (= (fail) Parse_shen.<digits>)) (shen.pair (hd Parse_shen.<digits>) (- 0 (shen.pre (reverse (shen.hdtl Parse_shen.<digits>)) 0))) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<digits> (shen.<digits> V1546) (if (not (= (fail) Parse_shen.<digits>)) (shen.pair (hd Parse_shen.<digits>) (shen.pre (reverse (shen.hdtl Parse_shen.<digits>)) 0)) (fail))) (if (= Result (fail)) (fail) Result)) Result)))
+
+(defun shen.<plus> (V1551) (let Result (if (cons? (hd V1551)) (let Parse_Byte (hd (hd V1551)) (if (= Parse_Byte 43) (shen.pair (hd (shen.pair (tl (hd V1551)) (shen.hdtl V1551))) Parse_Byte) (fail))) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<stop> (V1556) (let Result (if (cons? (hd V1556)) (let Parse_Byte (hd (hd V1556)) (if (= Parse_Byte 46) (shen.pair (hd (shen.pair (tl (hd V1556)) (shen.hdtl V1556))) Parse_Byte) (fail))) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<predigits> (V1561) (let Result (let Parse_shen.<digits> (shen.<digits> V1561) (if (not (= (fail) Parse_shen.<digits>)) (shen.pair (hd Parse_shen.<digits>) (shen.hdtl Parse_shen.<digits>)) (fail))) (if (= Result (fail)) (let Result (let Parse_<e> (<e> V1561) (if (not (= (fail) Parse_<e>)) (shen.pair (hd Parse_<e>) ()) (fail))) (if (= Result (fail)) (fail) Result)) Result)))
+
+(defun shen.<postdigits> (V1566) (let Result (let Parse_shen.<digits> (shen.<digits> V1566) (if (not (= (fail) Parse_shen.<digits>)) (shen.pair (hd Parse_shen.<digits>) (shen.hdtl Parse_shen.<digits>)) (fail))) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<digits> (V1571) (let Result (let Parse_shen.<digit> (shen.<digit> V1571) (if (not (= (fail) Parse_shen.<digit>)) (let Parse_shen.<digits> (shen.<digits> Parse_shen.<digit>) (if (not (= (fail) Parse_shen.<digits>)) (shen.pair (hd Parse_shen.<digits>) (cons (shen.hdtl Parse_shen.<digit>) (shen.hdtl Parse_shen.<digits>))) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<digit> (shen.<digit> V1571) (if (not (= (fail) Parse_shen.<digit>)) (shen.pair (hd Parse_shen.<digit>) (cons (shen.hdtl Parse_shen.<digit>) ())) (fail))) (if (= Result (fail)) (fail) Result)) Result)))
+
+(defun shen.<digit> (V1576) (let Result (if (cons? (hd V1576)) (let Parse_X (hd (hd V1576)) (if (shen.numbyte? Parse_X) (shen.pair (hd (shen.pair (tl (hd V1576)) (shen.hdtl V1576))) (shen.byte->digit Parse_X)) (fail))) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.byte->digit (V1577) (cond ((= 48 V1577) 0) ((= 49 V1577) 1) ((= 50 V1577) 2) ((= 51 V1577) 3) ((= 52 V1577) 4) ((= 53 V1577) 5) ((= 54 V1577) 6) ((= 55 V1577) 7) ((= 56 V1577) 8) ((= 57 V1577) 9) (true (shen.sys-error shen.byte->digit))))
+
+(defun shen.pre (V1580 V1581) (cond ((= () V1580) 0) ((cons? V1580) (+ (* (shen.expt 10 V1581) (hd V1580)) (shen.pre (tl V1580) (+ V1581 1)))) (true (shen.sys-error shen.pre))))
+
+(defun shen.post (V1584 V1585) (cond ((= () V1584) 0) ((cons? V1584) (+ (* (shen.expt 10 (- 0 V1585)) (hd V1584)) (shen.post (tl V1584) (+ V1585 1)))) (true (shen.sys-error shen.post))))
+
+(defun shen.expt (V1588 V1589) (cond ((= 0 V1589) 1) ((> V1589 0) (* V1588 (shen.expt V1588 (- V1589 1)))) (true (* 1 (/ (shen.expt V1588 (+ V1589 1)) V1588)))))
+
+(defun shen.<st_input1> (V1594) (let Result (let Parse_shen.<st_input> (shen.<st_input> V1594) (if (not (= (fail) Parse_shen.<st_input>)) (shen.pair (hd Parse_shen.<st_input>) (shen.hdtl Parse_shen.<st_input>)) (fail))) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<st_input2> (V1599) (let Result (let Parse_shen.<st_input> (shen.<st_input> V1599) (if (not (= (fail) Parse_shen.<st_input>)) (shen.pair (hd Parse_shen.<st_input>) (shen.hdtl Parse_shen.<st_input>)) (fail))) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<comment> (V1604) (let Result (let Parse_shen.<singleline> (shen.<singleline> V1604) (if (not (= (fail) Parse_shen.<singleline>)) (shen.pair (hd Parse_shen.<singleline>) shen.skip) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<multiline> (shen.<multiline> V1604) (if (not (= (fail) Parse_shen.<multiline>)) (shen.pair (hd Parse_shen.<multiline>) shen.skip) (fail))) (if (= Result (fail)) (fail) Result)) Result)))
+
+(defun shen.<singleline> (V1609) (let Result (let Parse_shen.<backslash> (shen.<backslash> V1609) (if (not (= (fail) Parse_shen.<backslash>)) (let Parse_shen.<backslash> (shen.<backslash> Parse_shen.<backslash>) (if (not (= (fail) Parse_shen.<backslash>)) (let Parse_shen.<anysingle> (shen.<anysingle> Parse_shen.<backslash>) (if (not (= (fail) Parse_shen.<anysingle>)) (let Parse_shen.<return> (shen.<return> Parse_shen.<anysingle>) (if (not (= (fail) Parse_shen.<return>)) (shen.pair (hd Parse_shen.<return>) shen.skip) (fail))) (fail))) (fail))) (fail))) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<backslash> (V1614) (let Result (if (and (cons? (hd V1614)) (= 92 (hd (hd V1614)))) (shen.pair (hd (shen.pair (tl (hd V1614)) (shen.hdtl V1614))) shen.skip) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<anysingle> (V1619) (let Result (let Parse_shen.<non-return> (shen.<non-return> V1619) (if (not (= (fail) Parse_shen.<non-return>)) (let Parse_shen.<anysingle> (shen.<anysingle> Parse_shen.<non-return>) (if (not (= (fail) Parse_shen.<anysingle>)) (shen.pair (hd Parse_shen.<anysingle>) shen.skip) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_<e> (<e> V1619) (if (not (= (fail) Parse_<e>)) (shen.pair (hd Parse_<e>) shen.skip) (fail))) (if (= Result (fail)) (fail) Result)) Result)))
+
+(defun shen.<non-return> (V1624) (let Result (if (cons? (hd V1624)) (let Parse_X (hd (hd V1624)) (if (not (element? Parse_X (cons 10 (cons 13 ())))) (shen.pair (hd (shen.pair (tl (hd V1624)) (shen.hdtl V1624))) shen.skip) (fail))) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<return> (V1629) (let Result (if (cons? (hd V1629)) (let Parse_X (hd (hd V1629)) (if (element? Parse_X (cons 10 (cons 13 ()))) (shen.pair (hd (shen.pair (tl (hd V1629)) (shen.hdtl V1629))) shen.skip) (fail))) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<multiline> (V1634) (let Result (let Parse_shen.<backslash> (shen.<backslash> V1634) (if (not (= (fail) Parse_shen.<backslash>)) (let Parse_shen.<times> (shen.<times> Parse_shen.<backslash>) (if (not (= (fail) Parse_shen.<times>)) (let Parse_shen.<anymulti> (shen.<anymulti> Parse_shen.<times>) (if (not (= (fail) Parse_shen.<anymulti>)) (shen.pair (hd Parse_shen.<anymulti>) shen.skip) (fail))) (fail))) (fail))) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<times> (V1639) (let Result (if (and (cons? (hd V1639)) (= 42 (hd (hd V1639)))) (shen.pair (hd (shen.pair (tl (hd V1639)) (shen.hdtl V1639))) shen.skip) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.<anymulti> (V1644) (let Result (let Parse_shen.<comment> (shen.<comment> V1644) (if (not (= (fail) Parse_shen.<comment>)) (let Parse_shen.<anymulti> (shen.<anymulti> Parse_shen.<comment>) (if (not (= (fail) Parse_shen.<anymulti>)) (shen.pair (hd Parse_shen.<anymulti>) shen.skip) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<times> (shen.<times> V1644) (if (not (= (fail) Parse_shen.<times>)) (let Parse_shen.<backslash> (shen.<backslash> Parse_shen.<times>) (if (not (= (fail) Parse_shen.<backslash>)) (shen.pair (hd Parse_shen.<backslash>) shen.skip) (fail))) (fail))) (if (= Result (fail)) (let Result (if (cons? (hd V1644)) (let Parse_X (hd (hd V1644)) (let Parse_shen.<anymulti> (shen.<anymulti> (shen.pair (tl (hd V1644)) (shen.hdtl V1644))) (if (not (= (fail) Parse_shen.<anymulti>)) (shen.pair (hd Parse_shen.<anymulti>) shen.skip) (fail)))) (fail)) (if (= Result (fail)) (fail) Result)) Result)) Result)))
+
+(defun shen.<whitespaces> (V1649) (let Result (let Parse_shen.<whitespace> (shen.<whitespace> V1649) (if (not (= (fail) Parse_shen.<whitespace>)) (let Parse_shen.<whitespaces> (shen.<whitespaces> Parse_shen.<whitespace>) (if (not (= (fail) Parse_shen.<whitespaces>)) (shen.pair (hd Parse_shen.<whitespaces>) shen.skip) (fail))) (fail))) (if (= Result (fail)) (let Result (let Parse_shen.<whitespace> (shen.<whitespace> V1649) (if (not (= (fail) Parse_shen.<whitespace>)) (shen.pair (hd Parse_shen.<whitespace>) shen.skip) (fail))) (if (= Result (fail)) (fail) Result)) Result)))
+
+(defun shen.<whitespace> (V1654) (let Result (if (cons? (hd V1654)) (let Parse_X (hd (hd V1654)) (if (let Parse_Case Parse_X (or (= Parse_Case 32) (or (= Parse_Case 13) (or (= Parse_Case 10) (= Parse_Case 9))))) (shen.pair (hd (shen.pair (tl (hd V1654)) (shen.hdtl V1654))) shen.skip) (fail))) (fail)) (if (= Result (fail)) (fail) Result)))
+
+(defun shen.cons_form (V1655) (cond ((= () V1655) ()) ((and (cons? V1655) (and (cons? (tl V1655)) (and (cons? (tl (tl V1655))) (and (= () (tl (tl (tl V1655)))) (= (hd (tl V1655)) bar!))))) (cons cons (cons (hd V1655) (tl (tl V1655))))) ((cons? V1655) (cons cons (cons (hd V1655) (cons (shen.cons_form (tl V1655)) ())))) (true (shen.sys-error shen.cons_form))))
+
+(defun shen.package-macro (V1658 V1659) (cond ((and (cons? V1658) (and (= $ (hd V1658)) (and (cons? (tl V1658)) (= () (tl (tl V1658)))))) (append (explode (hd (tl V1658))) V1659)) ((and (cons? V1658) (and (= package (hd V1658)) (and (cons? (tl V1658)) (and (= null (hd (tl V1658))) (cons? (tl (tl V1658))))))) (append (tl (tl (tl V1658))) V1659)) ((and (cons? V1658) (and (= package (hd V1658)) (and (cons? (tl V1658)) (cons? (tl (tl V1658)))))) (let ListofExceptions (shen.eval-without-macros (hd (tl (tl V1658)))) (let Record (shen.record-exceptions ListofExceptions (hd (tl V1658))) (let PackageNameDot (intern (cn (str (hd (tl V1658))) ".")) (append (shen.packageh PackageNameDot ListofExceptions (tl (tl (tl V1658)))) V1659))))) (true (cons V1658 V1659))))
+
+(defun shen.record-exceptions (V1660 V1661) (let CurrExceptions (trap-error (get V1661 shen.external-symbols (value *property-vector*)) (lambda E ())) (let AllExceptions (union V1660 CurrExceptions) (put V1661 shen.external-symbols AllExceptions (value *property-vector*)))))
+
+(defun shen.packageh (V1670 V1671 V1672) (cond ((cons? V1672) (cons (shen.packageh V1670 V1671 (hd V1672)) (shen.packageh V1670 V1671 (tl V1672)))) ((or (shen.sysfunc? V1672) (or (variable? V1672) (or (element? V1672 V1671) (or (shen.doubleunderline? V1672) (shen.singleunderline? V1672))))) V1672) ((and (symbol? V1672) (not (shen.prefix? (cons "s" (cons "h" (cons "e" (cons "n" (cons "." ()))))) (explode V1672)))) (concat V1670 V1672)) (true V1672)))
+
+
+
