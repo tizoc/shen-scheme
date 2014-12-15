@@ -105,11 +105,19 @@
 
 (define kl:simple-error error)
 
+;; If handler is a lambda, delay it's evaluation
+;; to avoid allocating closures unnecessarily.
+;; Otherwise evaluate the expression in case it happens
+;; to have side effects.
 (define-syntax kl:trap-error
-  (syntax-rules ()
+  (syntax-rules (lambda)
+    ((_ ?expression (lambda ?v ?body))
+     (guard (exn (else ((lambda ?v ?body) exn)))
+       ?expression))
     ((_ ?expression ?handler)
-     (guard (exn (else (?handler exn)))
-       ?expression))))
+     (let ((handler ?handler))
+       (guard (exn (else (handler exn)))
+         ?expression)))))
 
 (define (kl:error-to-string e)
   (call-with-output-string
