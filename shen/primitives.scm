@@ -409,21 +409,26 @@
     (('fail) '($$quote shen.fail!))
     (('$native exp) exp)
     (('$native . exps) `($$begin ,@exps))
-    ((op param ...)
-     (let* ((arity ($$function-arity op))
-            (partial-call? (not (or (= arity -1) (= arity (length param)))))
-            (args (map (lambda (exp) (quote-expression exp scope))
-                       param))
-            (args-list (left-to-right `($$list ,@args))))
-       (cond ((null? args) `(($$function-binding ,(quote-expression op scope))))
-             (partial-call?
-              `($$call-nested ,($$nest-lambda op arity) ,args-list))
-             ((or (pair? op) (not (unbound-in-current-scope? op)))
-              (left-to-right
-               `($$call-nested ($$function ,(quote-expression op scope)) ,args-list)))
-             (else
-              (left-to-right (cons op args))))))
+    ((op params ...) (emit-application op params scope))
     (else expr)))
+
+(define (emit-application op params scope)
+  (let* ((arity ($$function-arity op))
+         (partial-call? (not (or (= arity -1) (= arity (length params)))))
+         (args (map (lambda (exp) (quote-expression exp scope))
+                    params))
+         (args-list (left-to-right `($$list ,@args))))
+    (cond ((null? args)
+           (cond ((pair? op) `(,(quote-expression op scope)))
+                 ((unbound-symbol? op scope) `(,op))
+                 (else `(($$function-binding ,op)))))
+          (partial-call?
+           `($$call-nested ,($$nest-lambda op arity) ,args-list))
+          ((or (pair? op) (not (unbound-symbol? op scope)))
+           (left-to-right
+            `($$call-nested ($$function ,(quote-expression op scope)) ,args-list)))
+          (else
+           (left-to-right (cons op args))))))
 
 (define ($$nest-lambda callable arity)
   (define (merge-args f arg)
