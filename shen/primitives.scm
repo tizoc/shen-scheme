@@ -108,12 +108,8 @@
 (define-syntax kl:trap-error
   (syntax-rules ()
     ((_ ?expression ?handler)
-     (let ((handler ?handler))
-       (call-with-current-continuation
-        (lambda (exit)
-          (with-exception-handler
-           (lambda (exn) (exit (handler exn)))
-           (lambda () ?expression))))))))
+     (guard (exn (else (?handler exn)))
+       ?expression))))
 
 (define (kl:error-to-string e)
   (call-with-output-string
