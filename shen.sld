@@ -109,8 +109,8 @@
   (begin
     (defun shen.pvar? (V)
        ($$and (absvector? V)
-            (> ($$vector-length V) 0)
-            ($$eq? (<-address V 0) ($$quote shen.pvar)))))
+              (> ($$vector-length V) 0)
+              ($$eq? (<-address V 0) ($$quote shen.pvar)))))
 
   (include "compiled/track.kl.scm")
   (include "compiled/load.kl.scm")
