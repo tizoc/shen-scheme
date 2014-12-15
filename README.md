@@ -1,10 +1,10 @@
-chibi-scheme port of the Shen language
-======================================
+chibi-shen, a chibi-scheme port of the Shen language
+====================================================
 
-* `Shen <http://shenlanguage.org/>`_
-* `chibi-scheme <http://code.google.com/p/chibi-scheme>`_
+* [Shen](http://shenlanguage.org)
+* [chibi-scheme](http://code.google.com/p/chibi-scheme>)
 
-Shen is a portable functional programming language by `Mark Tarver <http://www.lambdassociates.org/>`_ that offers
+Shen is a portable functional programming language by [Mark Tarver](http://marktarver.com) that offers
 
 - pattern matching,
 - λ calculus consistency,
@@ -17,7 +17,7 @@ Shen is a portable functional programming language by `Mark Tarver <http://www.l
 Building
 --------
 
-To precompile the `.kl` files into Scheme code run::
+To precompile the `.kl` files into Scheme code run:
 
     make
 
@@ -28,7 +28,7 @@ Running
 
 Version 0.7 of chibi-scheme is needed to run chibi-shen. Other versions may work, but testing and development are done against that version.
 
-To launch the Shen REPL do::
+To launch the Shen REPL do:
 
     chibi-scheme -h 500M -xshen -e'(shen.shen)'
 
