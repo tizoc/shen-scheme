@@ -105,14 +105,14 @@
 
 (define kl:simple-error error)
 
-;; If handler is a lambda, delay it's evaluation
+;; If handler is a lambda, translate it into a let expression
 ;; to avoid allocating closures unnecessarily.
 ;; Otherwise evaluate the expression in case it happens
 ;; to have side effects.
 (define-syntax kl:trap-error
   (syntax-rules (lambda)
-    ((_ ?expression (lambda ?v ?body))
-     (guard (exn (else ((lambda ?v ?body) exn)))
+    ((_ ?expression (lambda (?v) ?body))
+     (guard (exn (else (let ((?v exn) ?body))))
        ?expression))
     ((_ ?expression ?handler)
      (let ((handler ?handler))
