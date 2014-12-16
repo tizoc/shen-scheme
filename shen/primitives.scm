@@ -123,8 +123,11 @@
   (call-with-output-string
    (lambda (out)
      (display (error-object-message e) out)
-     (display ": " out)
-     (write-simple (error-object-irritants e) out))))
+     (let ((irritants (error-object-irritants e)))
+       (if (not (null? irritants))
+           (begin
+             (display ": " out)
+             (write-simple (error-object-irritants e) out)))))))
 
 ;; Lists
 ;;
