@@ -1,3 +1,9 @@
+next:
+
+	* Optimize out unnecessary wrapper lambdas
+
+	* Slightly better trap-error and error messages
+
 0.8
 
 	* Works with Shen 16.
