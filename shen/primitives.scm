@@ -402,11 +402,8 @@
     ('|}| '($$quote |}|))
     ('|;| '($$quote |;|))
     ((? unbound-in-current-scope? sym) `($$quote ,sym))
-    (('let var value body)
-     `(let ,var ,(quote-expression value scope)
-        ,(quote-expression body (cons var scope))))
-    (('cond clauses ...)
-     `(cond ,@(quote-cond-clauses clauses scope)))
+    (('let var value body) (emit-let var value body (cons var scope)))
+    (('cond clauses ...) (emit-cond clauses scope))
     ;; Remove intermediary wrapper lambdas
     (('lambda var ((? unbound-in-current-scope? op) var)) op)
     (('lambda var body)
@@ -419,6 +416,13 @@
     (('= v1 v2) (emit-equality-check v1 v2 scope))
     ((op params ...) (emit-application op params scope))
     (else expr)))
+
+(define (emit-let var value body scope)
+  `(let ,var ,(quote-expression value scope)
+     ,(quote-expression body (cons var scope))))
+
+(define (emit-cond clauses scope)
+  `(cond ,@(quote-cond-clauses clauses scope)))
 
 (define (emit-equality-check v1 v2 scope)
   (cond ((or (unbound-symbol? v1 scope)
