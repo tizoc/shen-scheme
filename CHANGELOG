@@ -1,8 +1,8 @@
 next:
 
-	* Optimize out unnecessary wrapper lambdas
+	* Optimise out unnecessary wrapper lambdas
 
-	* Optimize symbol equality checks
+	* Optimise equality checks
 
 	* Slightly better trap-error and error messages
 
@@ -14,7 +14,7 @@ next:
 
 	* Fixes issue with functions that partially apply themselves.
 
-	* Add optimized 'shen.pvar?' overwrite. Makes prolog and typechecking considerably faster.
+	* Add optimised 'shen.pvar?' overwrite. Makes prolog and typechecking considerably faster.
 
 	* Add a fast-path for the common case of trap-error
 
