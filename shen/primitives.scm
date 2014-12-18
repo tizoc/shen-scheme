@@ -362,23 +362,21 @@
 ;;
 
 (define (quote-let-vars vars scope)
-  (if (null? vars)
-      '()
-      (let ((var (car vars))
-            (value (cadr vars))
-            (rest (cddr vars)))
-        (cons var (cons (quote-expression value scope)
-                        (quote-let-vars rest (cons var scope)))))))
+  (match vars
+    (() '())
+    ((var value . rest)
+     (let ((quoted-value (quote-expression value scope))
+           (quoted-rest (quote-let-vars rest (cons var scope))))
+     `(,var ,quoted-value ,@quoted-rest)))))
 
 (define (quote-cond-clauses clauses scope)
-  (if (null? clauses)
-      '()
-      (let ((test (caar clauses))
-            (body (car (cdar clauses)))
-            (rest (cdr clauses)))
-        (cons (list (quote-expression test scope)
-                    (quote-expression body scope))
-              (quote-cond-clauses rest scope)))))
+  (match clauses
+    (() '())
+    (((test body) . rest)
+     (let ((quoted-test (quote-expression test scope))
+           (quoted-body (quote-expression body scope))
+           (quoted-rest (quote-cond-clauses rest scope)))
+       `((,quoted-test ,quoted-body) ,@quoted-rest)))))
 
 (define (unbound-symbol? maybe-sym scope)
   (and (symbol? maybe-sym)
