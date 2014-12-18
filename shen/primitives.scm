@@ -532,20 +532,6 @@
               (loop (- position 1)
                     (cons (bytevector-u8-ref bytes position) result))))))))
 
-(define ($$shen-variable? maybe-sym)
-  (and (symbol? maybe-sym)
-       (char-upper-case? (string-ref (symbol->string maybe-sym) 0))))
-
-(define ($$segvar? maybe-sym)
-  (and (symbol? maybe-sym)
-       (equal? #\? (string-ref (symbol->string maybe-sym) 0))))
-
-(define ($$grammar_symbol? maybe-sym)
-  (and (symbol? maybe-sym)
-       (let ((strsym (symbol->string maybe-sym)))
-         (and (equal? #\< (string-ref strsym 0))
-              (equal? #\> (string-ref strsym (- (string-length strsym) 1)))))))
-
 (define shen-*system* (make-hash-table eq?))
 
 (define ($$init-*system*)
@@ -560,10 +546,6 @@
 
 (define ($$shen-sysfunc? val)
   (hash-table-ref/default shen-*system* val #f))
-
-(define ($$hash val bound)
-  (let ((res (hash val bound)))
-    (if (eq? 0 res) 1 res)))
 
 (define ($$shen-walk func val)
   (if (pair? val)

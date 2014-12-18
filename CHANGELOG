@@ -1,10 +1,12 @@
 next:
 
-	* Optimise out unnecessary wrapper lambdas
+	* Optimise out unnecessary wrapper lambdas.
 
-	* Optimise equality checks
+	* Optimise equality checks.
 
-	* Slightly better trap-error and error messages
+	* Slightly better trap-error and error messages.
+
+	* Function overwrites are now handled when precompiling instead of startup.
 
 0.8
 

@@ -14,9 +14,6 @@
    $$function-binding
    $$read-file-as-bytelist
    $$read-file-as-string
-   $$shen-variable?
-   $$segvar?
-   $$grammar_symbol?
    $$eval-in-shen
    $$l2r
    $$call-nested
@@ -27,7 +24,6 @@
    $$shen-sysfunc?
    $$init-*system*
 
-   $$hash
    $$shen-walk
    $$macroexpand
 
