@@ -407,6 +407,7 @@
         ,(quote-expression body (cons var scope))))
     (('cond clauses ...)
      `(cond ,@(quote-cond-clauses clauses scope)))
+    (('lambda var ((? symbol? op) var)) op) ;; Remove intermediary wrapper lambdas
     (('lambda var body)
      `(lambda ,var ,(quote-expression body (cons var scope))))
     (('do expr1 expr2)
