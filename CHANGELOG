@@ -2,6 +2,8 @@ next:
 
 	* Optimize out unnecessary wrapper lambdas
 
+	* Optimize symbol equality checks
+
 	* Slightly better trap-error and error messages
 
 0.8

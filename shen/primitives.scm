@@ -407,7 +407,8 @@
         ,(quote-expression body (cons var scope))))
     (('cond clauses ...)
      `(cond ,@(quote-cond-clauses clauses scope)))
-    (('lambda var ((? symbol? op) var)) op) ;; Remove intermediary wrapper lambdas
+    ;; Remove intermediary wrapper lambdas
+    (('lambda var ((? unbound-in-current-scope? op) var)) op)
     (('lambda var body)
      `(lambda ,var ,(quote-expression body (cons var scope))))
     (('do expr1 expr2)
@@ -415,6 +416,11 @@
     ;; inlines fail compares
     (('= expr '(fail)) `($$eq? ,(quote-expression expr scope) ($$quote shen.fail!)))
     (('fail) '($$quote shen.fail!))
+    ;; Optimized eq checks for symbols
+    (('= (? unbound-in-current-scope? v1) v2) `($$eq? ,(quote-expression v1 scope)
+                                                      ,(quote-expression v2 scope)))
+    (('= v1 (? unbound-in-current-scope? v2)) `($$eq? ,(quote-expression v1 scope)
+                                                      ,(quote-expression v2 scope)))
     (('$native exp) exp)
     (('$native . exps) `($$begin ,@exps))
     ((op params ...) (emit-application op params scope))
