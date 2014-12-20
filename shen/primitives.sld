@@ -18,7 +18,6 @@
    $$l2r
    $$call-nested
    $$nest-lambda
-   $$function-arity
    $$function
 
    $$shen-sysfunc?

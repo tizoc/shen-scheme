@@ -153,7 +153,7 @@
 (define (register-function-arity name arity)
   (hash-table-set! *shen-function-arities* name arity))
 
-(define ($$function-arity name)
+(define (function-arity name)
   (if (symbol? name)
       (hash-table-ref/default *shen-function-arities* name -1)
       -1))
@@ -438,7 +438,7 @@
                   ,(quote-expression v2 scope)))))
 
 (define (emit-application op params scope)
-  (let* ((arity ($$function-arity op))
+  (let* ((arity (function-arity op))
          (partial-call? (not (or (= arity -1) (= arity (length params)))))
          (args (map (lambda (exp) (quote-expression exp scope))
                     params))
@@ -476,9 +476,9 @@
   (string-prefix? "not enough args" (error-object-message e)))
 
 (define (handle-arity-error exn f args)
-  (if (and (arity-error? exn) (> ($$function-arity f) (length args)))
+  (if (and (arity-error? exn) (> (function-arity f) (length args)))
       ($$call-nested
-       (kl:eval-kl ($$nest-lambda f ($$function-arity f))) args)
+       (kl:eval-kl ($$nest-lambda f (function-arity f))) args)
       (raise exn)))
 
 (define ($$function f)
