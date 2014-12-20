@@ -361,23 +361,6 @@
 ;; Kl to Scheme translator
 ;;
 
-(define (quote-let-vars vars scope)
-  (match vars
-    (() '())
-    ((var value . rest)
-     (let ((quoted-value (quote-expression value scope))
-           (quoted-rest (quote-let-vars rest (cons var scope))))
-     `(,var ,quoted-value ,@quoted-rest)))))
-
-(define (quote-cond-clauses clauses scope)
-  (match clauses
-    (() '())
-    (((test body) . rest)
-     (let ((quoted-test (quote-expression test scope))
-           (quoted-body (quote-expression body scope))
-           (quoted-rest (quote-cond-clauses rest scope)))
-       `((,quoted-test ,quoted-body) ,@quoted-rest)))))
-
 (define (unbound-symbol? maybe-sym scope)
   (and (symbol? maybe-sym)
        (not (memq maybe-sym scope))))
@@ -388,8 +371,8 @@
   (set! *gensym-counter* (+ 1 *gensym-counter*))
   (string->symbol (string-append prefix (number->string *gensym-counter*))))
 
-(define (quote-expression expr scope)
-  (define (unbound-in-current-scope? maybe-sym)
+(define (compile-expression expr scope)
+  (define (unbound? maybe-sym)
     (unbound-symbol? maybe-sym scope))
 
   (match expr
@@ -399,15 +382,15 @@
     ('|{| '($$quote |{|))
     ('|}| '($$quote |}|))
     ('|;| '($$quote |;|))
-    ((? unbound-in-current-scope? sym) `($$quote ,sym))
+    ((? unbound? sym) `($$quote ,sym))
     (('let var value body) (emit-let var value body (cons var scope)))
     (('cond clauses ...) (emit-cond clauses scope))
     ;; Remove intermediary wrapper lambdas
-    (('lambda var ((? unbound-in-current-scope? op) var)) op)
+    (('lambda var ((? unbound? op) var)) op)
     (('lambda var body)
-     `(lambda ,var ,(quote-expression body (cons var scope))))
+     `(lambda ,var ,(compile-expression body (cons var scope))))
     (('do expr1 expr2)
-     `($$begin ,(quote-expression expr1 scope) ,(quote-expression expr2 scope)))
+     `($$begin ,(compile-expression expr1 scope) ,(compile-expression expr2 scope)))
     (('fail) '($$quote shen.fail!))
     (('$native exp) exp)
     (('$native . exps) `($$begin ,@exps))
@@ -416,42 +399,51 @@
     (else expr)))
 
 (define (emit-let var value body scope)
-  `(let ,var ,(quote-expression value scope)
-     ,(quote-expression body (cons var scope))))
+  `(let ,var ,(compile-expression value scope)
+     ,(compile-expression body (cons var scope))))
 
 (define (emit-cond clauses scope)
-  `(cond ,@(quote-cond-clauses clauses scope)))
+  `(cond ,@(emit-cond-clauses clauses scope)))
+
+(define (emit-cond-clauses clauses scope)
+  (match clauses
+    (() '())
+    (((test body) . rest)
+     (let ((compiled-test (compile-expression test scope))
+           (compiled-body (compile-expression body scope))
+           (compiled-rest (emit-cond-clauses rest scope)))
+       `((,compiled-test ,compiled-body) ,@compiled-rest)))))
 
 (define (emit-equality-check v1 v2 scope)
   (cond ((or (unbound-symbol? v1 scope)
              (unbound-symbol? v2 scope)
              (equal? '(fail) v1)
              (equal? '(fail) v2))
-         `($$eq? ,(quote-expression v1 scope)
-                 ,(quote-expression v2 scope)))
+         `($$eq? ,(compile-expression v1 scope)
+                 ,(compile-expression v2 scope)))
         ((or (string? v1) (string? v2))
-         `($$equal? ,(quote-expression v1 scope)
-                    ,(quote-expression v2 scope)))
-        ((null? v1) `($$null? ,(quote-expression v2 scope)))
-        ((null? v2) `($$null? ,(quote-expression v1 scope)))
-        (else `(= ,(quote-expression v1 scope)
-                  ,(quote-expression v2 scope)))))
+         `($$equal? ,(compile-expression v1 scope)
+                    ,(compile-expression v2 scope)))
+        ((null? v1) `($$null? ,(compile-expression v2 scope)))
+        ((null? v2) `($$null? ,(compile-expression v1 scope)))
+        (else `(= ,(compile-expression v1 scope)
+                  ,(compile-expression v2 scope)))))
 
 (define (emit-application op params scope)
   (let* ((arity (function-arity op))
          (partial-call? (not (or (= arity -1) (= arity (length params)))))
-         (args (map (lambda (exp) (quote-expression exp scope))
+         (args (map (lambda (exp) (compile-expression exp scope))
                     params))
          (args-list (left-to-right `($$list ,@args))))
     (cond ((null? args)
-           (cond ((pair? op) `(,(quote-expression op scope)))
+           (cond ((pair? op) `(,(compile-expression op scope)))
                  ((unbound-symbol? op scope) `(,op))
                  (else `(($$function-binding ,op)))))
           (partial-call?
            `($$call-nested ,($$nest-lambda op arity) ,args-list))
           ((or (pair? op) (not (unbound-symbol? op scope)))
            (left-to-right
-            `($$call-nested ($$function ,(quote-expression op scope)) ,args-list)))
+            `($$call-nested ($$function ,(compile-expression op scope)) ,args-list)))
           (else
            (left-to-right (cons op args))))))
 
@@ -512,8 +504,8 @@
      ;; and partially-calls itself
      (register-function-arity name (length args))
      `(defun ,name ,args
-        ,(quote-expression body args)))
-    (else (quote-expression expr '()))))
+        ,(compile-expression body args)))
+    (else (compile-expression expr '()))))
 
 ;; Overrides
 
