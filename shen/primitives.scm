@@ -1,6 +1,14 @@
 ;; Boolean Operators
 ;;
 
+(define-syntax assert-boolean
+  (syntax-rules ()
+    ((_ ?value)
+     (let ((value ?value))
+       (if (boolean? value)
+           value
+           (error "expected a boolean, got" value))))))
+
 (define-syntax kl:if
   (syntax-rules ()
     ((_ ?test ?then ?else)
@@ -164,6 +172,11 @@
          (vector=? a b))
         (else (equal? a b))))
 
+(define *shen-environment* #f)
+
+(define ($$set-shen-environment! env)
+  (set! *shen-environment* env))
+
 (define ($$eval-in-shen expr)
   (eval expr *shen-environment*))
 
@@ -196,6 +209,10 @@
 
 (define kl:read-byte read-u8)
 (define kl:write-byte write-u8)
+
+(define (full-path-for-file filename)
+  (make-path (kl:value '*home-directory*)
+             filename))
 
 (define (kl:open filename direction)
   (let ((full-path (full-path-for-file filename)))

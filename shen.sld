@@ -49,6 +49,8 @@
      (kl:<=               <=)
      (kl:number?          number?))
 
+   (shen overwrites-internal)
+
    (prefix (scheme base) $$)
    (prefix (scheme char) $$)
    (prefix (scheme file) $$)
@@ -81,5 +83,4 @@
   (include "compiled/t-star.kl.scm")
 
   (begin
-    ($$init-*system*)
     (cd ".")))

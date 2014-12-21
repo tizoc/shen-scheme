@@ -1,3 +1,7 @@
+(define (full-path-for-file filename)
+  (make-path (kl:value '*home-directory*)
+             filename))
+
 (define ($$read-file-as-string filename)
   (call-with-input-file (full-path-for-file filename)
     port->string))
@@ -13,9 +17,11 @@
               (loop (- position 1)
                     (cons (bytevector-u8-ref bytes position) result))))))))
 
-(define shen-*system* (make-hash-table eq?))
+(define shen-*system* #f)
 
-(define ($$init-*system*)
+(define (init-*system*)
+  (set! shen-*system* (make-hash-table eq?))
+
   (for-each
    (lambda (sym) (hash-table-set! shen-*system*
                                   (case sym
@@ -23,10 +29,13 @@
                                     ((#f) 'false)
                                     (else sym)) #t))
    (($$function-binding 'get)
-    'shen 'shen.external-symbols (kl:value '*property-vector*))))
+    'shen 'shen.external-symbols (kl:value '*property-vector*)))
+
+  shen-*system*)
 
 (define ($$shen-sysfunc? val)
-  (hash-table-ref/default shen-*system* val #f))
+  (let ((table (or shen-*system* (init-*system*))))
+    (hash-table-ref/default table val #f)))
 
 (define ($$shen-walk func val)
   (if (pair? val)

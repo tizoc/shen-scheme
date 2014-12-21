@@ -39,7 +39,7 @@
 (defun shen.byte->digit (N)
   ($$- N 48))
 
-;; Definitions for these are on shen/primitives.scm
+;; Definitions for these are on shen/overwrites-internal.scm
 
 (defun shen.sysfunc? (Val)
   ($$shen-sysfunc? Val))

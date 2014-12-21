@@ -12,19 +12,10 @@
   (export
    $$set-shen-environment!
    $$function-binding
-   $$read-file-as-bytelist
-   $$read-file-as-string
-   $$eval-in-shen
    $$l2r
    $$call-nested
    $$nest-lambda
    $$function
-
-   $$shen-sysfunc?
-   $$init-*system*
-
-   $$shen-walk
-   $$macroexpand
 
    kl:if
    kl:and
@@ -75,8 +66,6 @@
 
    kl->scheme)
 
-  (include "utils.scm")
   (include "primitives.scm")
   (include "declarations.scm")
-  (include "compiler.scm")
-  (include "overwrites-internal.scm"))
+  (include "compiler.scm"))
