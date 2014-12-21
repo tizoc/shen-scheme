@@ -74,4 +74,9 @@
    kl:number?
 
    kl->scheme)
-  (include "primitives.scm"))
+
+  (include "utils.scm")
+  (include "primitives.scm")
+  (include "declarations.scm")
+  (include "compiler.scm")
+  (include "overwrites-internal.scm"))
