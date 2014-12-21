@@ -177,11 +177,11 @@
 (define ($$set-shen-environment! env)
   (set! *shen-environment* env))
 
-(define ($$eval-in-shen expr)
+(define (eval-in-shen expr)
   (eval expr *shen-environment*))
 
 (define (kl:eval-kl expr)
-  ($$eval-in-shen (kl->scheme expr)))
+  (eval-in-shen (kl->scheme expr)))
 
 (define-syntax kl:freeze
   (syntax-rules ()
@@ -258,3 +258,92 @@
 (define (kl:<= a b) (<= a b))
 
 (define kl:number? number?)
+
+;; Support
+
+(define-syntax $$l2r
+  (syntax-rules ()
+    ((_ () ?expr) ?expr)
+    ((_ (?op ?params ...) (?expr ...))
+     (let ((f ?op))
+       ($$l2r (?params ...) (?expr ... f))))))
+
+(define ($$call-nested f args)
+  (if (null? args)
+      f
+      ($$call-nested (f (car args)) (cdr args))))
+
+(define (arity-error? e)
+  (string-prefix? "not enough args" (error-object-message e)))
+
+(define (handle-arity-error exn f args)
+  (if (and (arity-error? exn) (> (function-arity f) (length args)))
+      ($$call-nested
+       (kl:eval-kl (nest-lambda f (function-arity f))) args)
+      (raise exn)))
+
+(define ($$function-binding maybe-symbol)
+  (if (symbol? maybe-symbol)
+      (hash-table-ref *shen-functions* maybe-symbol
+                      (lambda () (error "undefined function: "
+                                        maybe-symbol)))
+      maybe-symbol))
+
+(define ($$function f)
+  (if (not (symbol? f))
+      f
+      (lambda args
+        (call-with-current-continuation
+         (lambda (exit)
+           (with-exception-handler
+            (lambda (exn) (exit (handle-arity-error exn f args)))
+            (lambda () (apply ($$function-binding f) args))))))))
+
+;; Function references by name
+
+(define (or-function a b)
+  (kl:or a b))
+
+(define (and-function a b)
+  (kl:and a b))
+
+(map (lambda (name+ref) (apply register-function name+ref))
+     `((intern ,kl:intern)
+       (pos ,kl:pos)
+       (tlstr ,kl:tlstr)
+       (cn ,kl:cn)
+       (str ,kl:str)
+       (string? ,kl:string?)
+       (string->n ,kl:string->n)
+       (n->string ,kl:n->string)
+       (set ,kl:set)
+       (value ,kl:value)
+       (simple-error ,kl:simple-error)
+       (error-to-string ,kl:error-to-string)
+       (cons ,kl:cons)
+       (hd ,kl:hd)
+       (tl ,kl:tl)
+       (cons? ,kl:cons?)
+       (= ,kl:=)
+       (eval-kl ,kl:eval-kl)
+       (type ,kl:type)
+       (absvector ,kl:absvector)
+       (<-address ,kl:<-address)
+       (address-> ,kl:address->)
+       (absvector? ,kl:absvector?)
+       (read-byte ,kl:read-byte)
+       (write-byte ,kl:write-byte)
+       (open ,kl:open)
+       (close ,kl:close)
+       (get-time ,kl:get-time)
+       (+ ,kl:+)
+       (- ,kl:-)
+       (* ,kl:*)
+       (/ ,kl:/)
+       (> ,kl:>)
+       (< ,kl:<)
+       (>= ,kl:>=)
+       (<= ,kl:<=)
+       (or ,or-function)
+       (and ,and-function)
+       (number? ,kl:number?)))

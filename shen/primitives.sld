@@ -7,14 +7,15 @@
           (only (srfi 1) filter)
           (only (chibi pathname) make-path)
           (only (chibi filesystem) file-exists?)
-          (only (chibi io) port->string read-u8))
+          (only (chibi io) port->string read-u8)
+
+          (shen compiler))
 
   (export
    $$set-shen-environment!
    $$function-binding
    $$l2r
    $$call-nested
-   $$nest-lambda
    $$function
 
    kl:if
@@ -66,6 +67,4 @@
 
    kl->scheme)
 
-  (include "primitives.scm")
-  (include "declarations.scm")
-  (include "compiler.scm"))
+  (include "primitives.scm"))

@@ -77,14 +77,14 @@
                  ((unbound-symbol? op scope) `(,op))
                  (else `(($$function-binding ,op)))))
           (partial-call?
-           `($$call-nested ,($$nest-lambda op arity) ,args-list))
+           `($$call-nested ,(nest-lambda op arity) ,args-list))
           ((or (pair? op) (not (unbound-symbol? op scope)))
            (left-to-right
             `($$call-nested ($$function ,(compile-expression op scope)) ,args-list)))
           (else
            (left-to-right (cons op args))))))
 
-(define ($$nest-lambda callable arity)
+(define (nest-lambda callable arity)
   (define (merge-args f arg)
     (if (pair? f)
         (append f (list arg))
@@ -94,38 +94,7 @@
       callable
       (let ((aname (gensym "Y")))
         `(lambda ,aname
-           ,($$nest-lambda (merge-args callable aname) (- arity 1))))))
-
-(define ($$call-nested f args)
-  (if (null? args)
-      f
-      ($$call-nested (f (car args)) (cdr args))))
-
-(define (arity-error? e)
-  (string-prefix? "not enough args" (error-object-message e)))
-
-(define (handle-arity-error exn f args)
-  (if (and (arity-error? exn) (> (function-arity f) (length args)))
-      ($$call-nested
-       (kl:eval-kl ($$nest-lambda f (function-arity f))) args)
-      (raise exn)))
-
-(define ($$function-binding maybe-symbol)
-  (if (symbol? maybe-symbol)
-      (hash-table-ref *shen-functions* maybe-symbol
-                      (lambda () (error "undefined function: "
-                                        maybe-symbol)))
-      maybe-symbol))
-
-(define ($$function f)
-  (if (not (symbol? f))
-      f
-      (lambda args
-        (call-with-current-continuation
-         (lambda (exit)
-           (with-exception-handler
-            (lambda (exn) (exit (handle-arity-error exn f args)))
-            (lambda () (apply ($$function-binding f) args))))))))
+           ,(nest-lambda (merge-args callable aname) (- arity 1))))))
 
 ;; Enforce left-to-right evaluation if needed
 (define (left-to-right expr)
@@ -133,13 +102,6 @@
           (< (length (filter pair? expr)) 2))
       expr
       `($$l2r ,expr ())))
-
-(define-syntax $$l2r
-  (syntax-rules ()
-    ((_ () ?expr) ?expr)
-    ((_ (?op ?params ...) (?expr ...))
-     (let ((f ?op))
-       ($$l2r (?params ...) (?expr ... f))))))
 
 (define (kl->scheme expr)
   (match expr
