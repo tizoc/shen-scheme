@@ -273,15 +273,6 @@
       f
       ($$call-nested (f (car args)) (cdr args))))
 
-(define (arity-error? e)
-  (string-prefix? "not enough args" (error-object-message e)))
-
-(define (handle-arity-error exn f args)
-  (if (and (arity-error? exn) (> (function-arity f) (length args)))
-      ($$call-nested
-       (kl:eval-kl (nest-lambda f (function-arity f))) args)
-      (raise exn)))
-
 (define ($$function-binding maybe-symbol)
   (if (symbol? maybe-symbol)
       (hash-table-ref *shen-functions* maybe-symbol
@@ -290,14 +281,9 @@
       maybe-symbol))
 
 (define ($$function f)
-  (if (not (symbol? f))
-      f
-      (lambda args
-        (call-with-current-continuation
-         (lambda (exit)
-           (with-exception-handler
-            (lambda (exn) (exit (handle-arity-error exn f args)))
-            (lambda () (apply ($$function-binding f) args))))))))
+  (if (symbol? f)
+      (kl:eval-kl (nest-lambda f (function-arity f)))
+      f))
 
 ;; Function references by name
 
