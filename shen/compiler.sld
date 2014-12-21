@@ -1,13 +1,8 @@
 (define-library (shen compiler)
-  (import (scheme base) (scheme eval)
-          (scheme write) (scheme file) (scheme time) (scheme char)
+  (import (scheme base)
           (srfi 69)
-          (chibi match) (chibi string)
-          (only (chibi) call-with-output-string)
-          (only (srfi 1) filter)
-          (only (chibi pathname) make-path)
-          (only (chibi filesystem) file-exists?)
-          (only (chibi io) port->string read-u8))
+          (chibi match)
+          (only (srfi 1) filter))
 
   (export kl->scheme
           register-function
