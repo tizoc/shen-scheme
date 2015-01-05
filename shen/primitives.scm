@@ -161,16 +161,16 @@
 
 (define (kl:= a b)
   (cond ((eq? a b) #t) ;; fast path
-        ((and (number? a) (number? b))
-         (= a b))
+        ((number? a) (and (number? b) (= a b)))
+        ((pair? a)
+         (and (pair? b)
+              (kl:= (car a) (car b))
+              (kl:= (cdr a) (cdr b))))
+        ((string? a) (and (string? b) (string=? a b)))
         ;; if eq? was false none of these can result in #t
         ((or (null? a) (null? b) (symbol? a) (symbol? b)) #f)
-        ((and (pair? a) (pair? b))
-         (and (kl:= (car a) (car b))
-              (kl:= (cdr a) (cdr b))))
-        ((and (vector? a) (vector? b))
-         (vector=? a b))
-        (else (equal? a b))))
+        ((vector? a) (and (vector? b) (vector=? a b)))
+        (else #f)))
 
 (define *shen-environment* #f)
 
