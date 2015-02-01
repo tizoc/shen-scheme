@@ -13,13 +13,13 @@
     (unbound-symbol? maybe-sym scope))
 
   (match expr
-    ((? null?) '($$quote ()))
+    ((? null?) '(scm.quote ()))
     ('true #t)
     ('false #f)
-    ('|{| '($$quote |{|))
-    ('|}| '($$quote |}|))
-    ('|;| '($$quote |;|))
-    ((? unbound? sym) `($$quote ,sym))
+    ('|{| '(scm.quote |{|))
+    ('|}| '(scm.quote |}|))
+    ('|;| '(scm.quote |;|))
+    ((? unbound? sym) `(scm.quote ,sym))
     (('let var value body) (emit-let var value body (cons var scope)))
     (('cond clauses ...) (emit-cond clauses scope))
     ;; Remove intermediary wrapper lambdas
@@ -27,10 +27,10 @@
     (('lambda var body)
      `(lambda ,var ,(compile-expression body (cons var scope))))
     (('do expr1 expr2)
-     `($$begin ,(compile-expression expr1 scope) ,(compile-expression expr2 scope)))
-    (('fail) '($$quote shen.fail!))
+     `(scm.begin ,(compile-expression expr1 scope) ,(compile-expression expr2 scope)))
+    (('fail) '(scm.quote shen.fail!))
     (('$native exp) exp)
-    (('$native . exps) `($$begin ,@exps))
+    (('$native . exps) `(scm.begin ,@exps))
     (('= v1 v2) (emit-equality-check v1 v2 scope))
     ((op params ...) (emit-application op params scope))
     (else expr)))
@@ -56,13 +56,13 @@
              (unbound-symbol? v2 scope)
              (equal? '(fail) v1)
              (equal? '(fail) v2))
-         `($$eq? ,(compile-expression v1 scope)
-                 ,(compile-expression v2 scope)))
+         `(scm.eq? ,(compile-expression v1 scope)
+                   ,(compile-expression v2 scope)))
         ((or (string? v1) (string? v2))
-         `($$equal? ,(compile-expression v1 scope)
-                    ,(compile-expression v2 scope)))
-        ((null? v1) `($$null? ,(compile-expression v2 scope)))
-        ((null? v2) `($$null? ,(compile-expression v1 scope)))
+         `(scm.equal? ,(compile-expression v1 scope)
+                      ,(compile-expression v2 scope)))
+        ((null? v1) `(scm.null? ,(compile-expression v2 scope)))
+        ((null? v2) `(scm.null? ,(compile-expression v1 scope)))
         (else `(= ,(compile-expression v1 scope)
                   ,(compile-expression v2 scope)))))
 
@@ -71,16 +71,16 @@
          (partial-call? (not (or (= arity -1) (= arity (length params)))))
          (args (map (lambda (exp) (compile-expression exp scope))
                     params))
-         (args-list (left-to-right `($$list ,@args))))
+         (args-list (left-to-right `(scm.list ,@args))))
     (cond ((null? args)
            (cond ((pair? op) `(,(compile-expression op scope)))
                  ((unbound-symbol? op scope) `(,op))
-                 (else `(($$function-binding ,op)))))
+                 (else `((scm.function-binding ,op)))))
           (partial-call?
-           `($$call-nested ,(nest-lambda op arity) ,args-list))
+           `(scm.call-nested ,(nest-lambda op arity) ,args-list))
           ((or (pair? op) (not (unbound-symbol? op scope)))
            (left-to-right
-            `($$call-nested ($$function ,(compile-expression op scope)) ,args-list)))
+            `(scm.call-nested (scm.function ,(compile-expression op scope)) ,args-list)))
           (else
            (left-to-right (cons op args))))))
 
@@ -101,7 +101,7 @@
   (if (or (memq (car expr) '(trap-error set and or if freeze thaw))
           (< (length (filter pair? expr)) 2))
       expr
-      `($$l2r ,expr ())))
+      `(scm.l2r ,expr ())))
 
 (define (kl->scheme expr)
   (match expr

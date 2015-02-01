@@ -51,14 +51,14 @@
 
    (shen overwrites-internal)
 
-   (prefix (scheme base) $$)
-   (prefix (scheme char) $$)
-   (prefix (scheme file) $$)
-   (prefix (scheme read) $$)
-   (prefix (scheme write) $$)
-   (prefix (scheme eval) $$)
-   (prefix (srfi 69) $$)
-   (prefix (only (chibi) current-environment import) $$))
+   (prefix (scheme base) scm.)
+   (prefix (scheme char) scm.)
+   (prefix (scheme file) scm.)
+   (prefix (scheme read) scm.)
+   (prefix (scheme write) scm.)
+   (prefix (scheme eval) scm.)
+   (prefix (srfi 69) scm.)
+   (prefix (only (chibi) current-environment import) scm.))
 
   (export shen.shen)
 

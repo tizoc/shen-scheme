@@ -2,11 +2,11 @@
   (make-path (kl:value '*home-directory*)
              filename))
 
-(define ($$read-file-as-string filename)
+(define (scm.read-file-as-string filename)
   (call-with-input-file (full-path-for-file filename)
     port->string))
 
-(define ($$read-file-as-bytelist filename)
+(define (scm.read-file-as-bytelist filename)
   (call-with-input-file (full-path-for-file filename)
     (lambda (in)
       (let ((bytes (read-bytevector 1000000 in)))
@@ -28,18 +28,18 @@
                                     ((#t) 'true)
                                     ((#f) 'false)
                                     (else sym)) #t))
-   (($$function-binding 'get)
+   ((scm.function-binding 'get)
     'shen 'shen.external-symbols (kl:value '*property-vector*)))
 
   shen-*system*)
 
-(define ($$shen-sysfunc? val)
+(define (scm.shen-sysfunc? val)
   (let ((table (or shen-*system* (init-*system*))))
     (hash-table-ref/default table val #f)))
 
-(define ($$shen-walk func val)
+(define (scm.shen-walk func val)
   (if (pair? val)
-      (func (map (lambda (subexp) ($$shen-walk func subexp)) val))
+      (func (map (lambda (subexp) (scm.shen-walk func subexp)) val))
       (func val)))
 
 (define (compose funcs value)
@@ -47,14 +47,14 @@
       value
       (compose (cdr funcs) ((car funcs) value))))
 
-(define ($$macroexpand expr)
-  (define macros (map $$function-binding (kl:value '*macros*)))
+(define (scm.macroexpand expr)
+  (define macros (map scm.function-binding (kl:value '*macros*)))
 
   (define (expand expr)
     (let ((transformed (compose macros expr)))
       (if (or (eq? expr transformed)
               (and (pair? expr) (eq? (car expr) '$native)))
           expr
-          ($$shen-walk expand transformed))))
+          (scm.shen-walk expand transformed))))
 
   (expand expr))

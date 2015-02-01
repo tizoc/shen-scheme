@@ -1,57 +1,62 @@
 (defun hash (Val Bound)
-  (let Res ($$hash Val Bound)
-    ($$if ($$eq? 0 Res) 1 Res)))
+  (let Res (scm.hash Val Bound)
+    (scm.if (scm.eq? 0 Res) 1 Res)))
 
 (defun not (Val)
-  ($$not Val))
+  (scm.not Val))
 
 (defun boolean? (Val)
-  ($$boolean? Val))
+  (scm.boolean? Val))
 
 (defun integer? (Val)
-  ($$integer? Val))
+  (scm.integer? Val))
 
 (defun variable? (Val)
-  ($$and ($$symbol? Val)
-         ($$char-upper-case? ($$string-ref ($$symbol->string Val) 0))))
+  (scm.and
+   (scm.symbol? Val)
+   (scm.char-upper-case? (scm.string-ref (scm.symbol->string Val) 0))))
 
 (defun symbol? (Val)
-  ($$symbol? Val))
+  (scm.symbol? Val))
 
 (defun segvar? (Val)
-  ($$and ($$symbol? Val)
-         ($$equal? #\? ($$string-ref ($$symbol->string Val) 0))))
+  (scm.and
+   (scm.symbol? Val)
+   (scm.equal? #\? (scm.string-ref (scm.symbol->string Val) 0))))
 
 (defun shen.pvar? (V)
-  ($$and (absvector? V)
-         ($$> ($$vector-length V) 0)
-         ($$eq? ($$vector-ref V 0) ($$quote shen.pvar))))
+  (scm.and
+   (absvector? V)
+   (scm.> (scm.vector-length V) 0)
+   (scm.eq? (scm.vector-ref V 0) (scm.quote shen.pvar))))
 
 (defun shen.grammar_symbol? (Val)
-  ($$and ($$symbol? Val)
-         (let Strsym ($$symbol->string Val)
-           ($$and ($$equal? #\< ($$string-ref Strsym 0))
-                  ($$equal? #\> ($$string-ref Strsym ($$- ($$string-length Strsym) 1)))))))
+  (scm.and
+   (scm.symbol? Val)
+   (let Strsym (scm.symbol->string Val)
+     (scm.and
+      (scm.equal? #\< (scm.string-ref Strsym 0))
+      (scm.equal? #\> (scm.string-ref Strsym (scm.- (scm.string-length Strsym) 1)))))))
 
 (defun shen.numbyte? (N)
-  ($$and ($$>= N 48) ($$<= N 57)))
+  (scm.and (scm.>= N 48) (scm.<= N 57)))
 
 (defun shen.byte->digit (N)
-  ($$- N 48))
+  (scm.- N 48))
 
 ;; Definitions for these are on shen/overwrites-internal.scm
 
 (defun shen.sysfunc? (Val)
-  ($$shen-sysfunc? Val))
+  (scm.shen-sysfunc? Val))
 
 (defun shen.walk (Func Val)
-  ($$shen-walk ($$function-binding Func) Val))
+  (scm.shen-walk (scm.function-binding Func) Val))
 
 (defun macroexpand (E)
-  ($$macroexpand E))
+  (scm.macroexpand E))
 
 (defun read-file-as-bytelist (Filename)
-  ($$read-file-as-bytelist Filename))
+  (scm.read-file-as-bytelist Filename))
 
 (defun read-file-as-string (Filename)
-  ($$read-file-as-string Filename))
+  (scm.read-file-as-string Filename))

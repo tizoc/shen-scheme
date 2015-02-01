@@ -174,7 +174,7 @@
 
 (define *shen-environment* #f)
 
-(define ($$set-shen-environment! env)
+(define (scm.set-shen-environment! env)
   (set! *shen-environment* env))
 
 (define (eval-in-shen expr)
@@ -261,26 +261,26 @@
 
 ;; Support
 
-(define-syntax $$l2r
+(define-syntax scm.l2r
   (syntax-rules ()
     ((_ () ?expr) ?expr)
     ((_ (?op ?params ...) (?expr ...))
      (let ((f ?op))
-       ($$l2r (?params ...) (?expr ... f))))))
+       (scm.l2r (?params ...) (?expr ... f))))))
 
-(define ($$call-nested f args)
+(define (scm.call-nested f args)
   (if (null? args)
       f
-      ($$call-nested (f (car args)) (cdr args))))
+      (scm.call-nested (f (car args)) (cdr args))))
 
-(define ($$function-binding maybe-symbol)
+(define (scm.function-binding maybe-symbol)
   (if (symbol? maybe-symbol)
       (hash-table-ref *shen-functions* maybe-symbol
                       (lambda () (error "undefined function: "
                                         maybe-symbol)))
       maybe-symbol))
 
-(define ($$function f)
+(define (scm.function f)
   (if (symbol? f)
       (kl:eval-kl (nest-lambda f (function-arity f)))
       f))

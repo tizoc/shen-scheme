@@ -11,11 +11,11 @@
           (shen compiler))
 
   (export
-   $$set-shen-environment!
-   $$function-binding
-   $$l2r
-   $$call-nested
-   $$function
+   scm.set-shen-environment!
+   scm.function-binding
+   scm.l2r
+   scm.call-nested
+   scm.function
 
    kl:if
    kl:and
