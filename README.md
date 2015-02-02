@@ -35,7 +35,5 @@ To launch the Shen REPL do:
 License
 -------
 
-chibi-shen is licensed under [BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause).
-
-- Shen, Copyright © 2010-2015 Mark Tarver
-- chibi-shen, Copyright © 2012-2015 Bruno Deferrari
+- Shen, Copyright © 2010-2015 Mark Tarver - [License](http://www.shenlanguage.org/license.pdf).
+- chibi-shen, Copyright © 2012-2015 Bruno Deferrari under [BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause).
