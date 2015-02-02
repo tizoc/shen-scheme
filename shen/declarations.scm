@@ -1,3 +1,6 @@
+;; Copyright (c) 2012-2015 Bruno Deferrari.  All rights reserved.
+;; BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause
+
 ;; symbol->function registry
 (define *shen-functions* (make-hash-table eq?))
 (define *shen-function-arities* (make-hash-table eq?))

@@ -1,3 +1,6 @@
+;; Copyright (c) 2012-2015 Bruno Deferrari.  All rights reserved.
+;; BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause
+
 (defun hash (Val Bound)
   (let Res (scm.hash Val Bound)
     (scm.if (scm.eq? 0 Res) 1 Res)))

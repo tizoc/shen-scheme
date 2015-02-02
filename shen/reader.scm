@@ -1,3 +1,6 @@
+;; Copyright (c) 2012-2015 Bruno Deferrari.  All rights reserved.
+;; BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause
+
 (define (with-input-from-port port thunk)
   (parameterize ((current-input-port port))
     (thunk)))

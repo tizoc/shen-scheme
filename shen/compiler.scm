@@ -1,3 +1,6 @@
+;; Copyright (c) 2012-2015 Bruno Deferrari.  All rights reserved.
+;; BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause
+
 (define (unbound-symbol? maybe-sym scope)
   (and (symbol? maybe-sym)
        (not (memq maybe-sym scope))))
