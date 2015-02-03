@@ -1,105 +1,81 @@
-"**********************************************************************************
-*                           The License						                                      *
-* 										                                                                  *
-* The user is free to produce commercial applications with the software, to 	          *
-* distribute these applications in source or binary  form, and to charge monies         *
-* for them as he sees fit and in concordance with the laws of the land subject 	        *
-* to the following license.							                                                *
-*										                                                                    * 
-* 1. The license applies to all the software and all derived software and 	            *
-*    must appear on such.							                                                  *
-*										                                                                    *
-* 2. It is illegal to distribute the software without this license attached	            *
-*    to it and use of the software implies agreement with the license as such.          *
-*    It is illegal for anyone who is not the copyright holder to tamper with 	          *
-*    or change the license.							                                                *
-*										                                                                    *
-* 3. Neither the names of Lambda Associates or the copyright holder may be used         *
-*    to endorse or promote products built using the software without specific 	        *
-*    prior written permission from the copyright holder.		                            *
-*										                                                                    *
-* 4. That possession of this license does not confer on the copyright holder 	          *
-*    any special contractual obligation towards the user. That in no event 	            * 
-*    shall the copyright holder be liable for any direct, indirect, incidental,        *   
-*    special, exemplary or consequential damages (including but not limited             *
-*    to procurement of substitute goods or services, loss of use, data, 	              * 
-*    interruption), however caused and on any theory of liability, whether in	          * 
-*    contract, strict liability or tort (including negligence) arising in any         	*
-*    way out of the use of the software, even if advised of the possibility of         	*
-*    such damage.						                                                        		* 
-*										                                                                    *
-* 5. It is permitted for the user to change the software, for the purpose of 	          *
-*    improving performance, correcting an error, or porting to a new platform, 	        *
-*    and distribute the derived version of Shen provided the resulting program 	        *
-*    conforms in all respects to the Shen standard and is issued under that             * 
-*    title. The user must make it clear with his distribution that he/she is 	          *
-*    the author of the changes and what these changes are and why. 		                  *
-*										                                                                    *
-* 6. Derived versions of this software in whatever form are subject to the same         *
-*    restrictions. In particular it is not permitted to make derived copies of          *
-*    this software which do not conform to the Shen standard or appear under a          *
-*    different title.								                                                    *
-*										                                                                    *
-*    It is permitted to distribute versions of Shen which incorporate libraries,        *
-*    graphics or other facilities which are not part of the Shen standard.	            *
-*										                                                                    *
-* For an explication of this license see www.shenlanguage.org/license.htm which         *
-* explains this license in full.                                                        *
-*				 						                                                                    *
-*****************************************************************************************
-"(defun pr (V2292 V2293) (trap-error (shen.prh V2292 V2293 0) (lambda E V2292)))
+"Copyright (c) 2015, Mark Tarver
 
-(defun shen.prh (V2294 V2295 V2296) (shen.prh V2294 V2295 (shen.write-char-and-inc V2294 V2295 V2296)))
+All rights reserved.
 
-(defun shen.write-char-and-inc (V2297 V2298 V2299) (do (write-byte (string->n (pos V2297 V2299)) V2298) (+ V2299 1)))
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3. The name of Mark Tarver may not be used to endorse or promote products
+   derived from this software without specific prior written permission.
 
-(defun print (V2300) (let String (shen.insert V2300 "~S") (let Print (shen.prhush String (stoutput)) V2300)))
+THIS SOFTWARE IS PROVIDED BY Mark Tarver ''AS IS'' AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL Mark Tarver BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 
-(defun shen.prhush (V2301 V2302) (if (value *hush*) V2301 (pr V2301 V2302)))
+(defun pr (V2338 V2339) (trap-error (shen.prh V2338 V2339 0) (lambda E V2338)))
 
-(defun shen.mkstr (V2303 V2304) (cond ((string? V2303) (shen.mkstr-l (shen.proc-nl V2303) V2304)) (true (shen.mkstr-r (cons shen.proc-nl (cons V2303 ())) V2304))))
+(defun shen.prh (V2340 V2341 V2342) (shen.prh V2340 V2341 (shen.write-char-and-inc V2340 V2341 V2342)))
 
-(defun shen.mkstr-l (V2305 V2306) (cond ((= () V2306) V2305) ((cons? V2306) (shen.mkstr-l (shen.insert-l (hd V2306) V2305) (tl V2306))) (true (shen.sys-error shen.mkstr-l))))
+(defun shen.write-char-and-inc (V2343 V2344 V2345) (do (write-byte (string->n (pos V2343 V2345)) V2344) (+ V2345 1)))
 
-(defun shen.insert-l (V2309 V2310) (cond ((= "" V2310) "") ((and (shen.+string? V2310) (and (= "~" (pos V2310 0)) (and (shen.+string? (tlstr V2310)) (= "A" (pos (tlstr V2310) 0))))) (cons shen.app (cons V2309 (cons (tlstr (tlstr V2310)) (cons shen.a ()))))) ((and (shen.+string? V2310) (and (= "~" (pos V2310 0)) (and (shen.+string? (tlstr V2310)) (= "R" (pos (tlstr V2310) 0))))) (cons shen.app (cons V2309 (cons (tlstr (tlstr V2310)) (cons shen.r ()))))) ((and (shen.+string? V2310) (and (= "~" (pos V2310 0)) (and (shen.+string? (tlstr V2310)) (= "S" (pos (tlstr V2310) 0))))) (cons shen.app (cons V2309 (cons (tlstr (tlstr V2310)) (cons shen.s ()))))) ((shen.+string? V2310) (shen.factor-cn (cons cn (cons (pos V2310 0) (cons (shen.insert-l V2309 (tlstr V2310)) ()))))) ((and (cons? V2310) (and (= cn (hd V2310)) (and (cons? (tl V2310)) (and (cons? (tl (tl V2310))) (= () (tl (tl (tl V2310)))))))) (cons cn (cons (hd (tl V2310)) (cons (shen.insert-l V2309 (hd (tl (tl V2310)))) ())))) ((and (cons? V2310) (and (= shen.app (hd V2310)) (and (cons? (tl V2310)) (and (cons? (tl (tl V2310))) (and (cons? (tl (tl (tl V2310)))) (= () (tl (tl (tl (tl V2310)))))))))) (cons shen.app (cons (hd (tl V2310)) (cons (shen.insert-l V2309 (hd (tl (tl V2310)))) (tl (tl (tl V2310))))))) (true (shen.sys-error shen.insert-l))))
+(defun print (V2346) (let String (shen.insert V2346 "~S") (let Print (shen.prhush String (stoutput)) V2346)))
 
-(defun shen.factor-cn (V2311) (cond ((and (cons? V2311) (and (= cn (hd V2311)) (and (cons? (tl V2311)) (and (cons? (tl (tl V2311))) (and (cons? (hd (tl (tl V2311)))) (and (= cn (hd (hd (tl (tl V2311))))) (and (cons? (tl (hd (tl (tl V2311))))) (and (cons? (tl (tl (hd (tl (tl V2311)))))) (and (= () (tl (tl (tl (hd (tl (tl V2311))))))) (and (= () (tl (tl (tl V2311)))) (and (string? (hd (tl V2311))) (string? (hd (tl (hd (tl (tl V2311))))))))))))))))) (cons cn (cons (cn (hd (tl V2311)) (hd (tl (hd (tl (tl V2311)))))) (tl (tl (hd (tl (tl V2311)))))))) (true V2311)))
+(defun shen.prhush (V2347 V2348) (if (value *hush*) V2347 (pr V2347 V2348)))
 
-(defun shen.proc-nl (V2312) (cond ((= "" V2312) "") ((and (shen.+string? V2312) (and (= "~" (pos V2312 0)) (and (shen.+string? (tlstr V2312)) (= "%" (pos (tlstr V2312) 0))))) (cn (n->string 10) (shen.proc-nl (tlstr (tlstr V2312))))) ((shen.+string? V2312) (cn (pos V2312 0) (shen.proc-nl (tlstr V2312)))) (true (shen.sys-error shen.proc-nl))))
+(defun shen.mkstr (V2349 V2350) (cond ((string? V2349) (shen.mkstr-l (shen.proc-nl V2349) V2350)) (true (shen.mkstr-r (cons shen.proc-nl (cons V2349 ())) V2350))))
 
-(defun shen.mkstr-r (V2313 V2314) (cond ((= () V2314) V2313) ((cons? V2314) (shen.mkstr-r (cons shen.insert (cons (hd V2314) (cons V2313 ()))) (tl V2314))) (true (shen.sys-error shen.mkstr-r))))
+(defun shen.mkstr-l (V2351 V2352) (cond ((= () V2352) V2351) ((cons? V2352) (shen.mkstr-l (shen.insert-l (hd V2352) V2351) (tl V2352))) (true (shen.f_error shen.mkstr-l))))
 
-(defun shen.insert (V2315 V2316) (shen.insert-h V2315 V2316 ""))
+(defun shen.insert-l (V2355 V2356) (cond ((= "" V2356) "") ((and (shen.+string? V2356) (and (= "~" (pos V2356 0)) (and (shen.+string? (tlstr V2356)) (= "A" (pos (tlstr V2356) 0))))) (cons shen.app (cons V2355 (cons (tlstr (tlstr V2356)) (cons shen.a ()))))) ((and (shen.+string? V2356) (and (= "~" (pos V2356 0)) (and (shen.+string? (tlstr V2356)) (= "R" (pos (tlstr V2356) 0))))) (cons shen.app (cons V2355 (cons (tlstr (tlstr V2356)) (cons shen.r ()))))) ((and (shen.+string? V2356) (and (= "~" (pos V2356 0)) (and (shen.+string? (tlstr V2356)) (= "S" (pos (tlstr V2356) 0))))) (cons shen.app (cons V2355 (cons (tlstr (tlstr V2356)) (cons shen.s ()))))) ((shen.+string? V2356) (shen.factor-cn (cons cn (cons (pos V2356 0) (cons (shen.insert-l V2355 (tlstr V2356)) ()))))) ((and (cons? V2356) (and (= cn (hd V2356)) (and (cons? (tl V2356)) (and (cons? (tl (tl V2356))) (= () (tl (tl (tl V2356)))))))) (cons cn (cons (hd (tl V2356)) (cons (shen.insert-l V2355 (hd (tl (tl V2356)))) ())))) ((and (cons? V2356) (and (= shen.app (hd V2356)) (and (cons? (tl V2356)) (and (cons? (tl (tl V2356))) (and (cons? (tl (tl (tl V2356)))) (= () (tl (tl (tl (tl V2356)))))))))) (cons shen.app (cons (hd (tl V2356)) (cons (shen.insert-l V2355 (hd (tl (tl V2356)))) (tl (tl (tl V2356))))))) (true (shen.f_error shen.insert-l))))
 
-(defun shen.insert-h (V2319 V2320 V2321) (cond ((= "" V2320) V2321) ((and (shen.+string? V2320) (and (= "~" (pos V2320 0)) (and (shen.+string? (tlstr V2320)) (= "A" (pos (tlstr V2320) 0))))) (cn V2321 (shen.app V2319 (tlstr (tlstr V2320)) shen.a))) ((and (shen.+string? V2320) (and (= "~" (pos V2320 0)) (and (shen.+string? (tlstr V2320)) (= "R" (pos (tlstr V2320) 0))))) (cn V2321 (shen.app V2319 (tlstr (tlstr V2320)) shen.r))) ((and (shen.+string? V2320) (and (= "~" (pos V2320 0)) (and (shen.+string? (tlstr V2320)) (= "S" (pos (tlstr V2320) 0))))) (cn V2321 (shen.app V2319 (tlstr (tlstr V2320)) shen.s))) ((shen.+string? V2320) (shen.insert-h V2319 (tlstr V2320) (cn V2321 (pos V2320 0)))) (true (shen.sys-error shen.insert-h))))
+(defun shen.factor-cn (V2357) (cond ((and (cons? V2357) (and (= cn (hd V2357)) (and (cons? (tl V2357)) (and (cons? (tl (tl V2357))) (and (cons? (hd (tl (tl V2357)))) (and (= cn (hd (hd (tl (tl V2357))))) (and (cons? (tl (hd (tl (tl V2357))))) (and (cons? (tl (tl (hd (tl (tl V2357)))))) (and (= () (tl (tl (tl (hd (tl (tl V2357))))))) (and (= () (tl (tl (tl V2357)))) (and (string? (hd (tl V2357))) (string? (hd (tl (hd (tl (tl V2357))))))))))))))))) (cons cn (cons (cn (hd (tl V2357)) (hd (tl (hd (tl (tl V2357)))))) (tl (tl (hd (tl (tl V2357)))))))) (true V2357)))
 
-(defun shen.app (V2322 V2323 V2324) (cn (shen.arg->str V2322 V2324) V2323))
+(defun shen.proc-nl (V2358) (cond ((= "" V2358) "") ((and (shen.+string? V2358) (and (= "~" (pos V2358 0)) (and (shen.+string? (tlstr V2358)) (= "%" (pos (tlstr V2358) 0))))) (cn (n->string 10) (shen.proc-nl (tlstr (tlstr V2358))))) ((shen.+string? V2358) (cn (pos V2358 0) (shen.proc-nl (tlstr V2358)))) (true (shen.f_error shen.proc-nl))))
 
-(defun shen.arg->str (V2330 V2331) (cond ((= V2330 (fail)) "...") ((shen.list? V2330) (shen.list->str V2330 V2331)) ((string? V2330) (shen.str->str V2330 V2331)) ((absvector? V2330) (shen.vector->str V2330 V2331)) (true (shen.atom->str V2330))))
+(defun shen.mkstr-r (V2359 V2360) (cond ((= () V2360) V2359) ((cons? V2360) (shen.mkstr-r (cons shen.insert (cons (hd V2360) (cons V2359 ()))) (tl V2360))) (true (shen.f_error shen.mkstr-r))))
 
-(defun shen.list->str (V2332 V2333) (cond ((= shen.r V2333) (@s "(" (@s (shen.iter-list V2332 shen.r (shen.maxseq)) ")"))) (true (@s "[" (@s (shen.iter-list V2332 V2333 (shen.maxseq)) "]")))))
+(defun shen.insert (V2361 V2362) (shen.insert-h V2361 V2362 ""))
+
+(defun shen.insert-h (V2365 V2366 V2367) (cond ((= "" V2366) V2367) ((and (shen.+string? V2366) (and (= "~" (pos V2366 0)) (and (shen.+string? (tlstr V2366)) (= "A" (pos (tlstr V2366) 0))))) (cn V2367 (shen.app V2365 (tlstr (tlstr V2366)) shen.a))) ((and (shen.+string? V2366) (and (= "~" (pos V2366 0)) (and (shen.+string? (tlstr V2366)) (= "R" (pos (tlstr V2366) 0))))) (cn V2367 (shen.app V2365 (tlstr (tlstr V2366)) shen.r))) ((and (shen.+string? V2366) (and (= "~" (pos V2366 0)) (and (shen.+string? (tlstr V2366)) (= "S" (pos (tlstr V2366) 0))))) (cn V2367 (shen.app V2365 (tlstr (tlstr V2366)) shen.s))) ((shen.+string? V2366) (shen.insert-h V2365 (tlstr V2366) (cn V2367 (pos V2366 0)))) (true (shen.f_error shen.insert-h))))
+
+(defun shen.app (V2368 V2369 V2370) (cn (shen.arg->str V2368 V2370) V2369))
+
+(defun shen.arg->str (V2376 V2377) (cond ((= V2376 (fail)) "...") ((shen.list? V2376) (shen.list->str V2376 V2377)) ((string? V2376) (shen.str->str V2376 V2377)) ((absvector? V2376) (shen.vector->str V2376 V2377)) (true (shen.atom->str V2376))))
+
+(defun shen.list->str (V2378 V2379) (cond ((= shen.r V2379) (@s "(" (@s (shen.iter-list V2378 shen.r (shen.maxseq)) ")"))) (true (@s "[" (@s (shen.iter-list V2378 V2379 (shen.maxseq)) "]")))))
 
 (defun shen.maxseq () (value *maximum-print-sequence-size*))
 
-(defun shen.iter-list (V2344 V2345 V2346) (cond ((= () V2344) "") ((= 0 V2346) "... etc") ((and (cons? V2344) (= () (tl V2344))) (shen.arg->str (hd V2344) V2345)) ((cons? V2344) (@s (shen.arg->str (hd V2344) V2345) (@s " " (shen.iter-list (tl V2344) V2345 (- V2346 1))))) (true (@s "|" (@s " " (shen.arg->str V2344 V2345))))))
+(defun shen.iter-list (V2390 V2391 V2392) (cond ((= () V2390) "") ((= 0 V2392) "... etc") ((and (cons? V2390) (= () (tl V2390))) (shen.arg->str (hd V2390) V2391)) ((cons? V2390) (@s (shen.arg->str (hd V2390) V2391) (@s " " (shen.iter-list (tl V2390) V2391 (- V2392 1))))) (true (@s "|" (@s " " (shen.arg->str V2390 V2391))))))
 
-(defun shen.str->str (V2351 V2352) (cond ((= shen.a V2352) V2351) (true (@s (n->string 34) (@s V2351 (n->string 34))))))
+(defun shen.str->str (V2397 V2398) (cond ((= shen.a V2398) V2397) (true (@s (n->string 34) (@s V2397 (n->string 34))))))
 
-(defun shen.vector->str (V2353 V2354) (if (shen.print-vector? V2353) ((<-address V2353 0) V2353) (if (vector? V2353) (@s "<" (@s (shen.iter-vector V2353 1 V2354 (shen.maxseq)) ">")) (@s "<" (@s "<" (@s (shen.iter-vector V2353 0 V2354 (shen.maxseq)) ">>"))))))
+(defun shen.vector->str (V2399 V2400) (if (shen.print-vector? V2399) ((<-address V2399 0) V2399) (if (vector? V2399) (@s "<" (@s (shen.iter-vector V2399 1 V2400 (shen.maxseq)) ">")) (@s "<" (@s "<" (@s (shen.iter-vector V2399 0 V2400 (shen.maxseq)) ">>"))))))
 
-(defun shen.print-vector? (V2355) (let Zero (<-address V2355 0) (if (= Zero shen.tuple) true (if (= Zero shen.pvar) true (if (not (number? Zero)) (shen.fbound? Zero) false)))))
+(defun shen.print-vector? (V2401) (let Zero (<-address V2401 0) (if (= Zero shen.tuple) true (if (= Zero shen.pvar) true (if (not (number? Zero)) (shen.fbound? Zero) false)))))
 
-(defun shen.fbound? (V2356) (trap-error (do (ps V2356) true) (lambda E false)))
+(defun shen.fbound? (V2402) (trap-error (do (ps V2402) true) (lambda E false)))
 
-(defun shen.tuple (V2357) (cn "(@p " (shen.app (<-address V2357 1) (cn " " (shen.app (<-address V2357 2) ")" shen.s)) shen.s)))
+(defun shen.tuple (V2403) (cn "(@p " (shen.app (<-address V2403 1) (cn " " (shen.app (<-address V2403 2) ")" shen.s)) shen.s)))
 
-(defun shen.iter-vector (V2364 V2365 V2366 V2367) (cond ((= 0 V2367) "... etc") (true (let Item (trap-error (<-address V2364 V2365) (lambda E shen.out-of-bounds)) (let Next (trap-error (<-address V2364 (+ V2365 1)) (lambda E shen.out-of-bounds)) (if (= Item shen.out-of-bounds) "" (if (= Next shen.out-of-bounds) (shen.arg->str Item V2366) (@s (shen.arg->str Item V2366) (@s " " (shen.iter-vector V2364 (+ V2365 1) V2366 (- V2367 1)))))))))))
+(defun shen.iter-vector (V2410 V2411 V2412 V2413) (cond ((= 0 V2413) "... etc") (true (let Item (trap-error (<-address V2410 V2411) (lambda E shen.out-of-bounds)) (let Next (trap-error (<-address V2410 (+ V2411 1)) (lambda E shen.out-of-bounds)) (if (= Item shen.out-of-bounds) "" (if (= Next shen.out-of-bounds) (shen.arg->str Item V2412) (@s (shen.arg->str Item V2412) (@s " " (shen.iter-vector V2410 (+ V2411 1) V2412 (- V2413 1)))))))))))
 
-(defun shen.atom->str (V2368) (trap-error (str V2368) (lambda E (shen.funexstring))))
+(defun shen.atom->str (V2414) (trap-error (str V2414) (lambda E (shen.funexstring))))
 
 (defun shen.funexstring () (@s "" (@s "f" (@s "u" (@s "n" (@s "e" (@s (shen.arg->str (gensym (intern "x")) shen.a) "")))))))
 
-(defun shen.list? (V2369) (or (empty? V2369) (cons? V2369)))
+(defun shen.list? (V2415) (or (empty? V2415) (cons? V2415)))
 
 
 

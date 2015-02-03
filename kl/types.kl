@@ -1,60 +1,36 @@
-"**********************************************************************************
-*                           The License						                                      *
-* 										                                                                  *
-* The user is free to produce commercial applications with the software, to 	          *
-* distribute these applications in source or binary  form, and to charge monies         *
-* for them as he sees fit and in concordance with the laws of the land subject 	        *
-* to the following license.							                                                *
-*										                                                                    * 
-* 1. The license applies to all the software and all derived software and 	            *
-*    must appear on such.							                                                  *
-*										                                                                    *
-* 2. It is illegal to distribute the software without this license attached	            *
-*    to it and use of the software implies agreement with the license as such.          *
-*    It is illegal for anyone who is not the copyright holder to tamper with 	          *
-*    or change the license.							                                                *
-*										                                                                    *
-* 3. Neither the names of Lambda Associates or the copyright holder may be used         *
-*    to endorse or promote products built using the software without specific 	        *
-*    prior written permission from the copyright holder.		                            *
-*										                                                                    *
-* 4. That possession of this license does not confer on the copyright holder 	          *
-*    any special contractual obligation towards the user. That in no event 	            * 
-*    shall the copyright holder be liable for any direct, indirect, incidental,        *   
-*    special, exemplary or consequential damages (including but not limited             *
-*    to procurement of substitute goods or services, loss of use, data, 	              * 
-*    interruption), however caused and on any theory of liability, whether in	          * 
-*    contract, strict liability or tort (including negligence) arising in any         	*
-*    way out of the use of the software, even if advised of the possibility of         	*
-*    such damage.						                                                        		* 
-*										                                                                    *
-* 5. It is permitted for the user to change the software, for the purpose of 	          *
-*    improving performance, correcting an error, or porting to a new platform, 	        *
-*    and distribute the derived version of Shen provided the resulting program 	        *
-*    conforms in all respects to the Shen standard and is issued under that             * 
-*    title. The user must make it clear with his distribution that he/she is 	          *
-*    the author of the changes and what these changes are and why. 		                  *
-*										                                                                    *
-* 6. Derived versions of this software in whatever form are subject to the same         *
-*    restrictions. In particular it is not permitted to make derived copies of          *
-*    this software which do not conform to the Shen standard or appear under a          *
-*    different title.								                                                    *
-*										                                                                    *
-*    It is permitted to distribute versions of Shen which incorporate libraries,        *
-*    graphics or other facilities which are not part of the Shen standard.	            *
-*										                                                                    *
-* For an explication of this license see www.shenlanguage.org/license.htm which         *
-* explains this license in full.                                                        *
-*				 						                                                                    *
-*****************************************************************************************
-"(defun declare (V2166 V2167) (let Record (set shen.*signedfuncs* (cons (cons V2166 V2167) (value shen.*signedfuncs*))) (let Variancy (trap-error (shen.variancy-test V2166 V2167) (lambda E shen.skip)) (let Type (shen.rcons_form (shen.demodulate V2167)) (let F* (concat shen.type-signature-of- V2166) (let Parameters (shen.parameters 1) (let Clause (cons (cons F* (cons X ())) (cons :- (cons (cons (cons unify! (cons X (cons Type ()))) ()) ()))) (let AUM_instruction (shen.aum Clause Parameters) (let Code (shen.aum_to_shen AUM_instruction) (let ShenDef (cons define (cons F* (append Parameters (append (cons ProcessN (cons Continuation ())) (cons -> (cons Code ())))))) (let Eval (shen.eval-without-macros ShenDef) V2166)))))))))))
+"Copyright (c) 2015, Mark Tarver
 
-(defun shen.demodulate (V2168) (trap-error (let Demod (shen.walk (lambda X2165 (shen.demod X2165)) V2168) (if (= Demod V2168) V2168 (shen.demodulate Demod))) (lambda E V2168)))
+All rights reserved.
 
-(defun shen.variancy-test (V2169 V2170) (let TypeF (shen.typecheck V2169 B) (let Check (if (= symbol TypeF) shen.skip (if (shen.variant? TypeF V2170) shen.skip (shen.prhush (cn "warning: changing the type of " (shen.app V2169 " may create errors
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3. The name of Mark Tarver may not be used to endorse or promote products
+   derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY Mark Tarver ''AS IS'' AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL Mark Tarver BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+
+(defun declare (V2321 V2322) (let Record (set shen.*signedfuncs* (cons (cons V2321 V2322) (value shen.*signedfuncs*))) (let Variancy (trap-error (shen.variancy-test V2321 V2322) (lambda E shen.skip)) (let Type (shen.rcons_form (shen.demodulate V2322)) (let F* (concat shen.type-signature-of- V2321) (let Parameters (shen.parameters 1) (let Clause (cons (cons F* (cons X ())) (cons :- (cons (cons (cons unify! (cons X (cons Type ()))) ()) ()))) (let AUM_instruction (shen.aum Clause Parameters) (let Code (shen.aum_to_shen AUM_instruction) (let ShenDef (cons define (cons F* (append Parameters (append (cons ProcessN (cons Continuation ())) (cons -> (cons Code ())))))) (let Eval (shen.eval-without-macros ShenDef) V2321)))))))))))
+
+(defun shen.demodulate (V2323) (trap-error (let Demod (shen.walk shen.demod V2323) (if (= Demod V2323) V2323 (shen.demodulate Demod))) (lambda E V2323)))
+
+(defun shen.variancy-test (V2324 V2325) (let TypeF (shen.typecheck V2324 B) (let Check (if (= symbol TypeF) shen.skip (if (shen.variant? TypeF V2325) shen.skip (shen.prhush (cn "warning: changing the type of " (shen.app V2324 " may create errors
 " shen.a)) (stoutput)))) shen.skip)))
 
-(defun shen.variant? (V2179 V2180) (cond ((= V2180 V2179) true) ((and (cons? V2179) (and (cons? V2180) (= (hd V2180) (hd V2179)))) (shen.variant? (tl V2179) (tl V2180))) ((and (cons? V2179) (and (cons? V2180) (and (shen.pvar? (hd V2179)) (variable? (hd V2180))))) (shen.variant? (subst shen.a (hd V2179) (tl V2179)) (subst shen.a (hd V2180) (tl V2180)))) ((and (cons? V2179) (and (cons? (hd V2179)) (and (cons? V2180) (cons? (hd V2180))))) (shen.variant? (append (hd V2179) (tl V2179)) (append (hd V2180) (tl V2180)))) (true false)))
+(defun shen.variant? (V2336 V2337) (cond ((= V2337 V2336) true) ((and (cons? V2336) (and (cons? V2337) (= (hd V2337) (hd V2336)))) (shen.variant? (tl V2336) (tl V2337))) ((and (cons? V2336) (and (cons? V2337) (and (shen.pvar? (hd V2336)) (variable? (hd V2337))))) (shen.variant? (subst shen.a (hd V2336) (tl V2336)) (subst shen.a (hd V2337) (tl V2337)))) ((and (cons? V2336) (and (cons? (hd V2336)) (and (cons? V2337) (cons? (hd V2337))))) (shen.variant? (append (hd V2336) (tl V2336)) (append (hd V2337) (tl V2337)))) (true false)))
 
 (declare absvector? (cons A (cons --> (cons boolean ()))))
 
@@ -80,7 +56,7 @@
 
 (declare cn (cons string (cons --> (cons (cons string (cons --> (cons string ()))) ()))))
 
-(declare compile (cons (cons A (cons ==> (cons B ()))) (cons --> (cons (cons A (cons --> (cons (cons (cons A (cons --> (cons B ()))) (cons --> (cons B ()))) ()))) ()))))
+(declare compile (cons (cons A (cons shen.==> (cons B ()))) (cons --> (cons (cons A (cons --> (cons (cons (cons A (cons --> (cons B ()))) (cons --> (cons B ()))) ()))) ()))))
 
 (declare cons? (cons A (cons --> (cons boolean ()))))
 
@@ -90,9 +66,9 @@
 
 (declare do (cons A (cons --> (cons (cons B (cons --> (cons B ()))) ()))))
 
-(declare <e> (cons (cons list (cons A ())) (cons ==> (cons (cons list (cons B ())) ()))))
+(declare <e> (cons (cons list (cons A ())) (cons shen.==> (cons (cons list (cons B ())) ()))))
 
-(declare <!> (cons (cons list (cons A ())) (cons ==> (cons (cons list (cons A ())) ()))))
+(declare shen.<!> (cons (cons list (cons A ())) (cons shen.==> (cons (cons list (cons A ())) ()))))
 
 (declare element? (cons A (cons --> (cons (cons (cons list (cons A ())) (cons --> (cons boolean ()))) ()))))
 
@@ -105,6 +81,8 @@
 (declare error-to-string (cons exception (cons --> (cons string ()))))
 
 (declare explode (cons A (cons --> (cons (cons list (cons string ())) ()))))
+
+(declare fail (cons --> (cons symbol ())))
 
 (declare fail-if (cons (cons symbol (cons --> (cons boolean ()))) (cons --> (cons (cons symbol (cons --> (cons symbol ()))) ()))))
 
@@ -186,6 +164,8 @@
 
 (declare os (cons --> (cons string ())))
 
+(declare package? (cons symbol (cons --> (cons boolean ()))))
+
 (declare port (cons --> (cons string ())))
 
 (declare porters (cons --> (cons string ())))
@@ -211,6 +191,8 @@
 (declare shen.prhush (cons string (cons --> (cons (cons (cons stream (cons out ())) (cons --> (cons string ()))) ()))))
 
 (declare ps (cons symbol (cons --> (cons (cons list (cons unit ())) ()))))
+
+(declare read (cons (cons stream (cons in ())) (cons --> (cons unit ()))))
 
 (declare read-byte (cons (cons stream (cons in ())) (cons --> (cons number ()))))
 
@@ -254,7 +236,7 @@
 
 (declare symbol? (cons A (cons --> (cons boolean ()))))
 
-(declare systemf (cons symbol (cons --> (cons (cons list (cons symbol ())) ()))))
+(declare systemf (cons symbol (cons --> (cons symbol ()))))
 
 (declare tail (cons (cons list (cons A ())) (cons --> (cons (cons list (cons A ())) ()))))
 
@@ -315,10 +297,6 @@
 (declare * (cons number (cons --> (cons (cons number (cons --> (cons number ()))) ()))))
 
 (declare == (cons A (cons --> (cons (cons B (cons --> (cons boolean ()))) ()))))
-
-(declare shen.in-> (cons (cons A (cons ==> (cons B ()))) (cons --> (cons A ()))))
-
-(declare shen.<-out (cons (cons A (cons ==> (cons B ()))) (cons --> (cons B ()))))
 
 
 
