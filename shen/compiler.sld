@@ -3,8 +3,10 @@
 
 (define-library (shen compiler)
   (import (scheme base)
+          (scheme read)
           (srfi 69)
           (chibi match)
+          (only (chibi) call-with-input-string)
           (only (srfi 1) filter))
 
   (export kl->scheme
