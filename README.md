@@ -35,7 +35,7 @@ To launch the Shen REPL do:
 Native Calls
 ------------
 
-Scheme functions live under the `scm` namespace (`scm.` prefix).
+Scheme functions live under the `scm` namespace (`scm.` prefix), for example, `(scm.write [1 2 3 4])` invokes Scheme's `write` function with a list as an argument.
 
 To send literal, unprocessed code to the underlying interpreter the `scm.` form can be used:
 
