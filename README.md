@@ -32,6 +32,48 @@ To launch the Shen REPL do:
 
     chibi-scheme -h 500M -xshen -e'(shen.shen)'
 
+Native Calls
+------------
+
+Scheme functions live under the `scm` namespace (`scm.` prefix).
+
+To send literal, unprocessed code to the underlying interpreter the `scm.` form can be used:
+
+```
+(0-) (scm. "(scm.+ 1 2 3 4)")
+10
+
+(1-) (scm. "(scm.define (func-name x) (scm.display x) (scm.newline))")
+#<undef>
+
+(2-) (func-name "test")
+test
+#<undef>
+
+```
+
+Note that the `scm.` prefix is still required, because Scheme functions have been imported inside the Shen environment with an `scm.` prefix, and all compiled code runs inside this environment.
+
+Because Scheme functions can have variable numbers of arguments and the code passed to `scm.` is not preprocessed, any imported function that is intended to support partial application has to be wrapped with a `defun`:
+
+```
+(3-) (defun for-each (F L) (scm.for-each F L))
+for-each
+
+(4-) (for-each (/. X (do (print (+ X X)) (nl))) [1 2 3 4 5])
+2
+4
+6
+8
+10
+#<undef>
+
+(5-) (for-each (function print))
+#<procedure #f>
+```
+
+**TODO**: importing modules
+
 License
 -------
 
