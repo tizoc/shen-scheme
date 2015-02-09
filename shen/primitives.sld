@@ -7,7 +7,7 @@
           (srfi 69)
           (chibi string)
           (only (chibi) call-with-output-string)
-          (only (chibi pathname) make-path)
+          (only (chibi pathname) path-resolve)
           (only (chibi filesystem) file-exists?)
           (only (chibi io) port->string read-u8)
 

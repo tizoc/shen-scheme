@@ -1,6 +1,11 @@
 ;; Copyright (c) 2012-2015 Bruno Deferrari.  All rights reserved.
 ;; BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause
 
+(defun cd (Val)
+  (let Dir (if (= Val "") "" (scm.string-append Val "/"))
+    (do (scm.change-directory Dir)
+        (set (scm.quote *home-directory*) (scm.current-directory)))))
+
 (defun hash (Val Bound)
   (let Res (scm.hash Val Bound)
     (scm.if (scm.eq? 0 Res) 1 Res)))

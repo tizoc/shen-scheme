@@ -55,6 +55,7 @@
    (shen overwrites-internal)
 
    (prefix (chibi) scm.)
+   (prefix (chibi filesystem) scm.)
    (prefix (scheme file) scm.)
    (prefix (scheme eval) scm.)
    (prefix (srfi 69) scm.))
@@ -82,4 +83,4 @@
   (include "compiled/t-star.kl.scm")
 
   (begin
-    (cd ".")))
+    (cd "")))

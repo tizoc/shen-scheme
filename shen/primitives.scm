@@ -214,8 +214,8 @@
 (define kl:write-byte write-u8)
 
 (define (full-path-for-file filename)
-  (make-path (kl:value '*home-directory*)
-             filename))
+  (path-resolve filename
+                (kl:value '*home-directory*)))
 
 (define (kl:open filename direction)
   (let ((full-path (full-path-for-file filename)))
