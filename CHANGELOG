@@ -1,3 +1,15 @@
+0.10 (unreleased):
+
+	* Update for Shen 17.
+
+	* Better handling of paths and current directory.
+
+	* Scheme functions are now available with the `scm.` prefix.
+
+	* Replaced `$native` form with `scm.` form that takes a string of Scheme code that will not be processed.
+
+	* Explicit BSD licence everywhere.
+
 0.9:
 
 	* Optimise out unnecessary wrapper lambdas.
