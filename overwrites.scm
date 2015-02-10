@@ -27,11 +27,6 @@
 (defun symbol? (Val)
   (scm.symbol? Val))
 
-(defun segvar? (Val)
-  (scm.and
-   (scm.symbol? Val)
-   (scm.equal? #\? (scm.string-ref (scm.symbol->string Val) 0))))
-
 (defun shen.pvar? (V)
   (scm.and
    (absvector? V)
