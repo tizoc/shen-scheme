@@ -8,6 +8,8 @@
 
 	* Replaced `$native` form with `scm.` form that takes a string of Scheme code that will not be processed.
 
+	* Fixed optimised version of shen.grammar_symbol? (was broken for namespaced symbols)
+
 	* Explicit BSD licence everywhere.
 
 0.9:
