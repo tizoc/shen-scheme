@@ -52,25 +52,3 @@
                         (equal? #\. (string-cursor-ref s c)))
                     (equal? #\< (string-cursor-ref s (string-cursor-next s c)))
                     (loop (string-cursor-prev s c))))))))
-
-(define (scm.shen-walk func val)
-  (if (pair? val)
-      (func (map (lambda (subexp) (scm.shen-walk func subexp)) val))
-      (func val)))
-
-(define (compose funcs value)
-  (if (null? funcs)
-      value
-      (compose (cdr funcs) ((car funcs) value))))
-
-(define (scm.macroexpand expr)
-  (define macros (map scm.function-binding (kl:value '*macros*)))
-
-  (define (expand expr)
-    (let ((transformed (compose macros expr)))
-      (if (or (eq? expr transformed)
-              (and (pair? expr) (eq? (car expr) '$native)))
-          expr
-          (scm.shen-walk expand transformed))))
-
-  (expand expr))

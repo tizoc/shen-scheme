@@ -47,12 +47,6 @@
 (defun shen.sysfunc? (Val)
   (scm.shen-sysfunc? Val))
 
-(defun shen.walk (Func Val)
-  (scm.shen-walk (scm.function-binding Func) Val))
-
-(defun macroexpand (E)
-  (scm.macroexpand E))
-
 (defun read-file-as-bytelist (Filename)
   (scm.read-file-as-bytelist Filename))
 

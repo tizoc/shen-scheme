@@ -10,6 +10,8 @@
 
 	* Fixed optimised version of shen.grammar_symbol? (was broken for namespaced symbols)
 
+	* Removed overwrites for `macroexpand` and `walk`.
+
 	* Explicit BSD licence everywhere.
 
 0.9:

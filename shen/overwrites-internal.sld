@@ -13,8 +13,6 @@
    scm.read-file-as-bytelist
    scm.read-file-as-string
    scm.shen-sysfunc?
-   scm.shen-grammar_symbol?
-   scm.shen-walk
-   scm.macroexpand)
+   scm.shen-grammar_symbol?)
 
   (include "overwrites-internal.scm"))
