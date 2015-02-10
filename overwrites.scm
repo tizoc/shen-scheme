@@ -39,12 +39,7 @@
    (scm.eq? (scm.vector-ref V 0) (scm.quote shen.pvar))))
 
 (defun shen.grammar_symbol? (Val)
-  (scm.and
-   (scm.symbol? Val)
-   (let Strsym (scm.symbol->string Val)
-     (scm.and
-      (scm.equal? #\< (scm.string-ref Strsym 0))
-      (scm.equal? #\> (scm.string-ref Strsym (scm.- (scm.string-length Strsym) 1)))))))
+  (scm.shen-grammar_symbol? Val))
 
 (defun shen.numbyte? (N)
   (scm.and (scm.>= N 48) (scm.<= N 57)))
