@@ -3,8 +3,8 @@
 
 (defun cd (Val)
   (let Dir (if (= Val "") "" (scm.string-append Val "/"))
-    (do (scm.change-directory Dir)
-        (set (scm.quote *home-directory*) (scm.current-directory)))))
+    (let NewDir (scm.change-directory Dir)
+      (set (scm.quote *home-directory*) (scm.current-directory)))))
 
 (defun hash (Val Bound)
   (let Res (scm.hash Val Bound)
