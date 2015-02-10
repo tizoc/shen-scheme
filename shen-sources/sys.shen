@@ -66,7 +66,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.c#34;
               NewMacroReg (set *macroreg* (adjoin F (value *macroreg*)))
               (if (= MacroReg NewMacroReg)
                   skip
-                  (set *macros* [(/. X (F X)) | (value *macros*)]))))
+                  (let Var (gensym (protect V))
+                       MacroF (eval-kl [lambda Var [F Var]])
+                    (set *macros* [MacroF | (value *macros*)])))))
                 
 (define packaged?
   [package P E | _] -> true
