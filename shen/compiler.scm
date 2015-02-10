@@ -26,7 +26,8 @@
     (('let var value body) (emit-let var value body (cons var scope)))
     (('cond clauses ...) (emit-cond clauses scope))
     ;; Remove intermediary wrapper lambdas
-    (('lambda var ((? unbound? op) var)) op)
+    ;; FIXME: disabled for now, op may not be defined yet
+    ;; (('lambda var ((? unbound? op) var)) op)
     (('lambda var body)
      `(lambda ,var ,(compile-expression body (cons var scope))))
     (('do expr1 expr2)
