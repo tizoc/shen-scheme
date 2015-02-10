@@ -23,7 +23,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 
-(defun shen.shen->kl (V551 V552) (compile shen.<define> (cons V551 V552) (lambda X (shen.shen-syntax-error V551 X))))
+(defun shen.shen->kl (V551 V552) (compile (lambda V544 (shen.<define> V544)) (cons V551 V552) (lambda X (shen.shen-syntax-error V551 X))))
 
 (defun shen.shen-syntax-error (V553 V554) (simple-error (cn "syntax error in " (shen.app V553 (cn " here:
 
@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 
 (defun shen.<signature> (V558) (if (and (cons? (hd V558)) (= { (hd (hd V558)))) (let Parse_shen.<signature-help> (shen.<signature-help> (shen.pair (tl (hd V558)) (shen.hdtl V558))) (if (not (= (fail) Parse_shen.<signature-help>)) (if (and (cons? (hd Parse_shen.<signature-help>)) (= } (hd (hd Parse_shen.<signature-help>)))) (shen.pair (hd (shen.pair (tl (hd Parse_shen.<signature-help>)) (shen.hdtl Parse_shen.<signature-help>))) (shen.demodulate (shen.curry-type (shen.hdtl Parse_shen.<signature-help>)))) (fail)) (fail))) (fail)))
 
-(defun shen.curry-type (V559) (cond ((and (cons? V559) (and (cons? (tl V559)) (and (= --> (hd (tl V559))) (and (cons? (tl (tl V559))) (and (cons? (tl (tl (tl V559)))) (= --> (hd (tl (tl (tl V559)))))))))) (shen.curry-type (cons (hd V559) (cons --> (cons (tl (tl V559)) ()))))) ((and (cons? V559) (and (cons? (tl V559)) (and (= * (hd (tl V559))) (and (cons? (tl (tl V559))) (and (cons? (tl (tl (tl V559)))) (= * (hd (tl (tl (tl V559)))))))))) (shen.curry-type (cons (hd V559) (cons * (cons (tl (tl V559)) ()))))) ((cons? V559) (map shen.curry-type V559)) (true V559)))
+(defun shen.curry-type (V559) (cond ((and (cons? V559) (and (cons? (tl V559)) (and (= --> (hd (tl V559))) (and (cons? (tl (tl V559))) (and (cons? (tl (tl (tl V559)))) (= --> (hd (tl (tl (tl V559)))))))))) (shen.curry-type (cons (hd V559) (cons --> (cons (tl (tl V559)) ()))))) ((and (cons? V559) (and (cons? (tl V559)) (and (= * (hd (tl V559))) (and (cons? (tl (tl V559))) (and (cons? (tl (tl (tl V559)))) (= * (hd (tl (tl (tl V559)))))))))) (shen.curry-type (cons (hd V559) (cons * (cons (tl (tl V559)) ()))))) ((cons? V559) (map (lambda V545 (shen.curry-type V545)) V559)) (true V559)))
 
 (defun shen.<signature-help> (V560) (let YaccParse (if (cons? (hd V560)) (let Parse_X (hd (hd V560)) (let Parse_shen.<signature-help> (shen.<signature-help> (shen.pair (tl (hd V560)) (shen.hdtl V560))) (if (not (= (fail) Parse_shen.<signature-help>)) (if (not (element? Parse_X (cons { (cons } ())))) (shen.pair (hd Parse_shen.<signature-help>) (cons Parse_X (shen.hdtl Parse_shen.<signature-help>))) (fail)) (fail)))) (fail)) (if (= YaccParse (fail)) (let Parse_<e> (<e> V560) (if (not (= (fail) Parse_<e>)) (shen.pair (hd Parse_<e>) ()) (fail))) YaccParse)))
 
@@ -72,7 +72,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 
 (defun shen.record-source (V587 V588) (cond ((value shen.*installing-kl*) shen.skip) (true (put V587 shen.source V588 (value *property-vector*)))))
 
-(defun shen.compile_to_lambda+ (V589 V590) (let Arity (shen.aritycheck V589 V590) (let Free (map (lambda Rule (shen.free_variable_check V589 Rule)) V590) (let Variables (shen.parameters Arity) (let Strip (map shen.strip-protect V590) (let Abstractions (map shen.abstract_rule Strip) (let Applications (map (lambda X (shen.application_build Variables X)) Abstractions) (cons Variables (cons Applications ())))))))))
+(defun shen.compile_to_lambda+ (V589 V590) (let Arity (shen.aritycheck V589 V590) (let Free (map (lambda Rule (shen.free_variable_check V589 Rule)) V590) (let Variables (shen.parameters Arity) (let Strip (map (lambda V546 (shen.strip-protect V546)) V590) (let Abstractions (map (lambda V547 (shen.abstract_rule V547)) Strip) (let Applications (map (lambda X (shen.application_build Variables X)) Abstractions) (cons Variables (cons Applications ())))))))))
 
 (defun shen.free_variable_check (V591 V592) (cond ((and (cons? V592) (and (cons? (tl V592)) (= () (tl (tl V592))))) (let Bound (shen.extract_vars (hd V592)) (let Free (shen.extract_free_vars Bound (hd (tl V592))) (shen.free_variable_warnings V591 Free)))) (true (shen.f_error shen.free_variable_check))))
 
@@ -84,7 +84,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 
 (defun shen.list_variables (V609) (cond ((and (cons? V609) (= () (tl V609))) (cn (str (hd V609)) ".")) ((cons? V609) (cn (str (hd V609)) (cn ", " (shen.list_variables (tl V609))))) (true (shen.f_error shen.list_variables))))
 
-(defun shen.strip-protect (V610) (cond ((and (cons? V610) (and (cons? (tl V610)) (and (= () (tl (tl V610))) (= (hd V610) protect)))) (shen.strip-protect (hd (tl V610)))) ((cons? V610) (map shen.strip-protect V610)) (true V610)))
+(defun shen.strip-protect (V610) (cond ((and (cons? V610) (and (cons? (tl V610)) (and (= () (tl (tl V610))) (= (hd V610) protect)))) (shen.strip-protect (hd (tl V610)))) ((cons? V610) (map (lambda V548 (shen.strip-protect V548)) V610)) (true V610)))
 
 (defun shen.linearise (V611) (cond ((and (cons? V611) (and (cons? (tl V611)) (= () (tl (tl V611))))) (shen.linearise_help (shen.flatten (hd V611)) (hd V611) (hd (tl V611)))) (true (shen.f_error shen.linearise))))
 
@@ -101,7 +101,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 warning: changing the arity of " (shen.app V639 " can cause errors.
 " shen.a)) (stoutput)) V641))))
 
-(defun shen.aritycheck-action (V646) (cond ((cons? V646) (do (shen.aah (hd V646) (tl V646)) (map shen.aritycheck-action V646))) (true shen.skip)))
+(defun shen.aritycheck-action (V646) (cond ((cons? V646) (do (shen.aah (hd V646) (tl V646)) (map (lambda V549 (shen.aritycheck-action V549)) V646))) (true shen.skip)))
 
 (defun shen.aah (V647 V648) (let Arity (arity V647) (let Len (length V648) (if (and (> Arity -1) (> Len Arity)) (shen.prhush (cn "warning: " (shen.app V647 (cn " might not like " (shen.app Len (cn " argument" (shen.app (if (> Len 1) "s" "") ".
 " shen.a)) shen.a)) shen.a)) (stoutput)) shen.skip))))
@@ -114,7 +114,7 @@ warning: changing the arity of " (shen.app V639 " can cause errors.
 
 (defun shen.application_build (V653 V654) (cond ((= () V653) V654) ((cons? V653) (shen.application_build (tl V653) (cons V654 (cons (hd V653) ())))) (true (shen.f_error shen.application_build))))
 
-(defun shen.compile_to_kl (V655 V656) (cond ((and (cons? V656) (and (cons? (tl V656)) (= () (tl (tl V656))))) (let Arity (shen.store-arity V655 (length (hd V656))) (let Reduce (map shen.reduce (hd (tl V656))) (let CondExpression (shen.cond-expression V655 (hd V656) Reduce) (let TypeTable (if (value shen.*optimise*) (shen.typextable (shen.get-type V655) (hd V656)) shen.skip) (let TypedCondExpression (if (value shen.*optimise*) (shen.assign-types (hd V656) TypeTable CondExpression) CondExpression) (let KL (cons defun (cons V655 (cons (hd V656) (cons TypedCondExpression ())))) KL))))))) (true (shen.f_error shen.compile_to_kl))))
+(defun shen.compile_to_kl (V655 V656) (cond ((and (cons? V656) (and (cons? (tl V656)) (= () (tl (tl V656))))) (let Arity (shen.store-arity V655 (length (hd V656))) (let Reduce (map (lambda V550 (shen.reduce V550)) (hd (tl V656))) (let CondExpression (shen.cond-expression V655 (hd V656) Reduce) (let TypeTable (if (value shen.*optimise*) (shen.typextable (shen.get-type V655) (hd V656)) shen.skip) (let TypedCondExpression (if (value shen.*optimise*) (shen.assign-types (hd V656) TypeTable CondExpression) CondExpression) (let KL (cons defun (cons V655 (cons (hd V656) (cons TypedCondExpression ())))) KL))))))) (true (shen.f_error shen.compile_to_kl))))
 
 (defun shen.get-type (V661) (cond ((cons? V661) shen.skip) (true (let FType (assoc V661 (value shen.*signedfuncs*)) (if (empty? FType) shen.skip (tl FType))))))
 
