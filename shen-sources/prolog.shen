@@ -531,7 +531,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.c#34;
   
 (define call-help
   F [] ProcessN Continuation -> (F ProcessN Continuation)  
-  F [X | Y] ProcessN Continuation -> (call-help (F X) Y ProcessN Continuation))   
+  F [X | Y] ProcessN Continuation -> (call-help ((symbol->function F) X) Y ProcessN Continuation))
 
 (define intprolog
   [[F | X] | Y] -> (let ProcessN (start-new-prolog-process)
