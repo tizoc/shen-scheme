@@ -62,6 +62,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.c#34;
   [X | Y] -> (map (function elim-def) [X | Y])
   X -> X)
 
+(define symbol->function
+  Sym -> (eval-kl [lambda (protect X) [Sym (protect X)]])
+     where (symbol? Sym)
+  F -> F)
+
 \\(define add-macro
  \\ F -> (set *macros* (adjoin F (value *macros*))))
 
@@ -70,8 +75,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.c#34;
               NewMacroReg (set *macroreg* (adjoin F (value *macroreg*)))
               (if (= MacroReg NewMacroReg)
                   skip
-                  (let Var (gensym (protect V))
-                       MacroF (eval-kl [lambda Var [F Var]])
+                  (let MacroF (symbol->function F)
                     (set *macros* [MacroF | (value *macros*)])))))
                 
 (define packaged?
