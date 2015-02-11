@@ -39,21 +39,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.c#34;
                 (map (function eval-without-macros) (package-contents Macroexpand))
                 (eval-without-macros Macroexpand))))
 
-(define eval-without-macros 
-  X -> (eval-kl (elim-def (proc-input+ X)))) 
+(define proc-defmacro
+  [defmacro F | Rest] -> (add-macro F)
+  X -> X)
+
+(define eval-without-macros
+  X -> (let Result (eval-kl (elim-def (proc-input+ X)))
+            Macro (proc-defmacro X)
+         Result))
 
 (define proc-input+ 
   [input+ Type Stream] -> [input+ (rcons_form Type) Stream]
   [read+ Type Stream] -> [read+ (rcons_form Type) Stream]
   [X | Y] -> (map (function proc-input+) [X | Y])
   X -> X) 
-  
+
 (define elim-def
   [define F | Rest] -> (shen->kl F Rest)
   [defmacro F | Rest] -> (let Default [(protect X) -> (protect X)]
-                              Def (elim-def [define F | (append Rest Default)]) 
-                              MacroAdd (add-macro F) 
-                              Def)
+                           (elim-def [define F | (append Rest Default)]))
   [defcc F | X] -> (elim-def (yacc [defcc F | X]))
   [X | Y] -> (map (function elim-def) [X | Y])
   X -> X)
