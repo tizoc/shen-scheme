@@ -78,12 +78,12 @@
     (cond ((null? args)
            (cond ((pair? op) `(,(compile-expression op scope)))
                  ((unbound-symbol? op scope) `(,op))
-                 (else `((scm.function-binding ,op)))))
+                 (else `(,op))))
           (partial-call?
            `(scm.call-nested ,(nest-lambda op arity) ,args-list))
           ((or (pair? op) (not (unbound-symbol? op scope)))
            (left-to-right
-            `(scm.call-nested (scm.function ,(compile-expression op scope)) ,args-list)))
+            `(scm.call-nested ,(compile-expression op scope) ,args-list)))
           (else
            (left-to-right (cons op args))))))
 
