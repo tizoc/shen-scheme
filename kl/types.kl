@@ -23,14 +23,14 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 
-(defun declare (V2363 V2364) (let Record (set shen.*signedfuncs* (cons (cons V2363 V2364) (value shen.*signedfuncs*))) (let Variancy (trap-error (shen.variancy-test V2363 V2364) (lambda E shen.skip)) (let Type (shen.rcons_form (shen.demodulate V2364)) (let F* (concat shen.type-signature-of- V2363) (let Parameters (shen.parameters 1) (let Clause (cons (cons F* (cons X ())) (cons :- (cons (cons (cons unify! (cons X (cons Type ()))) ()) ()))) (let AUM_instruction (shen.aum Clause Parameters) (let Code (shen.aum_to_shen AUM_instruction) (let ShenDef (cons define (cons F* (append Parameters (append (cons ProcessN (cons Continuation ())) (cons -> (cons Code ())))))) (let Eval (shen.eval-without-macros ShenDef) V2363)))))))))))
+(defun declare (V2364 V2365) (let Record (set shen.*signedfuncs* (cons (cons V2364 V2365) (value shen.*signedfuncs*))) (let Variancy (trap-error (shen.variancy-test V2364 V2365) (lambda E shen.skip)) (let Type (shen.rcons_form (shen.demodulate V2365)) (let F* (concat shen.type-signature-of- V2364) (let Parameters (shen.parameters 1) (let Clause (cons (cons F* (cons X ())) (cons :- (cons (cons (cons unify! (cons X (cons Type ()))) ()) ()))) (let AUM_instruction (shen.aum Clause Parameters) (let Code (shen.aum_to_shen AUM_instruction) (let ShenDef (cons define (cons F* (append Parameters (append (cons ProcessN (cons Continuation ())) (cons -> (cons Code ())))))) (let Eval (shen.eval-without-macros ShenDef) V2364)))))))))))
 
-(defun shen.demodulate (V2365) (trap-error (let Demod (shen.walk (lambda V2362 (shen.demod V2362)) V2365) (if (= Demod V2365) V2365 (shen.demodulate Demod))) (lambda E V2365)))
+(defun shen.demodulate (V2366) (trap-error (let Demod (shen.walk (lambda V2363 (shen.demod V2363)) V2366) (if (= Demod V2366) V2366 (shen.demodulate Demod))) (lambda E V2366)))
 
-(defun shen.variancy-test (V2366 V2367) (let TypeF (shen.typecheck V2366 B) (let Check (if (= symbol TypeF) shen.skip (if (shen.variant? TypeF V2367) shen.skip (shen.prhush (cn "warning: changing the type of " (shen.app V2366 " may create errors
+(defun shen.variancy-test (V2367 V2368) (let TypeF (shen.typecheck V2367 B) (let Check (if (= symbol TypeF) shen.skip (if (shen.variant? TypeF V2368) shen.skip (shen.prhush (cn "warning: changing the type of " (shen.app V2367 " may create errors
 " shen.a)) (stoutput)))) shen.skip)))
 
-(defun shen.variant? (V2378 V2379) (cond ((= V2379 V2378) true) ((and (cons? V2378) (and (cons? V2379) (= (hd V2379) (hd V2378)))) (shen.variant? (tl V2378) (tl V2379))) ((and (cons? V2378) (and (cons? V2379) (and (shen.pvar? (hd V2378)) (variable? (hd V2379))))) (shen.variant? (subst shen.a (hd V2378) (tl V2378)) (subst shen.a (hd V2379) (tl V2379)))) ((and (cons? V2378) (and (cons? (hd V2378)) (and (cons? V2379) (cons? (hd V2379))))) (shen.variant? (append (hd V2378) (tl V2378)) (append (hd V2379) (tl V2379)))) (true false)))
+(defun shen.variant? (V2379 V2380) (cond ((= V2380 V2379) true) ((and (cons? V2379) (and (cons? V2380) (= (hd V2380) (hd V2379)))) (shen.variant? (tl V2379) (tl V2380))) ((and (cons? V2379) (and (cons? V2380) (and (shen.pvar? (hd V2379)) (variable? (hd V2380))))) (shen.variant? (subst shen.a (hd V2379) (tl V2379)) (subst shen.a (hd V2380) (tl V2380)))) ((and (cons? V2379) (and (cons? (hd V2379)) (and (cons? V2380) (cons? (hd V2380))))) (shen.variant? (append (hd V2379) (tl V2379)) (append (hd V2380) (tl V2380)))) (true false)))
 
 (declare absvector? (cons A (cons --> (cons boolean ()))))
 

@@ -23,65 +23,65 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 
-(defun shen.yacc (V2460) (cond ((and (cons? V2460) (and (= defcc (hd V2460)) (cons? (tl V2460)))) (shen.yacc->shen (hd (tl V2460)) (tl (tl V2460)))) (true (shen.f_error shen.yacc))))
+(defun shen.yacc (V2461) (cond ((and (cons? V2461) (and (= defcc (hd V2461)) (cons? (tl V2461)))) (shen.yacc->shen (hd (tl V2461)) (tl (tl V2461)))) (true (shen.f_error shen.yacc))))
 
-(defun shen.yacc->shen (V2461 V2462) (let CCRules (shen.split_cc_rules true V2462 ()) (let CCBody (map (lambda V2458 (shen.cc_body V2458)) CCRules) (let YaccCases (shen.yacc_cases CCBody) (cons define (cons V2461 (cons Stream (cons -> (cons (shen.kill-code YaccCases) ())))))))))
+(defun shen.yacc->shen (V2462 V2463) (let CCRules (shen.split_cc_rules true V2463 ()) (let CCBody (map (lambda V2459 (shen.cc_body V2459)) CCRules) (let YaccCases (shen.yacc_cases CCBody) (cons define (cons V2462 (cons Stream (cons -> (cons (shen.kill-code YaccCases) ())))))))))
 
-(defun shen.kill-code (V2463) (cond ((> (occurrences kill V2463) 0) (cons trap-error (cons V2463 (cons (cons lambda (cons E (cons (cons shen.analyse-kill (cons E ())) ()))) ())))) (true V2463)))
+(defun shen.kill-code (V2464) (cond ((> (occurrences kill V2464) 0) (cons trap-error (cons V2464 (cons (cons lambda (cons E (cons (cons shen.analyse-kill (cons E ())) ()))) ())))) (true V2464)))
 
 (defun kill () (simple-error "yacc kill"))
 
-(defun shen.analyse-kill (V2464) (let String (error-to-string V2464) (if (= String "yacc kill") (fail) V2464)))
+(defun shen.analyse-kill (V2465) (let String (error-to-string V2465) (if (= String "yacc kill") (fail) V2465)))
 
-(defun shen.split_cc_rules (V2467 V2468 V2469) (cond ((and (= () V2468) (= () V2469)) ()) ((= () V2468) (cons (shen.split_cc_rule V2467 (reverse V2469) ()) ())) ((and (cons? V2468) (= ; (hd V2468))) (cons (shen.split_cc_rule V2467 (reverse V2469) ()) (shen.split_cc_rules V2467 (tl V2468) ()))) ((cons? V2468) (shen.split_cc_rules V2467 (tl V2468) (cons (hd V2468) V2469))) (true (shen.f_error shen.split_cc_rules))))
+(defun shen.split_cc_rules (V2468 V2469 V2470) (cond ((and (= () V2469) (= () V2470)) ()) ((= () V2469) (cons (shen.split_cc_rule V2468 (reverse V2470) ()) ())) ((and (cons? V2469) (= ; (hd V2469))) (cons (shen.split_cc_rule V2468 (reverse V2470) ()) (shen.split_cc_rules V2468 (tl V2469) ()))) ((cons? V2469) (shen.split_cc_rules V2468 (tl V2469) (cons (hd V2469) V2470))) (true (shen.f_error shen.split_cc_rules))))
 
-(defun shen.split_cc_rule (V2474 V2475 V2476) (cond ((and (cons? V2475) (and (= := (hd V2475)) (and (cons? (tl V2475)) (= () (tl (tl V2475)))))) (cons (reverse V2476) (tl V2475))) ((and (cons? V2475) (and (= := (hd V2475)) (and (cons? (tl V2475)) (and (cons? (tl (tl V2475))) (and (= where (hd (tl (tl V2475)))) (and (cons? (tl (tl (tl V2475)))) (= () (tl (tl (tl (tl V2475))))))))))) (cons (reverse V2476) (cons (cons where (cons (hd (tl (tl (tl V2475)))) (cons (hd (tl V2475)) ()))) ()))) ((= () V2475) (do (shen.semantic-completion-warning V2474 V2476) (shen.split_cc_rule V2474 (cons := (cons (shen.default_semantics (reverse V2476)) ())) V2476))) ((cons? V2475) (shen.split_cc_rule V2474 (tl V2475) (cons (hd V2475) V2476))) (true (shen.f_error shen.split_cc_rule))))
+(defun shen.split_cc_rule (V2475 V2476 V2477) (cond ((and (cons? V2476) (and (= := (hd V2476)) (and (cons? (tl V2476)) (= () (tl (tl V2476)))))) (cons (reverse V2477) (tl V2476))) ((and (cons? V2476) (and (= := (hd V2476)) (and (cons? (tl V2476)) (and (cons? (tl (tl V2476))) (and (= where (hd (tl (tl V2476)))) (and (cons? (tl (tl (tl V2476)))) (= () (tl (tl (tl (tl V2476))))))))))) (cons (reverse V2477) (cons (cons where (cons (hd (tl (tl (tl V2476)))) (cons (hd (tl V2476)) ()))) ()))) ((= () V2476) (do (shen.semantic-completion-warning V2475 V2477) (shen.split_cc_rule V2475 (cons := (cons (shen.default_semantics (reverse V2477)) ())) V2477))) ((cons? V2476) (shen.split_cc_rule V2475 (tl V2476) (cons (hd V2476) V2477))) (true (shen.f_error shen.split_cc_rule))))
 
-(defun shen.semantic-completion-warning (V2485 V2486) (cond ((= true V2485) (do (shen.prhush "warning: " (stoutput)) (do (map (lambda X (shen.prhush (shen.app X " " shen.a) (stoutput))) (reverse V2486)) (shen.prhush "has no semantics.
+(defun shen.semantic-completion-warning (V2486 V2487) (cond ((= true V2486) (do (shen.prhush "warning: " (stoutput)) (do (map (lambda X (shen.prhush (shen.app X " " shen.a) (stoutput))) (reverse V2487)) (shen.prhush "has no semantics.
 " (stoutput))))) (true shen.skip)))
 
-(defun shen.default_semantics (V2487) (cond ((= () V2487) ()) ((and (cons? V2487) (and (= () (tl V2487)) (shen.grammar_symbol? (hd V2487)))) (hd V2487)) ((and (cons? V2487) (shen.grammar_symbol? (hd V2487))) (cons append (cons (hd V2487) (cons (shen.default_semantics (tl V2487)) ())))) ((cons? V2487) (cons cons (cons (hd V2487) (cons (shen.default_semantics (tl V2487)) ())))) (true (shen.f_error shen.default_semantics))))
+(defun shen.default_semantics (V2488) (cond ((= () V2488) ()) ((and (cons? V2488) (and (= () (tl V2488)) (shen.grammar_symbol? (hd V2488)))) (hd V2488)) ((and (cons? V2488) (shen.grammar_symbol? (hd V2488))) (cons append (cons (hd V2488) (cons (shen.default_semantics (tl V2488)) ())))) ((cons? V2488) (cons cons (cons (hd V2488) (cons (shen.default_semantics (tl V2488)) ())))) (true (shen.f_error shen.default_semantics))))
 
-(defun shen.grammar_symbol? (V2488) (and (symbol? V2488) (let Cs (shen.strip-pathname (explode V2488)) (and (= (hd Cs) "<") (= (hd (reverse Cs)) ">")))))
+(defun shen.grammar_symbol? (V2489) (and (symbol? V2489) (let Cs (shen.strip-pathname (explode V2489)) (and (= (hd Cs) "<") (= (hd (reverse Cs)) ">")))))
 
-(defun shen.yacc_cases (V2489) (cond ((and (cons? V2489) (= () (tl V2489))) (hd V2489)) ((cons? V2489) (let P YaccParse (cons let (cons P (cons (hd V2489) (cons (cons if (cons (cons = (cons P (cons (cons fail ()) ()))) (cons (shen.yacc_cases (tl V2489)) (cons P ())))) ())))))) (true (shen.f_error shen.yacc_cases))))
+(defun shen.yacc_cases (V2490) (cond ((and (cons? V2490) (= () (tl V2490))) (hd V2490)) ((cons? V2490) (let P YaccParse (cons let (cons P (cons (hd V2490) (cons (cons if (cons (cons = (cons P (cons (cons fail ()) ()))) (cons (shen.yacc_cases (tl V2490)) (cons P ())))) ())))))) (true (shen.f_error shen.yacc_cases))))
 
-(defun shen.cc_body (V2490) (cond ((and (cons? V2490) (and (cons? (tl V2490)) (= () (tl (tl V2490))))) (shen.syntax (hd V2490) Stream (hd (tl V2490)))) (true (shen.f_error shen.cc_body))))
+(defun shen.cc_body (V2491) (cond ((and (cons? V2491) (and (cons? (tl V2491)) (= () (tl (tl V2491))))) (shen.syntax (hd V2491) Stream (hd (tl V2491)))) (true (shen.f_error shen.cc_body))))
 
-(defun shen.syntax (V2491 V2492 V2493) (cond ((and (= () V2491) (and (cons? V2493) (and (= where (hd V2493)) (and (cons? (tl V2493)) (and (cons? (tl (tl V2493))) (= () (tl (tl (tl V2493))))))))) (cons if (cons (shen.semantics (hd (tl V2493))) (cons (cons shen.pair (cons (cons hd (cons V2492 ())) (cons (shen.semantics (hd (tl (tl V2493)))) ()))) (cons (cons fail ()) ()))))) ((= () V2491) (cons shen.pair (cons (cons hd (cons V2492 ())) (cons (shen.semantics V2493) ())))) ((cons? V2491) (if (shen.grammar_symbol? (hd V2491)) (shen.recursive_descent V2491 V2492 V2493) (if (variable? (hd V2491)) (shen.variable-match V2491 V2492 V2493) (if (shen.jump_stream? (hd V2491)) (shen.jump_stream V2491 V2492 V2493) (if (shen.terminal? (hd V2491)) (shen.check_stream V2491 V2492 V2493) (if (cons? (hd V2491)) (shen.list-stream (shen.decons (hd V2491)) (tl V2491) V2492 V2493) (simple-error (shen.app (hd V2491) " is not legal syntax
+(defun shen.syntax (V2492 V2493 V2494) (cond ((and (= () V2492) (and (cons? V2494) (and (= where (hd V2494)) (and (cons? (tl V2494)) (and (cons? (tl (tl V2494))) (= () (tl (tl (tl V2494))))))))) (cons if (cons (shen.semantics (hd (tl V2494))) (cons (cons shen.pair (cons (cons hd (cons V2493 ())) (cons (shen.semantics (hd (tl (tl V2494)))) ()))) (cons (cons fail ()) ()))))) ((= () V2492) (cons shen.pair (cons (cons hd (cons V2493 ())) (cons (shen.semantics V2494) ())))) ((cons? V2492) (if (shen.grammar_symbol? (hd V2492)) (shen.recursive_descent V2492 V2493 V2494) (if (variable? (hd V2492)) (shen.variable-match V2492 V2493 V2494) (if (shen.jump_stream? (hd V2492)) (shen.jump_stream V2492 V2493 V2494) (if (shen.terminal? (hd V2492)) (shen.check_stream V2492 V2493 V2494) (if (cons? (hd V2492)) (shen.list-stream (shen.decons (hd V2492)) (tl V2492) V2493 V2494) (simple-error (shen.app (hd V2492) " is not legal syntax
 " shen.a)))))))) (true (shen.f_error shen.syntax))))
 
-(defun shen.list-stream (V2494 V2495 V2496 V2497) (let Test (cons and (cons (cons cons? (cons (cons hd (cons V2496 ())) ())) (cons (cons cons? (cons (cons hd (cons (cons hd (cons V2496 ())) ())) ())) ()))) (let Placeholder (gensym shen.place) (let RunOn (shen.syntax V2495 (cons shen.pair (cons (cons tl (cons (cons hd (cons V2496 ())) ())) (cons (cons hd (cons (cons tl (cons V2496 ())) ())) ()))) V2497) (let Action (shen.insert-runon RunOn Placeholder (shen.syntax V2494 (cons shen.pair (cons (cons hd (cons (cons hd (cons V2496 ())) ())) (cons (cons hd (cons (cons tl (cons V2496 ())) ())) ()))) Placeholder)) (cons if (cons Test (cons Action (cons (cons fail ()) ())))))))))
+(defun shen.list-stream (V2495 V2496 V2497 V2498) (let Test (cons and (cons (cons cons? (cons (cons hd (cons V2497 ())) ())) (cons (cons cons? (cons (cons hd (cons (cons hd (cons V2497 ())) ())) ())) ()))) (let Placeholder (gensym shen.place) (let RunOn (shen.syntax V2496 (cons shen.pair (cons (cons tl (cons (cons hd (cons V2497 ())) ())) (cons (cons hd (cons (cons tl (cons V2497 ())) ())) ()))) V2498) (let Action (shen.insert-runon RunOn Placeholder (shen.syntax V2495 (cons shen.pair (cons (cons hd (cons (cons hd (cons V2497 ())) ())) (cons (cons hd (cons (cons tl (cons V2497 ())) ())) ()))) Placeholder)) (cons if (cons Test (cons Action (cons (cons fail ()) ())))))))))
 
-(defun shen.decons (V2498) (cond ((and (cons? V2498) (and (= cons (hd V2498)) (and (cons? (tl V2498)) (and (cons? (tl (tl V2498))) (and (= () (hd (tl (tl V2498)))) (= () (tl (tl (tl V2498))))))))) (cons (hd (tl V2498)) ())) ((and (cons? V2498) (and (= cons (hd V2498)) (and (cons? (tl V2498)) (and (cons? (tl (tl V2498))) (= () (tl (tl (tl V2498)))))))) (cons (hd (tl V2498)) (shen.decons (hd (tl (tl V2498)))))) (true V2498)))
+(defun shen.decons (V2499) (cond ((and (cons? V2499) (and (= cons (hd V2499)) (and (cons? (tl V2499)) (and (cons? (tl (tl V2499))) (and (= () (hd (tl (tl V2499)))) (= () (tl (tl (tl V2499))))))))) (cons (hd (tl V2499)) ())) ((and (cons? V2499) (and (= cons (hd V2499)) (and (cons? (tl V2499)) (and (cons? (tl (tl V2499))) (= () (tl (tl (tl V2499)))))))) (cons (hd (tl V2499)) (shen.decons (hd (tl (tl V2499)))))) (true V2499)))
 
-(defun shen.insert-runon (V2510 V2511 V2512) (cond ((and (cons? V2512) (and (= shen.pair (hd V2512)) (and (cons? (tl V2512)) (and (cons? (tl (tl V2512))) (and (= () (tl (tl (tl V2512)))) (= (hd (tl (tl V2512))) V2511)))))) V2510) ((cons? V2512) (map (lambda Z (shen.insert-runon V2510 V2511 Z)) V2512)) (true V2512)))
+(defun shen.insert-runon (V2511 V2512 V2513) (cond ((and (cons? V2513) (and (= shen.pair (hd V2513)) (and (cons? (tl V2513)) (and (cons? (tl (tl V2513))) (and (= () (tl (tl (tl V2513)))) (= (hd (tl (tl V2513))) V2512)))))) V2511) ((cons? V2513) (map (lambda Z (shen.insert-runon V2511 V2512 Z)) V2513)) (true V2513)))
 
-(defun shen.strip-pathname (V2517) (cond ((not (element? "." V2517)) V2517) ((cons? V2517) (shen.strip-pathname (tl V2517))) (true (shen.f_error shen.strip-pathname))))
+(defun shen.strip-pathname (V2518) (cond ((not (element? "." V2518)) V2518) ((cons? V2518) (shen.strip-pathname (tl V2518))) (true (shen.f_error shen.strip-pathname))))
 
-(defun shen.recursive_descent (V2518 V2519 V2520) (cond ((cons? V2518) (let Test (cons (hd V2518) (cons V2519 ())) (let Action (shen.syntax (tl V2518) (concat Parse_ (hd V2518)) V2520) (let Else (cons fail ()) (cons let (cons (concat Parse_ (hd V2518)) (cons Test (cons (cons if (cons (cons not (cons (cons = (cons (cons fail ()) (cons (concat Parse_ (hd V2518)) ()))) ())) (cons Action (cons Else ())))) ())))))))) (true (shen.f_error shen.recursive_descent))))
+(defun shen.recursive_descent (V2519 V2520 V2521) (cond ((cons? V2519) (let Test (cons (hd V2519) (cons V2520 ())) (let Action (shen.syntax (tl V2519) (concat Parse_ (hd V2519)) V2521) (let Else (cons fail ()) (cons let (cons (concat Parse_ (hd V2519)) (cons Test (cons (cons if (cons (cons not (cons (cons = (cons (cons fail ()) (cons (concat Parse_ (hd V2519)) ()))) ())) (cons Action (cons Else ())))) ())))))))) (true (shen.f_error shen.recursive_descent))))
 
-(defun shen.variable-match (V2521 V2522 V2523) (cond ((cons? V2521) (let Test (cons cons? (cons (cons hd (cons V2522 ())) ())) (let Action (cons let (cons (concat Parse_ (hd V2521)) (cons (cons hd (cons (cons hd (cons V2522 ())) ())) (cons (shen.syntax (tl V2521) (cons shen.pair (cons (cons tl (cons (cons hd (cons V2522 ())) ())) (cons (cons shen.hdtl (cons V2522 ())) ()))) V2523) ())))) (let Else (cons fail ()) (cons if (cons Test (cons Action (cons Else ())))))))) (true (shen.f_error shen.variable-match))))
+(defun shen.variable-match (V2522 V2523 V2524) (cond ((cons? V2522) (let Test (cons cons? (cons (cons hd (cons V2523 ())) ())) (let Action (cons let (cons (concat Parse_ (hd V2522)) (cons (cons hd (cons (cons hd (cons V2523 ())) ())) (cons (shen.syntax (tl V2522) (cons shen.pair (cons (cons tl (cons (cons hd (cons V2523 ())) ())) (cons (cons shen.hdtl (cons V2523 ())) ()))) V2524) ())))) (let Else (cons fail ()) (cons if (cons Test (cons Action (cons Else ())))))))) (true (shen.f_error shen.variable-match))))
 
-(defun shen.terminal? (V2532) (cond ((cons? V2532) false) ((variable? V2532) false) (true true)))
+(defun shen.terminal? (V2533) (cond ((cons? V2533) false) ((variable? V2533) false) (true true)))
 
-(defun shen.jump_stream? (V2537) (cond ((= V2537 _) true) (true false)))
+(defun shen.jump_stream? (V2538) (cond ((= V2538 _) true) (true false)))
 
-(defun shen.check_stream (V2538 V2539 V2540) (cond ((cons? V2538) (let Test (cons and (cons (cons cons? (cons (cons hd (cons V2539 ())) ())) (cons (cons = (cons (hd V2538) (cons (cons hd (cons (cons hd (cons V2539 ())) ())) ()))) ()))) (let Action (shen.syntax (tl V2538) (cons shen.pair (cons (cons tl (cons (cons hd (cons V2539 ())) ())) (cons (cons shen.hdtl (cons V2539 ())) ()))) V2540) (let Else (cons fail ()) (cons if (cons Test (cons Action (cons Else ())))))))) (true (shen.f_error shen.check_stream))))
+(defun shen.check_stream (V2539 V2540 V2541) (cond ((cons? V2539) (let Test (cons and (cons (cons cons? (cons (cons hd (cons V2540 ())) ())) (cons (cons = (cons (hd V2539) (cons (cons hd (cons (cons hd (cons V2540 ())) ())) ()))) ()))) (let Action (shen.syntax (tl V2539) (cons shen.pair (cons (cons tl (cons (cons hd (cons V2540 ())) ())) (cons (cons shen.hdtl (cons V2540 ())) ()))) V2541) (let Else (cons fail ()) (cons if (cons Test (cons Action (cons Else ())))))))) (true (shen.f_error shen.check_stream))))
 
-(defun shen.jump_stream (V2541 V2542 V2543) (cond ((cons? V2541) (let Test (cons cons? (cons (cons hd (cons V2542 ())) ())) (let Action (shen.syntax (tl V2541) (cons shen.pair (cons (cons tl (cons (cons hd (cons V2542 ())) ())) (cons (cons shen.hdtl (cons V2542 ())) ()))) V2543) (let Else (cons fail ()) (cons if (cons Test (cons Action (cons Else ())))))))) (true (shen.f_error shen.jump_stream))))
+(defun shen.jump_stream (V2542 V2543 V2544) (cond ((cons? V2542) (let Test (cons cons? (cons (cons hd (cons V2543 ())) ())) (let Action (shen.syntax (tl V2542) (cons shen.pair (cons (cons tl (cons (cons hd (cons V2543 ())) ())) (cons (cons shen.hdtl (cons V2543 ())) ()))) V2544) (let Else (cons fail ()) (cons if (cons Test (cons Action (cons Else ())))))))) (true (shen.f_error shen.jump_stream))))
 
-(defun shen.semantics (V2544) (cond ((= () V2544) ()) ((shen.grammar_symbol? V2544) (cons shen.hdtl (cons (concat Parse_ V2544) ()))) ((variable? V2544) (concat Parse_ V2544)) ((cons? V2544) (map (lambda V2459 (shen.semantics V2459)) V2544)) (true V2544)))
+(defun shen.semantics (V2545) (cond ((= () V2545) ()) ((shen.grammar_symbol? V2545) (cons shen.hdtl (cons (concat Parse_ V2545) ()))) ((variable? V2545) (concat Parse_ V2545)) ((cons? V2545) (map (lambda V2460 (shen.semantics V2460)) V2545)) (true V2545)))
 
-(defun shen.snd-or-fail (V2551) (cond ((and (cons? V2551) (and (cons? (tl V2551)) (= () (tl (tl V2551))))) (hd (tl V2551))) (true (fail))))
+(defun shen.snd-or-fail (V2552) (cond ((and (cons? V2552) (and (cons? (tl V2552)) (= () (tl (tl V2552))))) (hd (tl V2552))) (true (fail))))
 
-(defun fail () shen.fail!)(defun shen.pair (V2552 V2553) (cons V2552 (cons V2553 ())))
+(defun fail () shen.fail!)(defun shen.pair (V2553 V2554) (cons V2553 (cons V2554 ())))
 
-(defun shen.hdtl (V2554) (hd (tl V2554)))
+(defun shen.hdtl (V2555) (hd (tl V2555)))
 
-(defun shen.<!> (V2561) (cond ((and (cons? V2561) (and (cons? (tl V2561)) (= () (tl (tl V2561))))) (cons () (cons (hd V2561) ()))) (true (fail))))
+(defun shen.<!> (V2562) (cond ((and (cons? V2562) (and (cons? (tl V2562)) (= () (tl (tl V2562))))) (cons () (cons (hd V2562) ()))) (true (fail))))
 
-(defun <e> (V2566) (cond ((and (cons? V2566) (and (cons? (tl V2566)) (= () (tl (tl V2566))))) (cons (hd V2566) (cons () ()))) (true (shen.f_error <e>))))
+(defun <e> (V2567) (cond ((and (cons? V2567) (and (cons? (tl V2567)) (= () (tl (tl V2567))))) (cons (hd V2567) (cons () ()))) (true (shen.f_error <e>))))
 
 
 
