@@ -206,7 +206,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 
 (defun call (V1167 V1168 V1169) (cond ((cons? V1167) (shen.call-help (shen.m_prolog_to_s-prolog_predicate (shen.lazyderef (hd V1167) V1168)) (tl V1167) V1168 V1169)) (true false)))
 
-(defun shen.call-help (V1170 V1171 V1172 V1173) (cond ((= () V1171) (V1170 V1172 V1173)) ((cons? V1171) (shen.call-help (V1170 (hd V1171)) (tl V1171) V1172 V1173)) (true (shen.f_error shen.call-help))))
+(defun shen.call-help (V1170 V1171 V1172 V1173) (cond ((= () V1171) (V1170 V1172 V1173)) ((cons? V1171) (shen.call-help ((shen.symbol->function V1170) (hd V1171)) (tl V1171) V1172 V1173)) (true (shen.f_error shen.call-help))))
 
 (defun shen.intprolog (V1174) (cond ((and (cons? V1174) (cons? (hd V1174))) (let ProcessN (shen.start-new-prolog-process) (shen.intprolog-help (hd (hd V1174)) (shen.insert-prolog-variables (cons (tl (hd V1174)) (cons (tl V1174) ())) ProcessN) ProcessN))) (true (shen.f_error shen.intprolog))))
 
