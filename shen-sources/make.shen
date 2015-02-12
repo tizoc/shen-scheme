@@ -8,13 +8,6 @@
 \\(systemf *stoutput*)
 \\(systemf package?)
 
-(package shen []
-  (define function-abstraction 
-    F 0 -> [freeze F]
-    F -1 -> (function-abstraction F 1)
-    F N -> (function-abstraction-help F N []))  
-)
-
 (define make
   -> (map (function make-file) ["core.shen" "declarations.shen" "load.shen" "macros.shen"
                                 "prolog.shen" "reader.shen" "sequent.shen" "sys.shen" "t-star.shen"
