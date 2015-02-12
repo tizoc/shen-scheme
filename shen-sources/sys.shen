@@ -63,9 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.c#34;
   X -> X)
 
 (define symbol->function
-  Sym -> (eval-kl [lambda (protect X) [Sym (protect X)]])
-     where (symbol? Sym)
-  F -> F)
+  Sym N -> (eval-kl (function-abstraction Sym N)))
 
 \\(define add-macro
  \\ F -> (set *macros* (adjoin F (value *macros*))))
@@ -75,7 +73,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.c#34;
               NewMacroReg (set *macroreg* (adjoin F (value *macroreg*)))
               (if (= MacroReg NewMacroReg)
                   skip
-                  (let MacroF (symbol->function F)
+                  (let MacroF (symbol->function F 1)
                     (set *macros* [MacroF | (value *macros*)])))))
                 
 (define packaged?

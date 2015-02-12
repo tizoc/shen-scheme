@@ -176,7 +176,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.c#34;
 (define function-abstraction-help
   F 0 Vars -> [F | Vars]
   F N Vars -> (let X (gensym (protect V)) 
-                [/. X (function-abstraction-help F (- N 1) (append Vars [X]))]))
+                [lambda X (function-abstraction-help F (- N 1) (append Vars [X]))]))
 
 (define undefmacro
   F -> (let MacroReg (value *macroreg*)

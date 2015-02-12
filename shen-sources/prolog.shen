@@ -526,12 +526,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.c#34;
 
 (define call 
   [F | X] ProcessN Continuation 
-   -> (call-help (m_prolog_to_s-prolog_predicate (lazyderef F ProcessN)) X ProcessN Continuation)
+    -> (let Pred (m_prolog_to_s-prolog_predicate (lazyderef F ProcessN)) 
+            PredF (symbol->function Pred (length X))
+         (call-help PredF X ProcessN Continuation))
    _ _ _ -> false)
   
 (define call-help
   F [] ProcessN Continuation -> (F ProcessN Continuation)  
-  F [X | Y] ProcessN Continuation -> (call-help ((symbol->function F) X) Y ProcessN Continuation))
+  F [X | Y] ProcessN Continuation -> (call-help (F X) Y ProcessN Continuation))
 
 (define intprolog
   [[F | X] | Y] -> (let ProcessN (start-new-prolog-process)
