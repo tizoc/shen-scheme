@@ -7,7 +7,7 @@
           (chibi string)
           (only (chibi pathname) make-path)
           (only (chibi io) port->string)
-          (only (shen primitives) kl:value full-path-for-file scm.function-binding))
+          (only (shen primitives) kl:value full-path-for-file kl:eval-kl))
 
   (export
    scm.read-file-as-bytelist

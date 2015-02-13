@@ -10,11 +10,9 @@
           (only (srfi 1) filter))
 
   (export kl->scheme
-          register-function
           register-function-arity
           function-arity
-          nest-lambda
-          *shen-functions*)
+          nest-lambda)
 
   (include "compiler.scm")
   (include "declarations.scm"))

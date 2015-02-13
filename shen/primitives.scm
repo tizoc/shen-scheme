@@ -138,10 +138,9 @@
   (syntax-rules ()
     ((_ ?f (?args ...) ?expr)
      (begin
+       (register-function-arity '?f (length '(?args ...)))
        (define (?f ?args ...)
          ?expr)
-       (register-function '?f ?f)
-       (register-function-arity '?f (length '(?args ...)))
        '?f))))
 
 (define-syntax kl:lambda
@@ -276,18 +275,6 @@
       f
       (scm.call-nested (f (car args)) (cdr args))))
 
-(define (scm.function-binding maybe-symbol)
-  (if (symbol? maybe-symbol)
-      (hash-table-ref *shen-functions* maybe-symbol
-                      (lambda () (error "undefined function: "
-                                        maybe-symbol)))
-      maybe-symbol))
-
-(define (scm.function f)
-  (if (symbol? f)
-      (kl:eval-kl (nest-lambda f (function-arity f)))
-      f))
-
 ;; Function references by name
 
 (define (or-function a b)
@@ -295,44 +282,3 @@
 
 (define (and-function a b)
   (kl:and a b))
-
-(map (lambda (name+ref) (apply register-function name+ref))
-     `((intern ,kl:intern)
-       (pos ,kl:pos)
-       (tlstr ,kl:tlstr)
-       (cn ,kl:cn)
-       (str ,kl:str)
-       (string? ,kl:string?)
-       (string->n ,kl:string->n)
-       (n->string ,kl:n->string)
-       (set ,kl:set)
-       (value ,kl:value)
-       (simple-error ,kl:simple-error)
-       (error-to-string ,kl:error-to-string)
-       (cons ,kl:cons)
-       (hd ,kl:hd)
-       (tl ,kl:tl)
-       (cons? ,kl:cons?)
-       (= ,kl:=)
-       (eval-kl ,kl:eval-kl)
-       (type ,kl:type)
-       (absvector ,kl:absvector)
-       (<-address ,kl:<-address)
-       (address-> ,kl:address->)
-       (absvector? ,kl:absvector?)
-       (read-byte ,kl:read-byte)
-       (write-byte ,kl:write-byte)
-       (open ,kl:open)
-       (close ,kl:close)
-       (get-time ,kl:get-time)
-       (+ ,kl:+)
-       (- ,kl:-)
-       (* ,kl:*)
-       (/ ,kl:/)
-       (> ,kl:>)
-       (< ,kl:<)
-       (>= ,kl:>=)
-       (<= ,kl:<=)
-       (or ,or-function)
-       (and ,and-function)
-       (number? ,kl:number?)))

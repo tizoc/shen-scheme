@@ -15,10 +15,8 @@
 
   (export
    scm.set-shen-environment!
-   scm.function-binding
    scm.l2r
    scm.call-nested
-   scm.function
 
    kl:if
    kl:and

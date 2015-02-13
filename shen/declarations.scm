@@ -1,12 +1,7 @@
 ;; Copyright (c) 2012-2015 Bruno Deferrari.  All rights reserved.
 ;; BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause
 
-;; symbol->function registry
-(define *shen-functions* (make-hash-table eq?))
 (define *shen-function-arities* (make-hash-table eq?))
-
-(define (register-function name function)
-  (hash-table-set! *shen-functions* name function))
 
 (define (register-function-arity name arity)
   (hash-table-set! *shen-function-arities* name arity))

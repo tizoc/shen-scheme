@@ -1,10 +1,6 @@
 ;; Copyright (c) 2012-2015 Bruno Deferrari.  All rights reserved.
 ;; BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause
 
-(define (full-path-for-file filename)
-  (make-path (kl:value '*home-directory*)
-             filename))
-
 (define (scm.read-file-as-string filename)
   (call-with-input-file (full-path-for-file filename)
     port->string))
@@ -31,8 +27,8 @@
                                     ((#t) 'true)
                                     ((#f) 'false)
                                     (else sym)) #t))
-   ((scm.function-binding 'get)
-    'shen 'shen.external-symbols (kl:value '*property-vector*)))
+   (kl:eval-kl
+    '(get shen shen.external-symbols (value *property-vector*))))
 
   shen-*system*)
 
