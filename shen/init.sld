@@ -84,9 +84,8 @@
   (include "compiled/t-star.kl.scm")
 
   (begin
-    ;; TODO: don't use Shen's `load`, we want a custom loader not
-    ;; meant for the REPL here.
     (defun shen.load (File)
-      (load File))
+      (let Contents (read-file File)
+         (map (lambda X (shen.eval-without-macros X)) Contents)))
 
     (cd "")))
