@@ -60,7 +60,8 @@
    (prefix (scheme eval) scm.)
    (prefix (srfi 69) scm.))
 
-  (export shen.shen)
+  (export shen.shen
+          shen.load)
 
   (include "init.scm")
 
@@ -83,4 +84,9 @@
   (include "compiled/t-star.kl.scm")
 
   (begin
+    ;; TODO: don't use Shen's `load`, we want a custom loader not
+    ;; meant for the REPL here.
+    (defun shen.load (File)
+      (load File))
+
     (cd "")))

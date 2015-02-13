@@ -30,7 +30,11 @@ Version 0.7 of chibi-scheme is needed to run chibi-shen. Other versions may work
 
 To launch the Shen REPL do:
 
-    chibi-scheme -h 500M -xshen -e'(shen.shen)'
+    chibi-scheme -h 50M -Rshen.runner
+
+To run a script do:
+
+    chibi-scheme -h 50M -Rshen.runner script.shen
 
 Native Calls
 ------------
