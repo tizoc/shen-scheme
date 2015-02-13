@@ -36,6 +36,7 @@
 <ul>
 <li><a href="http://shenlanguage.org">Shen</a></li>
 <li><a href="http://code.google.com/p/chibi-scheme">chibi-scheme</a></li>
+<li><a href="https://github.com/tizoc/chibi-shen">chibi-shen</a></li>
 </ul>
 
 <p>Shen is a portable functional programming language by <a href="http://marktarver.com">Mark Tarver</a> that offers</p>
@@ -58,7 +59,7 @@
 <pre><code>make
 </code></pre>
 
-<p>The resulting code will live under the <code>compiled/</code> directory.</p>
+<p>The resulting code will live under the <code>shen/compiled/</code> directory.</p>
 
 <h2>
 <a id="running" class="anchor" href="#running" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running</h2>
@@ -67,16 +68,95 @@
 
 <p>To launch the Shen REPL do:</p>
 
-<pre><code>chibi-scheme -h 500M -xshen -e'(shen.shen)'
+<pre><code>chibi-scheme -Rshen.runner
 </code></pre>
+
+<p>To run a script do:</p>
+
+<pre><code>chibi-scheme -Rshen.runner script.shen
+</code></pre>
+
+<p>The initial heap size can be increased by using chibi-scheme's <code>-h</code> option:</p>
+
+<pre><code>chibi-scheme -h50M -Rshen.runner
+</code></pre>
+
+<p>The <code>(shen init)</code> module exports two functions, <code>shen.shen</code> for launching the shen REPL and <code>shen.load</code> for loading Shen scripts:</p>
+
+<pre><code># cat test.shen
+(print [1 2 3 4])
+(nl)
+# chibi-scheme
+&gt; (import (shen init))
+&gt; (shen.load "test.shen")
+[1 2 3 4]
+((1 2 3 4) 0)
+&gt; (shen.shen)
+
+Shen, copyright (C) 2010-2015 Mark Tarver
+www.shenlanguage.org, Shen 17
+running under Scheme, implementation: chibi-scheme
+port 0.10 ported by Bruno Deferrari
+
+
+(0-) 
+</code></pre>
+
+<h2>
+<a id="native-calls" class="anchor" href="#native-calls" aria-hidden="true"><span class="octicon octicon-link"></span></a>Native Calls</h2>
+
+<p>Scheme functions live under the <code>scm</code> namespace (<code>scm.</code> prefix). For example: <code>(scm.write [1 2 3 4])</code> invokes Scheme's <code>write</code> function with a list as an argument.</p>
+
+<p>To send literal, unprocessed code to the underlying interpreter the <code>scm.</code> form can be used:</p>
+
+<pre><code>(0-) (scm. "(scm.+ 1 2 3 4)")
+10
+
+(1-) (scm. "(scm.define (func-name x) (scm.display x) (scm.newline))")
+#&lt;undef&gt;
+
+(2-) (func-name "test")
+test
+#&lt;undef&gt;
+
+</code></pre>
+
+<p>Note that the <code>scm.</code> prefix is still required, because Scheme functions have been imported inside the Shen environment with an <code>scm.</code> prefix, and all compiled code runs inside this environment.</p>
+
+<p>Because Scheme functions can have variable numbers of arguments and the code passed to <code>scm.</code> is not preprocessed, any imported function that is intended to support partial application has to be wrapped with a <code>defun</code>:</p>
+
+<pre><code>(3-) (defun for-each (F L) (scm.for-each F L))
+for-each
+
+(4-) (for-each (/. X (do (print (+ X X)) (nl))) [1 2 3 4 5])
+2
+4
+6
+8
+10
+#&lt;undef&gt;
+
+(5-) (for-each (function print))
+#&lt;procedure #f&gt;
+</code></pre>
+
+<p><strong>Note on importing Scheme modules:</strong></p>
+
+<p>As of chibi-shen 0.10 this does not work:</p>
+
+<pre><code>(scm. "(scm.import (prefix (srfi 27) scm.))")
+</code></pre>
+
+<p>Which means that for now external modules can't be imported in the REPL.</p>
+
+<p>A temporary workaround is to edit <code>shen/init.sld</code> and add the necessary imports as described in <a href="https://github.com/tizoc/chibi-shen/issues/1#issuecomment-72329117">this comment</a>.</p>
 
 <h2>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
 
 <ul>
-<li><a href="http://shenlanguage.org/license.html">http://shenlanguage.org/license.html</a></li>
-<li>Shen, Copyright © 2010-2012 Mark Tarver</li>
-<li>chibi-shen, Copyright © 2012 Bruno Deferrari</li>
+<li>Shen, Copyright © 2010-2015 Mark Tarver - <a href="http://www.shenlanguage.org/license.pdf">License</a>.</li>
+<li>chibi-shen, Copyright © 2012-2015 Bruno Deferrari under <a href="http://opensource.org/licenses/BSD-3-Clause">BSD 3-Clause License</a>.</li>
 </ul>
       </section>
       <footer>
