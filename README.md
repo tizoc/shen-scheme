@@ -22,7 +22,7 @@ To precompile the `.kl` files into Scheme code run:
 
     make
 
-The resulting code will live under the `compiled/` directory.
+The resulting code will live under the `shen/compiled/` directory.
   
 Running
 -------
@@ -105,7 +105,7 @@ for-each
 
 **Note on importing Scheme modules:**
 
-As of chibi-shen 0.10 this is not working properly at the moment:
+As of chibi-shen 0.10 this does not work:
 
 ```
 (scm. "(scm.import (prefix (srfi 27) scm.))")
@@ -113,7 +113,7 @@ As of chibi-shen 0.10 this is not working properly at the moment:
 
 Which means that for now external modules can't be imported in the REPL.
 
-A temporary workaround is to edit `shen/init.sld` and add the necessary imports there.
+A temporary workaround is to edit `shen/init.sld` and add the necessary imports as described in [this comment](https://github.com/tizoc/chibi-shen/issues/1#issuecomment-72329117).
 
 License
 -------
