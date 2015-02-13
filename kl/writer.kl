@@ -61,7 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 
 (defun shen.str->str (V2440 V2441) (cond ((= shen.a V2441) V2440) (true (@s (n->string 34) (@s V2440 (n->string 34))))))
 
-(defun shen.vector->str (V2442 V2443) (if (shen.print-vector? V2442) ((<-address V2442 0) V2442) (if (vector? V2442) (@s "<" (@s (shen.iter-vector V2442 1 V2443 (shen.maxseq)) ">")) (@s "<" (@s "<" (@s (shen.iter-vector V2442 0 V2443 (shen.maxseq)) ">>"))))))
+(defun shen.vector->str (V2442 V2443) (if (shen.print-vector? V2442) ((shen.symbol->function (<-address V2442 0) 1) V2442) (if (vector? V2442) (@s "<" (@s (shen.iter-vector V2442 1 V2443 (shen.maxseq)) ">")) (@s "<" (@s "<" (@s (shen.iter-vector V2442 0 V2443 (shen.maxseq)) ">>"))))))
 
 (defun shen.print-vector? (V2444) (let Zero (<-address V2444 0) (if (= Zero shen.tuple) true (if (= Zero shen.pvar) true (if (not (number? Zero)) (shen.fbound? Zero) false)))))
 
