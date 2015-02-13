@@ -3,6 +3,7 @@ chibi-shen, a chibi-scheme port of the Shen language
 
 * [Shen](http://shenlanguage.org)
 * [chibi-scheme](http://code.google.com/p/chibi-scheme>)
+* [chibi-shen](https://github.com/tizoc/chibi-shen)
 
 Shen is a portable functional programming language by [Mark Tarver](http://marktarver.com) that offers
 
