@@ -8,9 +8,15 @@
 
 	* Replaced `$native` form with `scm.` form that takes a string of Scheme code that will not be processed.
 
+	* Support for running scripts from the command line without launching a REPL.
+
 	* Fixed optimised version of shen.grammar_symbol? (was broken for namespaced symbols)
 
 	* Removed overwrites for `macroexpand` and `walk`.
+
+	* Removed unused `segvar?` overwrite.
+
+	* Removed internal function registry and support for symbol disambiguation on function application.
 
 	* Explicit BSD licence everywhere.
 
