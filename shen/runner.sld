@@ -1,6 +1,6 @@
 (define-library (shen runner)
   (import (chibi)
-          (shen))
+          (shen init))
   (begin
     (define (main arguments)
       (cond ((null? arguments) (shen.shen))
