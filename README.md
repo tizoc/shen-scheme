@@ -30,11 +30,37 @@ Version 0.7 of chibi-scheme is needed to run chibi-shen. Other versions may work
 
 To launch the Shen REPL do:
 
-    chibi-scheme -h 50M -Rshen.runner
+    chibi-scheme -Rshen.runner
 
 To run a script do:
 
-    chibi-scheme -h 50M -Rshen.runner script.shen
+    chibi-scheme -Rshen.runner script.shen
+
+The initial heap size can be increased by using chibi-scheme's `-h` option:
+
+    chibi-scheme -h50M -Rshen.runner
+
+The `(shen init)` module exports two functions, `shen.shen` for launching the shen REPL and `shen.load` for loading Shen scripts:
+
+```
+# cat test.shen
+(print [1 2 3 4])
+(nl)
+# chibi-scheme
+> (import (shen init))
+> (shen.load "test.shen")
+[1 2 3 4]
+((1 2 3 4) 0)
+> (shen.shen)
+
+Shen, copyright (C) 2010-2015 Mark Tarver
+www.shenlanguage.org, Shen 17
+running under Scheme, implementation: chibi-scheme
+port 0.10 ported by Bruno Deferrari
+
+
+(0-) 
+```
 
 Native Calls
 ------------
@@ -76,7 +102,17 @@ for-each
 #<procedure #f>
 ```
 
-**TODO**: importing modules
+**Note on importing Scheme modules:**
+
+As of chibi-shen 0.10 this is not working properly at the moment:
+
+```
+(scm. "(scm.import (prefix (srfi 27) scm.))")
+```
+
+Which means that for now external modules can't be imported in the REPL.
+
+A temporary workaround is to edit `shen/init.sld` and add the necessary imports there.
 
 License
 -------
