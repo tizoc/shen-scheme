@@ -23,37 +23,37 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 
-(defun load (V729) (let Load (let Start (get-time run) (let Result (shen.load-help (value shen.*tc*) (read-file V729)) (let Finish (get-time run) (let Time (- Finish Start) (let Message (shen.prhush (cn "
+(defun load (V727) (let Load (let Start (get-time run) (let Result (shen.load-help (value shen.*tc*) (read-file V727)) (let Finish (get-time run) (let Time (- Finish Start) (let Message (shen.prhush (cn "
 run time: " (cn (str Time) " secs
 ")) (stoutput)) Result))))) (let Infs (if (value shen.*tc*) (shen.prhush (cn "
 typechecked in " (shen.app (inferences) " inferences
 " shen.a)) (stoutput)) shen.skip) loaded)))
 
-(defun shen.load-help (V734 V735) (cond ((= false V734) (map (lambda X (shen.prhush (shen.app (shen.eval-without-macros X) "
-" shen.s) (stoutput))) V735)) (true (let RemoveSynonyms (mapcan (lambda V724 (shen.remove-synonyms V724)) V735) (let Table (mapcan (lambda V725 (shen.typetable V725)) RemoveSynonyms) (let Assume (map (lambda V726 (shen.assumetype V726)) Table) (trap-error (map (lambda V727 (shen.typecheck-and-load V727)) RemoveSynonyms) (lambda E (shen.unwind-types E Table)))))))))
+(defun shen.load-help (V732 V733) (cond ((= false V732) (map (lambda X (shen.prhush (shen.app (shen.eval-without-macros X) "
+" shen.s) (stoutput))) V733)) (true (let RemoveSynonyms (mapcan (lambda V722 (shen.remove-synonyms V722)) V733) (let Table (mapcan (lambda V723 (shen.typetable V723)) RemoveSynonyms) (let Assume (map (lambda V724 (shen.assumetype V724)) Table) (trap-error (map (lambda V725 (shen.typecheck-and-load V725)) RemoveSynonyms) (lambda E (shen.unwind-types E Table)))))))))
 
-(defun shen.remove-synonyms (V736) (cond ((and (cons? V736) (= shen.synonyms-help (hd V736))) (do (eval V736) ())) (true (cons V736 ()))))
+(defun shen.remove-synonyms (V734) (cond ((and (cons? V734) (= shen.synonyms-help (hd V734))) (do (eval V734) ())) (true (cons V734 ()))))
 
-(defun shen.typecheck-and-load (V737) (do (nl 1) (shen.typecheck-and-evaluate V737 (gensym A))))
+(defun shen.typecheck-and-load (V735) (do (nl 1) (shen.typecheck-and-evaluate V735 (gensym A))))
 
-(defun shen.typetable (V742) (cond ((and (cons? V742) (and (= define (hd V742)) (cons? (tl V742)))) (let Sig (compile (lambda V728 (shen.<sig+rest> V728)) (tl (tl V742)) (lambda E (simple-error (shen.app (hd (tl V742)) " lacks a proper signature.
-" shen.a)))) (cons (cons (hd (tl V742)) Sig) ()))) (true ())))
+(defun shen.typetable (V740) (cond ((and (cons? V740) (and (= define (hd V740)) (cons? (tl V740)))) (let Sig (compile (lambda V726 (shen.<sig+rest> V726)) (tl (tl V740)) (lambda E (simple-error (shen.app (hd (tl V740)) " lacks a proper signature.
+" shen.a)))) (cons (cons (hd (tl V740)) Sig) ()))) (true ())))
 
-(defun shen.assumetype (V743) (cond ((cons? V743) (declare (hd V743) (tl V743))) (true (shen.f_error shen.assumetype))))
+(defun shen.assumetype (V741) (cond ((cons? V741) (declare (hd V741) (tl V741))) (true (shen.f_error shen.assumetype))))
 
-(defun shen.unwind-types (V748 V749) (cond ((= () V749) (simple-error (error-to-string V748))) ((and (cons? V749) (cons? (hd V749))) (do (shen.remtype (hd (hd V749))) (shen.unwind-types V748 (tl V749)))) (true (shen.f_error shen.unwind-types))))
+(defun shen.unwind-types (V746 V747) (cond ((= () V747) (simple-error (error-to-string V746))) ((and (cons? V747) (cons? (hd V747))) (do (shen.remtype (hd (hd V747))) (shen.unwind-types V746 (tl V747)))) (true (shen.f_error shen.unwind-types))))
 
-(defun shen.remtype (V750) (set shen.*signedfuncs* (shen.removetype V750 (value shen.*signedfuncs*))))
+(defun shen.remtype (V748) (set shen.*signedfuncs* (shen.removetype V748 (value shen.*signedfuncs*))))
 
-(defun shen.removetype (V756 V757) (cond ((= () V757) ()) ((and (cons? V757) (and (cons? (hd V757)) (= (hd (hd V757)) V756))) (shen.removetype (hd (hd V757)) (tl V757))) ((cons? V757) (cons (hd V757) (shen.removetype V756 (tl V757)))) (true (shen.f_error shen.removetype))))
+(defun shen.removetype (V754 V755) (cond ((= () V755) ()) ((and (cons? V755) (and (cons? (hd V755)) (= (hd (hd V755)) V754))) (shen.removetype (hd (hd V755)) (tl V755))) ((cons? V755) (cons (hd V755) (shen.removetype V754 (tl V755)))) (true (shen.f_error shen.removetype))))
 
-(defun shen.<sig+rest> (V758) (let Parse_shen.<signature> (shen.<signature> V758) (if (not (= (fail) Parse_shen.<signature>)) (let Parse_shen.<!> (shen.<!> Parse_shen.<signature>) (if (not (= (fail) Parse_shen.<!>)) (shen.pair (hd Parse_shen.<!>) (shen.hdtl Parse_shen.<signature>)) (fail))) (fail))))
+(defun shen.<sig+rest> (V756) (let Parse_shen.<signature> (shen.<signature> V756) (if (not (= (fail) Parse_shen.<signature>)) (let Parse_shen.<!> (shen.<!> Parse_shen.<signature>) (if (not (= (fail) Parse_shen.<!>)) (shen.pair (hd Parse_shen.<!>) (shen.hdtl Parse_shen.<signature>)) (fail))) (fail))))
 
-(defun write-to-file (V759 V760) (let Stream (open V759 out) (let String (if (string? V760) (shen.app V760 "
+(defun write-to-file (V757 V758) (let Stream (open V757 out) (let String (if (string? V758) (shen.app V758 "
 
-" shen.a) (shen.app V760 "
+" shen.a) (shen.app V758 "
 
-" shen.s)) (let Write (pr String Stream) (let Close (close Stream) V760)))))
+" shen.s)) (let Write (pr String Stream) (let Close (close Stream) V758)))))
 
 
 
