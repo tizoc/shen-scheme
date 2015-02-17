@@ -5,8 +5,10 @@
   (import (scheme base) (scheme eval)
           (scheme write) (scheme file) (scheme time) (scheme char)
           (srfi 69)
-          (chibi string)
-          (only (chibi) call-with-output-string)
+          (chibi string) (chibi match)
+          (only (meta) module-env)
+          (only (chibi modules) load-module)
+          (only (chibi) call-with-output-string %import)
           (only (chibi pathname) path-resolve)
           (only (chibi filesystem) file-exists?)
           (only (chibi io) port->string read-u8)
@@ -17,6 +19,7 @@
    scm.set-shen-environment!
    scm.l2r
    scm.call-nested
+   scm.import-from-module
 
    kl:if
    kl:and
