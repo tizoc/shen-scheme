@@ -274,11 +274,3 @@
   (if (null? args)
       f
       (scm.call-nested (f (car args)) (cdr args))))
-
-;; Function references by name
-
-(define (or-function a b)
-  (kl:or a b))
-
-(define (and-function a b)
-  (kl:and a b))
