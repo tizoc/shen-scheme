@@ -103,17 +103,25 @@ for-each
 #<procedure #f>
 ```
 
-**Note on importing Scheme modules:**
+**Importing bindings from Scheme modules:**
 
-As of chibi-shen 0.10 this does not work:
+The `scm.import-from-module` function can be used to import bindings from Scheme modules into Shen's environment.
+
+It takes two arguments: a module identifier, and a list of lists of which the first element is a symbol with the name the imported binding is going to have inside Shen's environment, and the second the name the binding inside the module.
+
+Example:
 
 ```
-(scm. "(scm.import (prefix (srfi 27) scm.))")
+(6-) (scm.import-from-module [srfi 27] [[scm.random-integer random-integer] [scm.random-real random-real]])
+[[scm.random-integer random-integer] [scm.random-real random-real]]
+
+(7-) (scm.random-integer 1000)
+927
+
+(8-) (scm.random-real)
+0.155211571676289
 ```
 
-Which means that for now external modules can't be imported in the REPL.
-
-A temporary workaround is to edit `shen/init.sld` and add the necessary imports as described in [this comment](https://github.com/tizoc/chibi-shen/issues/1#issuecomment-72329117).
 
 License
 -------
