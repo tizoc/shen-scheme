@@ -280,10 +280,10 @@
              (acc '()))
     (match rest
       ('() (reverse acc))
-      (`(,name <= ,original-name . ,rest)
+      (`((,name ,original-name) . ,rest)
        (loop rest (cons (cons name original-name) acc)))
       (else
-       (error "Bad import spec (expects: [name <= original-name ...]" rest)))))
+       (error "Bad import spec (expects a list of [imported-name original-name]" rest)))))
 
 (define (scm.import-from-module module-path spec)
   (let* ((imports (import-spec-to-assoc spec))
