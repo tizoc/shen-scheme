@@ -103,7 +103,8 @@ for-each
 #<procedure #f>
 ```
 
-**Importing bindings from Scheme modules:**
+Importing bindings from Scheme modules
+--------------------------------------
 
 The `scm.import-from-module` function can be used to import bindings from Scheme modules into Shen's environment.
 
