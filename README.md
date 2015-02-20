@@ -106,7 +106,7 @@ for-each
 Importing bindings from Scheme modules
 --------------------------------------
 
-The `scm.import-from-module` function can be used to import bindings from Scheme modules into Shen's environment.
+The `scm.import-from-module` function imports bindings from Scheme modules into Shen's environment.
 
 It takes two arguments: a module identifier, and a list of lists of which the first element is a symbol with the name the imported binding is going to have inside Shen's environment, and the second the name the binding inside the module.
 
