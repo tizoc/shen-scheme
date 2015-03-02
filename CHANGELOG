@@ -1,3 +1,7 @@
+0.11.1:
+
+	* Include Shen 17.2 fixes.
+
 0.11:
 
 	* Add `scm.import-from-module` function to import bindings from Scheme modules into Shen's environment.
