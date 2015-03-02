@@ -76,7 +76,7 @@ run time: " (cons (cons cn (cons (cons str (cons Time ())) (cons " secs
 
 (defun shen.function-macro (V795) (cond ((and (cons? V795) (and (= function (hd V795)) (and (cons? (tl V795)) (= () (tl (tl V795)))))) (shen.function-abstraction (hd (tl V795)) (arity (hd (tl V795))))) (true V795)))
 
-(defun shen.function-abstraction (V796 V797) (cond ((= 0 V797) (cons freeze (cons V796 ()))) ((= -1 V797) (shen.function-abstraction V796 1)) (true (shen.function-abstraction-help V796 V797 ()))))
+(defun shen.function-abstraction (V796 V797) (cond ((= 0 V797) (cons freeze (cons V796 ()))) ((= -1 V797) (shen.function-abstraction-help V796 1 ())) (true (shen.function-abstraction-help V796 V797 ()))))
 
 (defun shen.function-abstraction-help (V798 V799 V800) (cond ((= 0 V799) (cons V798 V800)) (true (let X (gensym V) (cons lambda (cons X (cons (shen.function-abstraction-help V798 (- V799 1) (append V800 (cons X ()))) ())))))))
 
