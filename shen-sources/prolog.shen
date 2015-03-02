@@ -56,7 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.c#34;
   
 (defcc <clauses*> 
   <clause*> <clauses*> := [<clause*> | <clauses*>];
-  <e>;)
+  <e> := [];)
   
 (defcc <clause*>
   <head*> <-- <body*> <end*> := [<head*> <body*>];)
