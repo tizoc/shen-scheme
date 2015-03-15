@@ -169,7 +169,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.c#34;
   X -> X)
   
 (define function-abstraction 
-  F 0 -> [freeze F]
+  F 0 -> F
   F -1 -> (function-abstraction-help F 1 [])
   F N -> (function-abstraction-help F N []))  
   
