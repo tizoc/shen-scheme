@@ -153,13 +153,13 @@
      (let ((?name ?value)) ?expr))))
 
 (define (vector=? a b)
-  (let ((minlen (min (vector-length a) (vector-length b))))
-    (and (= (vector-length a) (vector-length b))
+  (let ((len (vector-length a)))
+    (and (= len (vector-length b))
          (do ((i 0 (+ i 1)))
-             ((or (= i minlen)
+             ((or (= i len)
                   (not (kl:= (vector-ref a i)
                              (vector-ref b i))))
-              (= i minlen))))))
+              (= i len))))))
 
 (define (kl:= a b)
   (cond ((eq? a b) #t) ;; fast path
