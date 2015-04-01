@@ -42,6 +42,14 @@
 (defun shen.byte->digit (N)
   (scm.- N 48))
 
+(defun shen.lookup-func (F SymbolTable)
+  (let Entry (scm.assq F SymbolTable)
+    (if Entry
+        (scm.cdr Entry)
+        (simple-error (scm.string-append
+                       (scm.symbol->string F)
+                       " has no lambda expansion\n")))))
+
 ;; Definitions for these are on shen/overwrites-internal.scm
 
 (defun shen.sysfunc? (Val)
