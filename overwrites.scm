@@ -44,11 +44,12 @@
 
 (defun shen.lookup-func (F SymbolTable)
   (let Entry (scm.assq F SymbolTable)
-    (if Entry
-        (scm.cdr Entry)
-        (simple-error (scm.string-append
-                       (scm.symbol->string F)
-                       " has no lambda expansion\n")))))
+    (scm.if
+     Entry
+     (scm.cdr Entry)
+     (simple-error (scm.string-append
+                    (scm.symbol->string F)
+                    " has no lambda expansion\n")))))
 
 ;; Definitions for these are on shen/overwrites-internal.scm
 
