@@ -140,16 +140,24 @@ for-each
 #&lt;procedure #f&gt;
 </code></pre>
 
-<p><strong>Note on importing Scheme modules:</strong></p>
+<h2>
+<a id="importing-bindings-from-scheme-modules" class="anchor" href="#importing-bindings-from-scheme-modules" aria-hidden="true"><span class="octicon octicon-link"></span></a>Importing bindings from Scheme modules</h2>
 
-<p>As of chibi-shen 0.10 this does not work:</p>
+<p>The <code>scm.import-from-module</code> function imports bindings from Scheme modules into Shen's environment.</p>
 
-<pre><code>(scm. "(scm.import (prefix (srfi 27) scm.))")
+<p>It takes two arguments: a module identifier, and a list of lists of which the first element is a symbol with the name the imported binding is going to have inside Shen's environment, and the second the name the binding inside the module.</p>
+
+<p>Example:</p>
+
+<pre><code>(6-) (scm.import-from-module [srfi 27] [[scm.random-integer random-integer] [scm.random-real random-real]])
+[[scm.random-integer random-integer] [scm.random-real random-real]]
+
+(7-) (scm.random-integer 1000)
+927
+
+(8-) (scm.random-real)
+0.155211571676289
 </code></pre>
-
-<p>Which means that for now external modules can't be imported in the REPL.</p>
-
-<p>A temporary workaround is to edit <code>shen/init.sld</code> and add the necessary imports as described in <a href="https://github.com/tizoc/chibi-shen/issues/1#issuecomment-72329117">this comment</a>.</p>
 
 <h2>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
@@ -160,7 +168,7 @@ for-each
 </ul>
       </section>
       <footer>
-        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
       </footer>
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
