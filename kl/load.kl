@@ -23,37 +23,37 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 
-(defun load (V16247) (let Load (let Start (get-time run) (let Result (shen.load-help (value shen.*tc*) (read-file V16247)) (let Finish (get-time run) (let Time (- Finish Start) (let Message (shen.prhush (cn "
+(defun load (V1480) (let Load (let Start (get-time run) (let Result (shen.load-help (value shen.*tc*) (read-file V1480)) (let Finish (get-time run) (let Time (- Finish Start) (let Message (shen.prhush (cn "
 run time: " (cn (str Time) " secs
 ")) (stoutput)) Result))))) (let Infs (if (value shen.*tc*) (shen.prhush (cn "
 typechecked in " (shen.app (inferences) " inferences
 " shen.a)) (stoutput)) shen.skip) loaded)))
 
-(defun shen.load-help (V16254 V16255) (cond ((= false V16254) (map (lambda X (shen.prhush (shen.app (shen.eval-without-macros X) "
-" shen.s) (stoutput))) V16255)) (true (let RemoveSynonyms (mapcan (lambda X (shen.remove-synonyms X)) V16255) (let Table (mapcan (lambda X (shen.typetable X)) RemoveSynonyms) (let Assume (map (lambda X (shen.assumetype X)) Table) (trap-error (map (lambda X (shen.typecheck-and-load X)) RemoveSynonyms) (lambda E (shen.unwind-types E Table)))))))))
+(defun shen.load-help (V1487 V1488) (cond ((= false V1487) (map (lambda X (shen.prhush (shen.app (shen.eval-without-macros X) "
+" shen.s) (stoutput))) V1488)) (true (let RemoveSynonyms (mapcan (lambda X (shen.remove-synonyms X)) V1488) (let Table (mapcan (lambda X (shen.typetable X)) RemoveSynonyms) (let Assume (map (lambda X (shen.assumetype X)) Table) (trap-error (map (lambda X (shen.typecheck-and-load X)) RemoveSynonyms) (lambda E (shen.unwind-types E Table)))))))))
 
-(defun shen.remove-synonyms (V16257) (cond ((and (cons? V16257) (= shen.synonyms-help (hd V16257))) (do (eval V16257) ())) (true (cons V16257 ()))))
+(defun shen.remove-synonyms (V1490) (cond ((and (cons? V1490) (= shen.synonyms-help (hd V1490))) (do (eval V1490) ())) (true (cons V1490 ()))))
 
-(defun shen.typecheck-and-load (V16259) (do (nl 1) (shen.typecheck-and-evaluate V16259 (gensym A))))
+(defun shen.typecheck-and-load (V1492) (do (nl 1) (shen.typecheck-and-evaluate V1492 (gensym A))))
 
-(defun shen.typetable (V16265) (cond ((and (cons? V16265) (and (= define (hd V16265)) (cons? (tl V16265)))) (let Sig (compile (lambda Y (shen.<sig+rest> Y)) (tl (tl V16265)) (lambda E (simple-error (shen.app (hd (tl V16265)) " lacks a proper signature.
-" shen.a)))) (cons (cons (hd (tl V16265)) Sig) ()))) (true ())))
+(defun shen.typetable (V1498) (cond ((and (cons? V1498) (and (= define (hd V1498)) (cons? (tl V1498)))) (let Sig (compile (lambda Y (shen.<sig+rest> Y)) (tl (tl V1498)) (lambda E (simple-error (shen.app (hd (tl V1498)) " lacks a proper signature.
+" shen.a)))) (cons (cons (hd (tl V1498)) Sig) ()))) (true ())))
 
-(defun shen.assumetype (V16267) (cond ((cons? V16267) (declare (hd V16267) (tl V16267))) (true (shen.f_error shen.assumetype))))
+(defun shen.assumetype (V1500) (cond ((cons? V1500) (declare (hd V1500) (tl V1500))) (true (shen.f_error shen.assumetype))))
 
-(defun shen.unwind-types (V16274 V16275) (cond ((= () V16275) (simple-error (error-to-string V16274))) ((and (cons? V16275) (cons? (hd V16275))) (do (shen.remtype (hd (hd V16275))) (shen.unwind-types V16274 (tl V16275)))) (true (shen.f_error shen.unwind-types))))
+(defun shen.unwind-types (V1507 V1508) (cond ((= () V1508) (simple-error (error-to-string V1507))) ((and (cons? V1508) (cons? (hd V1508))) (do (shen.remtype (hd (hd V1508))) (shen.unwind-types V1507 (tl V1508)))) (true (shen.f_error shen.unwind-types))))
 
-(defun shen.remtype (V16277) (set shen.*signedfuncs* (shen.removetype V16277 (value shen.*signedfuncs*))))
+(defun shen.remtype (V1510) (set shen.*signedfuncs* (shen.removetype V1510 (value shen.*signedfuncs*))))
 
-(defun shen.removetype (V16285 V16286) (cond ((= () V16286) ()) ((and (cons? V16286) (and (cons? (hd V16286)) (= (hd (hd V16286)) V16285))) (shen.removetype (hd (hd V16286)) (tl V16286))) ((cons? V16286) (cons (hd V16286) (shen.removetype V16285 (tl V16286)))) (true (shen.f_error shen.removetype))))
+(defun shen.removetype (V1518 V1519) (cond ((= () V1519) ()) ((and (cons? V1519) (and (cons? (hd V1519)) (= (hd (hd V1519)) V1518))) (shen.removetype (hd (hd V1519)) (tl V1519))) ((cons? V1519) (cons (hd V1519) (shen.removetype V1518 (tl V1519)))) (true (shen.f_error shen.removetype))))
 
-(defun shen.<sig+rest> (V16288) (let Parse_shen.<signature> (shen.<signature> V16288) (if (not (= (fail) Parse_shen.<signature>)) (let Parse_shen.<!> (shen.<!> Parse_shen.<signature>) (if (not (= (fail) Parse_shen.<!>)) (shen.pair (hd Parse_shen.<!>) (shen.hdtl Parse_shen.<signature>)) (fail))) (fail))))
+(defun shen.<sig+rest> (V1521) (let Parse_shen.<signature> (shen.<signature> V1521) (if (not (= (fail) Parse_shen.<signature>)) (let Parse_shen.<!> (shen.<!> Parse_shen.<signature>) (if (not (= (fail) Parse_shen.<!>)) (shen.pair (hd Parse_shen.<!>) (shen.hdtl Parse_shen.<signature>)) (fail))) (fail))))
 
-(defun write-to-file (V16291 V16292) (let Stream (open V16291 out) (let String (if (string? V16292) (shen.app V16292 "
+(defun write-to-file (V1524 V1525) (let Stream (open V1524 out) (let String (if (string? V1525) (shen.app V1525 "
 
-" shen.a) (shen.app V16292 "
+" shen.a) (shen.app V1525 "
 
-" shen.s)) (let Write (pr String Stream) (let Close (close Stream) V16292)))))
+" shen.s)) (let Write (pr String Stream) (let Close (close Stream) V1525)))))
 
 
 
