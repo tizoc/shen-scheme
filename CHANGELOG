@@ -1,3 +1,7 @@
+0.12.2:
+
+	* Updated for Shen 19.1.
+
 0.12.1:
 
 	* Fix shen.lookup-func override.

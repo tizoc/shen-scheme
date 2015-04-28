@@ -3,7 +3,7 @@
 
 (set (scm.quote *language*) "Scheme")
 (set (scm.quote *implementation*) "chibi-scheme")
-(set (scm.quote *port*) "0.12.1")
+(set (scm.quote *port*) "0.12.2")
 (set (scm.quote *porters*) "Bruno Deferrari")
 (set (scm.quote *stinput*) (scm.current-input-port))
 (set (scm.quote *stoutput*) (scm.current-output-port))
