@@ -5,6 +5,7 @@
 (set (scm.quote *implementation*) "chibi-scheme")
 (set (scm.quote *port*) "0.12.2")
 (set (scm.quote *porters*) "Bruno Deferrari")
+(set (scm.quote *sterror*) (scm.current-error-port))
 (set (scm.quote *stinput*) (scm.current-input-port))
 (set (scm.quote *stoutput*) (scm.current-output-port))
 (scm.set-shen-environment! (scm.current-environment))

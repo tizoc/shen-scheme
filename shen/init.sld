@@ -88,4 +88,7 @@
       (let Contents (read-file File)
          (map (lambda X (shen.eval-without-macros X)) Contents)))
 
+    (defun sterror ()
+      (value (scm.quote *sterror*)))
+
     (cd "")))
