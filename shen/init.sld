@@ -58,6 +58,7 @@
    (prefix (chibi filesystem) scm.)
    (prefix (scheme file) scm.)
    (prefix (scheme eval) scm.)
+   (prefix (scheme process-context) scm.)
    (prefix (srfi 69) scm.))
 
   (export shen.shen
@@ -90,5 +91,8 @@
 
     (defun sterror ()
       (value (scm.quote *sterror*)))
+
+    (defun exit (Code)
+      (scm.exit Code))
 
     (cd "")))
