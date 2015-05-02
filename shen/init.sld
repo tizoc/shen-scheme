@@ -63,7 +63,7 @@
    (prefix (srfi 69) scm.))
 
   (export shen.shen
-          shen.load)
+          shen.quiet-load)
 
   (include "init.scm")
 

@@ -1,4 +1,4 @@
-(define shen.load
+(define shen.quiet-load
   File -> (let Contents (read-file File)
             (map (/. X (shen.eval-without-macros X)) Contents)))
 
