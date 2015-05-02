@@ -1,15 +1,15 @@
 "Copyright (c) 2012-2015 Bruno Deferrari.  All rights reserved.
 BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause"
 
-(defun shen.load (V1171) (let Contents (read-file V1171) (map (lambda X (shen.eval-without-macros X)) Contents)))
+(defun shen.quiet-load (V1178) (let Contents (read-file V1178) (map (lambda X (shen.eval-without-macros X)) Contents)))
 
 (defun sterror () (value *sterror*))
 
-(defun exit (V1173) (scm.exit V1173))
+(defun exit (V1180) (scm.exit V1180))
 
 (defun command-line () (scm.command-line))
 
-(defun open-append (V1175) (let FullPath (scm.path-resolve V1175 (value *home-directory*)) (let Mode (scm. "(scm.+ scm.open/create scm.open/write scm.open/append)") (let Fd (scm.open FullPath Mode) (scm.open-output-file-descriptor Fd)))))
+(defun open-append (V1182) (let FullPath (scm.path-resolve V1182 (value *home-directory*)) (let Mode (scm. "(scm.+ scm.open/create scm.open/write scm.open/append)") (let Fd (scm.open FullPath Mode) (scm.open-output-file-descriptor Fd)))))
 
 (declare open-append (cons string (cons --> (cons (cons stream (cons out ())) ()))))
 
