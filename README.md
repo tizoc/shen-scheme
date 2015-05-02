@@ -37,6 +37,12 @@ To run a script do:
 
     chibi-scheme -Rshen.runner script.shen
 
+or
+
+    chibi-scheme -Rshen.runner script.shen arg1 arg2 arg3 ...
+
+to pass arguments to it.
+
 The initial heap size can be increased by using chibi-scheme's `-h` option:
 
     chibi-scheme -h50M -Rshen.runner
