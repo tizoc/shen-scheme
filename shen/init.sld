@@ -56,6 +56,7 @@
 
    (prefix (chibi) scm.)
    (prefix (chibi filesystem) scm.)
+   (prefix (chibi pathname) scm.)
    (prefix (scheme file) scm.)
    (prefix (scheme eval) scm.)
    (prefix (scheme process-context) scm.)
@@ -83,16 +84,7 @@
   (include "compiled/declarations.kl.scm")
   (include "compiled/types.kl.scm")
   (include "compiled/t-star.kl.scm")
+  (include "compiled/extras.kl.scm")
 
   (begin
-    (defun shen.load (File)
-      (let Contents (read-file File)
-         (map (lambda X (shen.eval-without-macros X)) Contents)))
-
-    (defun sterror ()
-      (value (scm.quote *sterror*)))
-
-    (defun exit (Code)
-      (scm.exit Code))
-
     (cd "")))

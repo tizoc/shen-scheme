@@ -223,9 +223,6 @@
                 (open-input-file full-path)
                 (error "File does not exist" full-path)))
       ((out) (open-output-file full-path))
-      ((append) (let ((fd (open full-path
-                                (+ open/create open/write open/append))))
-                  (open-output-file-descriptor fd)))
       (else (error "Invalid direction" direction)))))
 
 (define (kl:close stream)

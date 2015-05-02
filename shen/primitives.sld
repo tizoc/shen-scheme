@@ -12,8 +12,6 @@
           (only (chibi pathname) path-resolve)
           (only (chibi filesystem) file-exists?)
           (only (chibi io) port->string read-u8)
-          (only (chibi filesystem) open open/create open/write open/append
-                                   open-output-file-descriptor)
 
           (shen compiler))
 
