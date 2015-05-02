@@ -10,5 +10,5 @@
       ;; sometimes argv[0] gets passed in, sometimes it doesn't
       (cond ((or (null? arguments) (equal? arguments '("chibi-scheme")))
              (shen.shen))
-            (else (for-each shen.quiet-load arguments))))))
+            (else (shen.quiet-load (car arguments)))))))
 
