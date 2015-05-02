@@ -126,7 +126,7 @@ Example:
 Extensions to core Shen
 -----------------------
 
-* Command line strings are accessible by calling `(command-line)`, the result is a list of strings, of which the first element is the name of hte program, and the rest the command-line arguments passed to it.
+* Command line strings can be obtained by calling `(command-line)`, the result is a list of strings, of which the first element is the name of the program, and the rest of the list being the arguments passed to it.
 * To exit the process, the `(exit N)` can be called, with `N` being the desired integer exit code.
 * A standard error stream can be accessed by calling `(sterror)`.
 * Files an be opened for output in "append" mode that doesn't truncate the file by calling `(open-append Filepath)`. The result is an stream handle of type `(stream out)`.
