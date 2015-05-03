@@ -56,6 +56,7 @@
 
    (prefix (chibi) scm.)
    (prefix (chibi filesystem) scm.)
+   (prefix (chibi io) scm.)
    (prefix (chibi pathname) scm.)
    (prefix (scheme file) scm.)
    (prefix (scheme eval) scm.)

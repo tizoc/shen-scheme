@@ -6,7 +6,7 @@
   -> (value *sterror*))
 
 (define exit
-  Code -> (scm.exit Code))
+  Code -> (scm.exit (scm.inexact->exact Code)))
 
 (define command-line
   -> (scm.command-line))
@@ -17,4 +17,26 @@
                Fd (scm.open FullPath Mode)
             (scm.open-output-file-descriptor Fd)))
 
+(define stream-position
+  Stream -> (scm.file-position Stream))
+
+(define stream-seek
+  Stream Pos -> (do (scm.set-file-position! Stream Pos (scm. "scm.seek/set"))
+                    Pos))
+
+(define stream-seek-from-current
+  Stream Pos -> (do (scm.set-file-position! Stream Pos (scm. "scm.seek/cur"))
+                    Pos))
+
+(define stream-seek-from-end
+  Stream Pos -> (do (scm.set-file-position! Stream Pos (scm. "scm.seek/end"))
+                    Pos))
+
+(declare command-line [--> [list string]])
+(declare exit [number --> unit])
 (declare open-append [string --> [stream out]])
+(declare sterror [--> [stream out]])
+(declare stream-position [[stream A] --> number])
+(declare stream-seek [[stream A] --> [number --> number]])
+(declare stream-seek-from-current [[stream A] --> [number --> number]])
+(declare stream-seek-from-end [[stream A] --> [number --> number]])
