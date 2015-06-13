@@ -20,15 +20,15 @@
 (define stream-position
   Stream -> (scm.file-position Stream))
 
-(define stream-seek
+(define stream-set-position
   Stream Pos -> (do (scm.set-file-position! Stream Pos (scm. "scm.seek/set"))
                     Pos))
 
-(define stream-seek-from-current
+(define stream-set-position-from-current
   Stream Pos -> (do (scm.set-file-position! Stream Pos (scm. "scm.seek/cur"))
                     Pos))
 
-(define stream-seek-from-end
+(define stream-set-position-from-end
   Stream Pos -> (do (scm.set-file-position! Stream Pos (scm. "scm.seek/end"))
                     Pos))
 
@@ -37,6 +37,6 @@
 (declare open-append [string --> [stream out]])
 (declare sterror [--> [stream out]])
 (declare stream-position [[stream A] --> number])
-(declare stream-seek [[stream A] --> [number --> number]])
-(declare stream-seek-from-current [[stream A] --> [number --> number]])
-(declare stream-seek-from-end [[stream A] --> [number --> number]])
+(declare stream-set-position [[stream A] --> [number --> number]])
+(declare stream-set-position-from-current [[stream A] --> [number --> number]])
+(declare stream-set-position-from-end [[stream A] --> [number --> number]])
