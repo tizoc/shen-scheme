@@ -1,3 +1,9 @@
+0.13:
+
+	* Updated for Shen 19.2.
+
+	* Add extra functions for stream position handling, opening files in append mode, exiting a process with specific exit codes and accessing the standard error stream.
+
 0.12.2:
 
 	* Updated for Shen 19.1.
