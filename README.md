@@ -132,11 +132,28 @@ Example:
 Extensions to core Shen
 -----------------------
 
-* Command line strings can be obtained by calling `(command-line)`, the result is a list of strings, of which the first element is the name of the program, and the rest of the list being the arguments passed to it.
-* To exit the process, the `(exit N)` can be called, with `N` being the desired integer exit code.
-* A standard error stream can be accessed by calling `(sterror)`.
-* Files an be opened for output in "append" mode that doesn't truncate the file by calling `(open-append Filepath)`. The result is an stream handle of type `(stream out)`.
+##### Command line arguments
 
+* `(command-line)` with type `--> (list string)`: Returns a list containing all comand line elements. The first element is the program name, and the remaining elements are the arguments passed to it.
+
+##### Process exit
+
+* `(exit ExitCode)` with type `number --> unit`: Exits the process using the specified exit code.
+
+##### Standard error stream
+
+* `(sterror)` with type `--> (stream out)`: Returns the standard error stream.
+
+##### File operations
+
+* `(open-append Filepath)` with type `string --> (stream out)`: Opens a file for output in "append" mode that doesn't truncate the file and returns a stream positioned at the end of the file.
+
+##### Stream position operations
+
+* `(stream-position Stream)` with type `(stream A) --> number`: Returns the stream position.
+* `(stream-set-position Stream AbsolutePosition)` with type `(stream A) --> number --> number`: Sets the stream position.
+* `(stream-set-position-from-current Stream RelativePosition)` with type `(stream A) --> number --> number`: Sets the stream position to a value relative to the current position.
+* `(stream-set-position-from-end Stream RelativePosition)` with type `(stream A) --> number --> number`: Sets the stream position to a value relative to the end position.
 
 License
 -------
