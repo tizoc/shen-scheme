@@ -4,12 +4,15 @@
 (define-library (precompile)
   (import (shen reader)
           (shen primitives)
-          (chibi match)
           (scheme base)
           (scheme read)
           (scheme process-context)
           (scheme file)
           (scheme write))
+
+  (cond-expand
+    (chibi (import (chibi match)))
+    (gauche (import (util match))))
 
   (export compile)
 
@@ -40,21 +43,19 @@
         (set! *overwrites* (cons (cons name defun) *overwrites*))))
 
     (define (load-overwrites)
-      (call-with-input-file "overwrites.scm"
+      (call-with-input-file "overwrites.kl"
         (lambda (in)
-          (let loop ((defun (read in)))
-            (if (eof-object? defun)
-                'done
-                (begin
-                  (overwrite defun)
-                  (loop (read in))))))))
+          (let loop ((defun (read-kl in)))
+            (cond ((eof-object? defun) 'done)
+                  (else
+                   (and (list? defun) (overwrite defun))
+                   (loop (read in))))))))
 
     (define (kl->scheme-with-overwrites expr)
       (match expr
-        (('defun name . rest) (let ((ow (assq name *overwrites*)))
-                                (if ow
-                                    (cdr ow)
-                                    (kl->scheme expr))))
+        (('defun name . rest) (let* ((ow (assq name *overwrites*))
+                                     (code (if ow (cdr ow) expr)))
+                                (kl->scheme code)))
         (else (kl->scheme expr))))
 
     (define (compile-kl-file in out)
