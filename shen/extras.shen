@@ -6,7 +6,7 @@
   -> (value *sterror*))
 
 (define exit
-  Code -> (scm.exit (scm.inexact->exact Code)))
+  Code -> (scm.exit (scm.exact Code)))
 
 (define command-line
   -> (scm.command-line))
