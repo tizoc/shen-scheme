@@ -169,9 +169,8 @@
               (kl:= (car a) (car b))
               (kl:= (cdr a) (cdr b))))
         ((string? a) (and (string? b) (string=? a b)))
-        ;; if eq? was false none of these can result in #t
-        ((or (null? a) (null? b) (symbol? a) (symbol? b)) #f)
         ((vector? a) (and (vector? b) (vector=? a b)))
+        ;; the first eq? test already covers for null and symbols
         (else #f)))
 
 (define *shen-environment* #f)
