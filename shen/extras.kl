@@ -1,23 +1,23 @@
 "Copyright (c) 2012-2015 Bruno Deferrari.  All rights reserved.
 BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause"
 
-(defun shen.quiet-load (V1214) (let Contents (read-file V1214) (map (lambda X (shen.eval-without-macros X)) Contents)))
+(defun shen.quiet-load (V1230) (let Contents (read-file V1230) (map (lambda X (shen.eval-without-macros X)) Contents)))
 
 (defun sterror () (value *sterror*))
 
-(defun exit (V1216) (scm.exit (scm.inexact->exact V1216)))
+(defun exit (V1232) (scm.exit (scm.exact V1232)))
 
 (defun command-line () (scm.command-line))
 
-(defun open-append (V1218) (let FullPath (scm.path-resolve V1218 (value *home-directory*)) (let Mode (scm. "(scm.+ scm.open/create scm.open/write scm.open/append)") (let Fd (scm.open FullPath Mode) (scm.open-output-file-descriptor Fd)))))
+(defun open-append (V1234) (let FullPath (scm.path-resolve V1234 (value *home-directory*)) (let Mode (scm. "(scm.+ scm.open/create scm.open/write scm.open/append)") (let Fd (scm.open FullPath Mode) (scm.open-output-file-descriptor Fd)))))
 
-(defun stream-position (V1220) (scm.file-position V1220))
+(defun stream-position (V1236) (scm.file-position V1236))
 
-(defun stream-set-position (V1223 V1224) (do (scm.set-file-position! V1223 V1224 (scm. "scm.seek/set")) V1224))
+(defun stream-set-position (V1239 V1240) (do (scm.set-file-position! V1239 V1240 (scm. "scm.seek/set")) V1240))
 
-(defun stream-set-position-from-current (V1227 V1228) (do (scm.set-file-position! V1227 V1228 (scm. "scm.seek/cur")) V1228))
+(defun stream-set-position-from-current (V1243 V1244) (do (scm.set-file-position! V1243 V1244 (scm. "scm.seek/cur")) V1244))
 
-(defun stream-set-position-from-end (V1231 V1232) (do (scm.set-file-position! V1231 V1232 (scm. "scm.seek/end")) V1232))
+(defun stream-set-position-from-end (V1247 V1248) (do (scm.set-file-position! V1247 V1248 (scm. "scm.seek/end")) V1248))
 
 (declare command-line (cons --> (cons (cons list (cons string ())) ())))
 
