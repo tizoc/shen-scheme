@@ -5,10 +5,6 @@
   (import
 
    (rename (shen primitives)
-     (kl:if               if)
-     (kl:and              and)
-     (kl:or               or)
-     (kl:cond             cond)
      (kl:intern           intern)
      (kl:pos              pos)
      (kl:tlstr            tlstr)
@@ -20,18 +16,14 @@
      (kl:set              set)
      (kl:value            value)
      (kl:simple-error     simple-error)
-     (kl:trap-error       trap-error)
      (kl:error-to-string  error-to-string)
      (kl:cons             cons)
      (kl:hd               hd)
      (kl:tl               tl)
      (kl:cons?            cons?)
      (kl:defun            defun)
-     (kl:lambda           lambda)
-     (kl:let              let)
      (kl:=                =)
      (kl:eval-kl          eval-kl)
-     (kl:freeze           freeze)
      (kl:type             type)
      (kl:absvector        absvector)
      (kl:<-address        <-address)
@@ -54,14 +46,23 @@
 
    (shen overwrites-internal)
 
-   (prefix (chibi) scm.)
-   (prefix (chibi filesystem) scm.)
-   (prefix (chibi io) scm.)
-   (prefix (chibi pathname) scm.)
+   (prefix (scheme base) scm.)
+   (prefix (scheme char) scm.)
    (prefix (scheme file) scm.)
    (prefix (scheme eval) scm.)
    (prefix (scheme process-context) scm.)
-   (prefix (srfi 69) scm.))
+   (prefix (only (srfi 69) hash) scm.)
+   (prefix (only (chibi) current-environment) scm.)
+   (prefix (only (chibi filesystem)
+                 change-directory current-directory
+                 open open/append open/write open/create
+                 open-output-file-descriptor)
+           scm.)
+   (prefix (only (chibi pathname) path-resolve) scm.)
+   (prefix (only (chibi io)
+                 seek/end seek/cur seek/set
+                 set-file-position! file-position)
+           scm.))
 
   (export shen.shen
           shen.quiet-load)
@@ -69,7 +70,7 @@
   (include "init.scm")
 
   ;; Avoid warning about shen.demod not being defined yet
-  (begin (defun shen.demod (Val) Val))
+  (begin (scm.define (shen.demod Val) Val))
 
   (include "compiled/toplevel.kl.scm")
   (include "compiled/core.kl.scm")

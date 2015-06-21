@@ -5,9 +5,11 @@
   (import (scheme base)
           (scheme read)
           (srfi 69)
-          (chibi match)
-          (only (chibi) call-with-input-string)
           (only (srfi 1) filter))
+
+  (cond-expand
+    (chibi (import (chibi match)))
+    (gauche (import (util match))))
 
   (export kl->scheme
           register-function-arity

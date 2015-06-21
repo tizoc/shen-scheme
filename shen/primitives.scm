@@ -1,45 +1,22 @@
 ;; Copyright (c) 2012-2015 Bruno Deferrari.  All rights reserved.
 ;; BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause
 
+;; Utils
+
+(define (call-with-output-string proc)
+  (let ((out (open-output-string)))
+    (proc out)
+    (get-output-string out)))
+
+(define scm.register-function-arity register-function-arity)
+
 ;; Boolean Operators
 ;;
 
-(define-syntax assert-boolean
-  (syntax-rules ()
-    ((_ ?value)
-     (let ((value ?value))
-       (if (boolean? value)
-           value
-           (error "expected a boolean, got" value))))))
-
-(define-syntax kl:if
-  (syntax-rules ()
-    ((_ ?test ?then ?else)
-     (if (assert-boolean ?test) ?then ?else))))
-
-(define-syntax kl:and
-  (syntax-rules ()
-    ((_ ?value1)
-     (let ((value1 ?value1))
-       (lambda (value2) (kl:and value1 value2))))
-    ((_ ?value1 ?value2)
-     (and (assert-boolean ?value1) (assert-boolean ?value2)))))
-
-(define-syntax kl:or
-  (syntax-rules ()
-    ((_ ?value1)
-     (let ((value1 ?value1))
-       (lambda (value2) (kl:or value1 value2))))
-    ((_ ?value1 ?value2)
-     (or (assert-boolean ?value1) (assert-boolean ?value2)))))
-
-(define-syntax kl:cond
-  (syntax-rules ()
-    ((_) #f)
-    ((_ (?test ?expr) ?clauses ...)
-     (if (assert-boolean ?test)
-         ?expr
-         (kl:cond ?clauses ...)))))
+(define (scm.assert-boolean value)
+  (if (boolean? value)
+      value
+      (error "expected a boolean, got" value)))
 
 ;; Symbols
 ;;
@@ -96,20 +73,6 @@
 
 (define kl:simple-error error)
 
-;; If handler is a lambda, translate it into a let expression
-;; to avoid allocating closures unnecessarily.
-;; Otherwise evaluate the expression in case it happens
-;; to have side effects.
-(define-syntax kl:trap-error
-  (syntax-rules (lambda)
-    ((_ ?expression (lambda (?v) ?body))
-     (guard (exn (else (let ((?v exn) ?body))))
-       ?expression))
-    ((_ ?expression ?handler)
-     (let ((handler ?handler))
-       (guard (exn (else (handler exn)))
-         ?expression)))))
-
 (define (kl:error-to-string e)
   (call-with-output-string
    (lambda (out)
@@ -133,24 +96,6 @@
 
 ;; Generic Functions
 ;;
-
-(define-syntax kl:defun
-  (syntax-rules ()
-    ((_ ?f (?args ...) ?expr)
-     (begin
-       (register-function-arity '?f (length '(?args ...)))
-       (define (?f ?args ...)
-         ?expr)
-       '?f))))
-
-(define-syntax kl:lambda
-  (syntax-rules ()
-    ((_ ?arg ?expr) (lambda (?arg) ?expr))))
-
-(define-syntax kl:let
-  (syntax-rules ()
-    ((_ ?name ?value ?expr)
-     (let ((?name ?value)) ?expr))))
 
 (define (vector=? a b)
   (let ((len (vector-length a)))
@@ -183,10 +128,6 @@
 
 (define (kl:eval-kl expr)
   (eval-in-shen (kl->scheme expr)))
-
-(define-syntax kl:freeze
-  (syntax-rules ()
-    ((_ ?expr) (lambda () ?expr))))
 
 (define (kl:type val type)
   val) ;; FIXME: do something with type

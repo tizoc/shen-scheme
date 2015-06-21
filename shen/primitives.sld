@@ -5,26 +5,24 @@
   (import (scheme base) (scheme eval)
           (scheme write) (scheme file) (scheme time) (scheme char)
           (srfi 69)
-          (chibi string) (chibi match)
-          (only (meta) module-env)
+          (only (meta) module-env %import)
           (only (chibi modules) load-module)
-          (only (chibi) call-with-output-string %import)
           (only (chibi pathname) path-resolve)
-          (only (chibi filesystem) file-exists?)
-          (only (chibi io) port->string read-u8)
 
           (shen compiler))
 
+  (cond-expand
+    (chibi (import (chibi match)))
+    (gauche (import (util match))))
+
   (export
+   scm.register-function-arity
    scm.set-shen-environment!
    scm.l2r
    scm.call-nested
    scm.import-from-module
+   scm.assert-boolean
 
-   kl:if
-   kl:and
-   kl:or
-   kl:cond
    kl:intern
    kl:pos
    kl:tlstr
@@ -36,18 +34,13 @@
    kl:set
    kl:value
    kl:simple-error
-   kl:trap-error
    kl:error-to-string
    kl:cons
    kl:hd
    kl:tl
    kl:cons?
-   kl:defun
-   kl:lambda
-   kl:let
    kl:=
    kl:eval-kl
-   kl:freeze
    kl:type
    kl:absvector
    kl:<-address

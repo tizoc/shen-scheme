@@ -4,15 +4,18 @@
 (define-library (shen overwrites-internal)
   (import (scheme base) (scheme file)
           (srfi 69)
-          (chibi string)
-          (only (chibi pathname) make-path)
-          (only (chibi io) port->string)
           (only (shen primitives) kl:value full-path-for-file kl:eval-kl))
+
+  (cond-expand
+    (chibi (import (only (chibi io) port->string)
+                   (only (chibi pathname) make-path)))
+    (gauche (import (rename (only (file-util) build-path)
+                            (build-path make-path))
+                    (only (gauche portutil) port->string))))
 
   (export
    scm.read-file-as-bytelist
    scm.read-file-as-string
-   scm.shen-sysfunc?
-   scm.shen-grammar_symbol?)
+   scm.shen-sysfunc?)
 
   (include "overwrites-internal.scm"))
