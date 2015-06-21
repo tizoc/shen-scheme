@@ -2,7 +2,7 @@
 ;; BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause
 
 (define-library (shen runner)
-  (import (chibi)
+  (import (scheme base)
           (shen init))
   (begin
     (define (main arguments)
