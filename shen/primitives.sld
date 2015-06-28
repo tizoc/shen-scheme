@@ -24,42 +24,15 @@
    scm.assert-boolean
 
    kl:intern
-   kl:pos
-   kl:tlstr
-   kl:cn
    kl:str
-   kl:string?
-   kl:string->n
-   kl:n->string
    kl:set
    kl:value
-   kl:simple-error
    kl:error-to-string
-   kl:cons
-   kl:hd
-   kl:tl
-   kl:cons?
    kl:=
    kl:eval-kl
-   kl:type
-   kl:absvector
-   kl:<-address
-   kl:address->
-   kl:absvector?
-   kl:read-byte
-   kl:write-byte
    kl:open
    kl:close
    kl:get-time
-   kl:+
-   kl:-
-   kl:*
-   kl:/
-   kl:>
-   kl:<
-   kl:>=
-   kl:<=
-   kl:number?
 
    kl->scheme)
 

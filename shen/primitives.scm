@@ -29,13 +29,6 @@
 ;; Strings
 ;;
 
-(define (kl:pos str n) (string (string-ref str n)))
-
-(define (kl:tlstr string) (substring string 1))
-
-(define (kl:cn string1 string2)
-  (string-append string1 string2))
-
 (define (kl:str value)
   (call-with-output-string
    (lambda (o)
@@ -45,14 +38,6 @@
             (display (symbol->string value) o))
            (else
             (write-simple value o))))))
-
-(define kl:string? string?)
-
-(define (kl:n->string n)
-  (string (integer->char n)))
-
-(define (kl:string->n str)
-  (char->integer (string-ref str 0)))
 
 ;; Assignments
 ;;
@@ -71,8 +56,6 @@
 ;; Error Handling
 ;;
 
-(define kl:simple-error error)
-
 (define (kl:error-to-string e)
   (call-with-output-string
    (lambda (out)
@@ -82,17 +65,6 @@
            (begin
              (display ": " out)
              (write-simple (error-object-irritants e) out)))))))
-
-;; Lists
-;;
-
-(define kl:cons cons)
-
-(define kl:hd car)
-
-(define kl:tl cdr)
-
-(define kl:cons? pair?)
 
 ;; Generic Functions
 ;;
@@ -129,28 +101,8 @@
 (define (kl:eval-kl expr)
   (eval-in-shen (kl->scheme expr)))
 
-(define (kl:type val type)
-  val) ;; FIXME: do something with type
-
-;; Vectors
-;;
-
-(define (kl:absvector size)
-  (make-vector size 'shen.fail!))
-
-(define kl:<-address vector-ref)
-
-(define (kl:address-> vec loc val)
-  (vector-set! vec loc val)
-  vec)
-
-(define kl:absvector? vector?)
-
 ;; Streams and I/O
 ;;
-
-(define kl:read-byte read-u8)
-(define kl:write-byte write-u8)
 
 (define (full-path-for-file filename)
   (path-resolve filename
@@ -180,26 +132,6 @@
     ((real) (current-second))
     ((run) (current-second))
     (else (error "get-time does not understand the parameter" sym))))
-
-;; Arithmetic
-;;
-
-(define (inexact-/ a b)
-  (let ((res (/ a b)))
-    (if (rational? res)
-        (inexact res)
-        res)))
-
-(define kl:/ inexact-/)
-(define (kl:+ a b) (+ a b))
-(define (kl:- a b) (- a b))
-(define (kl:* a b) (* a b))
-(define (kl:> a b) (> a b))
-(define (kl:< a b) (< a b))
-(define (kl:>= a b) (>= a b))
-(define (kl:<= a b) (<= a b))
-
-(define kl:number? number?)
 
 ;; Support
 
