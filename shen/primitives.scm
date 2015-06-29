@@ -142,11 +142,6 @@
      (let ((f ?op))
        (scm.l2r (?params ...) (?expr ... f))))))
 
-(define (scm.call-nested f args)
-  (if (null? args)
-      f
-      (scm.call-nested (f (car args)) (cdr args))))
-
 (define (import-spec-to-assoc spec)
   (let loop ((rest spec)
              (acc '()))

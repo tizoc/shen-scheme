@@ -152,16 +152,21 @@
                  ((unbound-symbol? op scope) `(,op))
                  (else `(,op))))
           (partial-call?
-           `(scm.call-nested ,(nest-lambda op arity '()) ,args-list))
+           (left-to-right (nest-call (nest-lambda op arity '()) args)))
           ((or (pair? op) (not (unbound-symbol? op scope)))
            (left-to-right
-            `(scm.call-nested ,(compile-expression op scope) ,args-list)))
+            (nest-call (compile-expression op scope) args)))
           (else
            (cond ((and (= arity 2) (binary-op-mapping op))
                   => (lambda (op) (left-to-right (cons op args))))
                  ((and (= arity 1) (unary-op-mapping op))
                   => (lambda (op) (left-to-right (cons op args))))
                  (else (left-to-right (cons op args))))))))
+
+(define (nest-call op args)
+  (if (null? args)
+      op
+      (nest-call (list op (car args)) (cdr args))))
 
 (define (nest-lambda callable arity scope)
   (define (merge-args f arg)
@@ -180,7 +185,7 @@
 ;; Enforce left-to-right evaluation if needed
 (define (left-to-right expr)
   (if (or (memq (car expr) '(trap-error set and or if freeze thaw
-                             scm.and scm.if scm.or scm.cond
+                             scm.and scm.if scm.or scm.cond scm.lambda
                              scm.let scm.letrec scm.let*))
           (< (length (filter pair? expr)) 2))
       expr

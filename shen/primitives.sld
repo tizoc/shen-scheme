@@ -19,7 +19,6 @@
    scm.register-function-arity
    scm.set-shen-environment!
    scm.l2r
-   scm.call-nested
    scm.import-from-module
    scm.assert-boolean
 
