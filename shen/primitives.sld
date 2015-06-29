@@ -2,24 +2,32 @@
 ;; BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause
 
 (define-library (shen primitives)
-  (import (scheme base) (scheme eval)
-          (scheme write) (scheme file) (scheme time) (scheme char)
+  (import (scheme base)
+          (scheme eval)
+          (scheme write)
+          (scheme file)
+          (scheme time)
+          (scheme char)
           (srfi 69)
-          (only (meta) module-env %import)
-          (only (chibi modules) load-module)
-          (only (chibi pathname) path-resolve)
-
           (shen compiler))
 
   (cond-expand
-    (chibi (import (chibi match)))
-    (gauche (import (util match))))
+    (chibi
+      (import (chibi match)
+              (only (chibi pathname) path-resolve)
+              (only (meta) module-env %import)
+              (only (chibi modules) load-module))
+      (include "chibi/import.scm")
+      (export scm.import-from-module))
+    (gauche
+      (import (util match)
+              (rename (file util)
+                (resolve-path path-resolve)))))
 
   (export
    scm.register-function-arity
    scm.set-shen-environment!
    scm.l2r
-   scm.import-from-module
    scm.assert-boolean
 
    kl:intern
