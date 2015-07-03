@@ -17,7 +17,7 @@
               (only (chibi pathname) path-resolve)
               (only (meta) module-env %import)
               (only (chibi modules) load-module))
-      (include "chibi/import.scm")
+      (include "impl/chibi/import.scm")
       (export scm.import-from-module))
     (gauche
       (import (util match)
@@ -43,4 +43,4 @@
 
    kl->scheme)
 
-  (include "primitives.scm"))
+  (include "impl/primitives.scm"))

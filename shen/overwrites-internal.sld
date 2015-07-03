@@ -18,4 +18,4 @@
    scm.read-file-as-string
    scm.shen-sysfunc?)
 
-  (include "overwrites-internal.scm"))
+  (include "impl/overwrites-internal.scm"))

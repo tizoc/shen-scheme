@@ -5,4 +5,4 @@
   (import (except (scheme base) read-string)
           (scheme char) (scheme file))
   (export read-kl read-kl-file)
-  (include "reader.scm"))
+  (include "impl/reader.scm"))

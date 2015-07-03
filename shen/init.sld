@@ -39,7 +39,7 @@
   (export shen.shen
           shen.quiet-load)
 
-  (include "init.scm")
+  (include "impl/init.scm")
 
   ;; Avoid warning about shen.demod not being defined yet
   (begin (scm.define (shen.demod Val) Val))

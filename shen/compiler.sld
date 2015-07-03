@@ -16,5 +16,5 @@
           function-arity
           nest-lambda)
 
-  (include "compiler.scm")
-  (include "declarations.scm"))
+  (include "impl/compiler.scm")
+  (include "impl/declarations.scm"))
