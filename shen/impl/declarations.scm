@@ -1,7 +1,7 @@
 ;; Copyright (c) 2012-2015 Bruno Deferrari.  All rights reserved.
 ;; BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause
 
-(define *shen-function-arities* (make-hash-table eq?))
+(define *shen-function-arities* (make-hash-table))
 
 (define (register-function-arity name arity)
   (hash-table-set! *shen-function-arities* name arity))
