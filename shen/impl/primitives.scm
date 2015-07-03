@@ -42,7 +42,7 @@
 ;; Assignments
 ;;
 
-(define *shen-globals* (make-hash-table eq?))
+(define *shen-globals* (make-hash-table))
 
 (define (kl:set key val)
   (hash-table-set! *shen-globals* key val)
