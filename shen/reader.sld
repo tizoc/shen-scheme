@@ -3,6 +3,7 @@
 
 (define-library (shen reader)
   (import (except (scheme base) read-string)
-          (scheme char) (scheme file))
+          (scheme char)
+          (scheme file))
   (export read-kl read-kl-file)
   (include "impl/reader.scm"))

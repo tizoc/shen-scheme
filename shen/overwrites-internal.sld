@@ -3,15 +3,18 @@
 
 (define-library (shen overwrites-internal)
   (import (scheme base) (scheme file)
-          (srfi 69)
           (only (shen primitives) kl:value full-path-for-file kl:eval-kl))
 
   (cond-expand
-    (chibi (import (only (chibi io) port->string)
-                   (only (chibi pathname) make-path)))
-    (gauche (import (rename (only (file-util) build-path)
-                            (build-path make-path))
-                    (only (gauche portutil) port->string))))
+   (chibi
+    (import (only (chibi io) port->string)
+            (only (chibi pathname) make-path)
+            (srfi 69)))
+   (gauche
+    (import (rename (only (file util) build-path)
+              (build-path make-path))
+            (only (gauche portutil) port->string)
+            (shen support gauche srfi-69))))
 
   (export
    scm.read-file-as-bytelist

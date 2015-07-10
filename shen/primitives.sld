@@ -8,27 +8,30 @@
           (scheme file)
           (scheme time)
           (scheme char)
-          (srfi 69)
           (shen compiler))
 
   (cond-expand
-    (chibi
-      (import (chibi match)
-              (only (chibi pathname) path-resolve)
-              (only (meta) module-env %import)
-              (only (chibi modules) load-module))
-      (include "impl/chibi/import.scm")
-      (export scm.import-from-module))
-    (gauche
-      (import (util match)
-              (rename (file util)
-                (resolve-path path-resolve)))))
+   (chibi
+    (import (chibi match)
+            (srfi 69)
+            (only (chibi pathname) path-resolve)
+            (only (meta) module-env %import)
+            (only (chibi modules) load-module))
+    (include "impl/chibi/import.scm")
+    (export scm.import-from-module))
+   (gauche
+    (import (util match)
+            (shen support gauche srfi-69)
+            (only (rename (file util)
+                    (resolve-path path-resolve))
+              path-resolve))))
 
   (export
    scm.register-function-arity
    scm.set-shen-environment!
    scm.l2r
    scm.assert-boolean
+   full-path-for-file
 
    kl:intern
    kl:str

@@ -4,12 +4,15 @@
 (define-library (shen compiler)
   (import (scheme base)
           (scheme read)
-          (srfi 69)
           (only (srfi 1) filter))
 
   (cond-expand
-    (chibi (import (chibi match)))
-    (gauche (import (util match))))
+   (chibi
+    (import (chibi match)
+            (srfi 69)))
+   (gauche
+    (import (util match)
+            (shen support gauche srfi-69))))
 
   (export kl->scheme
           register-function-arity
