@@ -1,0 +1,37 @@
+"Copyright (c) 2012-2015 Bruno Deferrari.  All rights reserved.
+BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause"
+
+(defun shen.quiet-load (V1230) (let Contents (read-file V1230) (map (lambda X (shen.eval-without-macros X)) Contents)))
+
+(defun sterror () (value *sterror*))
+
+(defun exit (V1232) (scm.exit (scm.exact V1232)))
+
+(defun command-line () (scm.command-line))
+
+(defun stream-position (V1234) (scm.file-position V1234))
+
+(defun stream-set-position (V1237 V1238) (do (scm.set-file-position! V1237 V1238 (scm. "scm.seek/set")) V1238))
+
+(defun stream-set-position-from-current (V1241 V1242) (do (scm.set-file-position! V1241 V1242 (scm. "scm.seek/cur")) V1242))
+
+(defun stream-set-position-from-end (V1245 V1246) (do (scm.set-file-position! V1245 V1246 (scm. "scm.seek/end")) V1246))
+
+(declare command-line (cons --> (cons (cons list (cons string ())) ())))
+
+(declare exit (cons number (cons --> (cons unit ()))))
+
+(declare open-append (cons string (cons --> (cons (cons stream (cons out ())) ()))))
+
+(declare sterror (cons --> (cons (cons stream (cons out ())) ())))
+
+(declare stream-position (cons (cons stream (cons A ())) (cons --> (cons number ()))))
+
+(declare stream-set-position (cons (cons stream (cons A ())) (cons --> (cons (cons number (cons --> (cons number ()))) ()))))
+
+(declare stream-set-position-from-current (cons (cons stream (cons A ())) (cons --> (cons (cons number (cons --> (cons number ()))) ()))))
+
+(declare stream-set-position-from-end (cons (cons stream (cons A ())) (cons --> (cons (cons number (cons --> (cons number ()))) ()))))
+
+
+
