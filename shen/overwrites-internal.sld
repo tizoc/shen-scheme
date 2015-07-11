@@ -17,8 +17,8 @@
             (shen support gauche srfi-69))))
 
   (export
-   scm.read-file-as-bytelist
-   scm.read-file-as-string
-   scm.shen-sysfunc?)
+   read-file-as-bytelist
+   read-file-as-string
+   shen-sysfunc?)
 
   (include "impl/overwrites-internal.scm"))

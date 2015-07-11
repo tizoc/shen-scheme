@@ -1,11 +1,11 @@
 ;; Copyright (c) 2012-2015 Bruno Deferrari.  All rights reserved.
 ;; BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause
 
-(define (scm.read-file-as-string filename)
+(define (read-file-as-string filename)
   (call-with-input-file (full-path-for-file filename)
     port->string))
 
-(define (scm.read-file-as-bytelist filename)
+(define (read-file-as-bytelist filename)
   (call-with-input-file (full-path-for-file filename)
     (lambda (in)
       (let ((bytes (read-bytevector 1000000 in)))
@@ -32,6 +32,6 @@
 
   shen-*system*)
 
-(define (scm.shen-sysfunc? val)
+(define (shen-sysfunc? val)
   (let ((table (or shen-*system* (init-*system*))))
     (hash-table-ref/default table val #f)))

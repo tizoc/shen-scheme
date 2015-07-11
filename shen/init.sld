@@ -5,68 +5,64 @@
   (import
 
    (rename (shen primitives)
-     (kl:intern           intern)
-     (kl:str              str)
-     (kl:set              set)
-     (kl:value            value)
-     (kl:error-to-string  error-to-string)
-     (kl:=                =)
-     (kl:eval-kl          eval-kl)
-     (kl:open             open)
-     (kl:close            close)
-     (kl:get-time         get-time))
+     (kl:intern           kl.intern)
+     (kl:str              kl.str)
+     (kl:set              kl.set)
+     (kl:value            kl.value)
+     (kl:error-to-string  kl.error-to-string)
+     (kl:=                kl.=)
+     (kl:eval-kl          kl.eval-kl)
+     (kl:open             kl.open)
+     (kl:close            kl.close)
+     (kl:get-time         kl.get-time))
 
    (shen overwrites-internal)
 
-   (prefix (scheme base) scm.)
-   (prefix (scheme char) scm.)
-   (prefix (scheme file) scm.)
-   (prefix (scheme eval) scm.)
-   (prefix (scheme process-context) scm.))
+   (scheme base)
+   (scheme char)
+   (scheme file)
+   (scheme eval)
+   (scheme process-context))
 
   (cond-expand
    (chibi
-    (import (prefix (only (srfi 69) hash) scm.)
-            (prefix (only (chibi pathname) path-resolve) scm.)
-            (prefix
-             (only (chibi filesystem)
-               change-directory current-directory
-               open open/append open/write open/create
-               open-output-file-descriptor)
-             scm.)
-            (prefix (only (chibi) current-environment) scm.)
-            (prefix
-             (only (chibi io)
-               seek/end seek/cur seek/set
-               set-file-position! file-position)
-             scm.)))
+    (import (only (srfi 69) hash)
+            (only (chibi pathname) path-resolve)
+            (only (chibi filesystem)
+              change-directory current-directory
+              open open/append open/write open/create
+              open-output-file-descriptor)
+            (only (chibi) current-environment)
+            (only (chibi io)
+              seek/end seek/cur seek/set
+              set-file-position! file-position)))
    (gauche
-    (import (prefix (only (shen support gauche srfi-69) hash) scm.)
+    (import (only (shen support gauche srfi-69) hash)
             (only (rename (file util)
-                    (resolve-path scm.path-resolve))
-              scm.path-resolve)
+                    (resolve-path path-resolve))
+              path-resolve)
             (only (rename (gauche base)
-                    (SEEK_CUR scm.seek/cur)
-                    (SEEK_SET scm.seek/set)
-                    (SEEK_END scm.seek/end)
-                    (port-tell scm.file-position)
-                    (port-seek scm.set-file-position!)
-                    (sys-getcwd scm.current-directory)
-                    (sys-chdir scm.change-directory))
-              scm.current-directory
-              scm.change-directory
-              scm.open-output-file-descriptor
-              scm.seek/cur scm.seek/set scm.seek/end
-              scm.file-position scm.set-file-position!
-              scm.current-directory scm.change-directory))))
+                    (SEEK_CUR seek/cur)
+                    (SEEK_SET seek/set)
+                    (SEEK_END seek/end)
+                    (port-tell file-position)
+                    (port-seek set-file-position!)
+                    (sys-getcwd current-directory)
+                    (sys-chdir change-directory))
+              current-directory
+              change-directory
+              open-output-file-descriptor
+              seek/cur seek/set seek/end
+              file-position set-file-position!
+              current-directory change-directory))))
 
-  (export shen.shen
-          shen.quiet-load)
+  (export kl.shen.shen
+          kl.shen.quiet-load)
 
   (include "impl/init.scm")
 
   ;; Avoid warning about shen.demod not being defined yet
-  (begin (scm.define (shen.demod Val) Val))
+  (begin (define (kl.shen.demod Val) Val))
 
   (include "compiled/toplevel.kl.scm")
   (include "compiled/core.kl.scm")
@@ -89,4 +85,4 @@
    (gauche (include "compiled/extensions-gauche.kl.scm")))
 
   (begin
-    (cd "")))
+    (kl.cd "")))

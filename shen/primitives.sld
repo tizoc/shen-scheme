@@ -27,10 +27,11 @@
               path-resolve))))
 
   (export
-   scm.register-function-arity
-   scm.set-shen-environment!
-   scm.l2r
-   scm.assert-boolean
+
+   register-function-arity
+   set-shen-environment!
+   l2r
+   assert-boolean
    full-path-for-file
 
    kl:intern

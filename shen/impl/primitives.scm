@@ -8,12 +8,10 @@
     (proc out)
     (get-output-string out)))
 
-(define scm.register-function-arity register-function-arity)
-
 ;; Boolean Operators
 ;;
 
-(define (scm.assert-boolean value)
+(define (assert-boolean value)
   (if (boolean? value)
       value
       (error "expected a boolean, got" value)))
@@ -92,7 +90,7 @@
 
 (define *shen-environment* #f)
 
-(define (scm.set-shen-environment! env)
+(define (set-shen-environment! env)
   (set! *shen-environment* env))
 
 (define (eval-in-shen expr)
@@ -135,9 +133,9 @@
 
 ;; Support
 
-(define-syntax scm.l2r
+(define-syntax l2r
   (syntax-rules ()
     ((_ () ?expr) ?expr)
     ((_ (?op ?params ...) (?expr ...))
      (let ((f ?op))
-       (scm.l2r (?params ...) (?expr ... f))))))
+       (l2r (?params ...) (?expr ... f))))))

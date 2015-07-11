@@ -1,11 +1,11 @@
 ;; Copyright (c) 2012-2015 Bruno Deferrari.  All rights reserved.
 ;; BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause
 
-(set (scm.quote *language*) "Scheme")
-(set (scm.quote *implementation*) "chibi-scheme")
-(set (scm.quote *port*) "0.13")
-(set (scm.quote *porters*) "Bruno Deferrari")
-(set (scm.quote *sterror*) (scm.current-error-port))
-(set (scm.quote *stinput*) (scm.current-input-port))
-(set (scm.quote *stoutput*) (scm.current-output-port))
-(scm.set-shen-environment! (scm.current-environment))
+(kl.set (quote *language*) "Scheme")
+(kl.set (quote *implementation*) "chibi-scheme")
+(kl.set (quote *port*) "0.13")
+(kl.set (quote *porters*) "Bruno Deferrari")
+(kl.set (quote *sterror*) (current-error-port))
+(kl.set (quote *stinput*) (current-input-port))
+(kl.set (quote *stoutput*) (current-output-port))
+(set-shen-environment! (current-environment))

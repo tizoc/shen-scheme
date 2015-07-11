@@ -15,15 +15,15 @@
   Stream -> (scm.file-position Stream))
 
 (define stream-set-position
-  Stream Pos -> (do (scm.set-file-position! Stream Pos (scm. "scm.seek/set"))
+  Stream Pos -> (do (scm.set-file-position! Stream Pos (scm. "seek/set"))
                     Pos))
 
 (define stream-set-position-from-current
-  Stream Pos -> (do (scm.set-file-position! Stream Pos (scm. "scm.seek/cur"))
+  Stream Pos -> (do (scm.set-file-position! Stream Pos (scm. "seek/cur"))
                     Pos))
 
 (define stream-set-position-from-end
-  Stream Pos -> (do (scm.set-file-position! Stream Pos (scm. "scm.seek/end"))
+  Stream Pos -> (do (scm.set-file-position! Stream Pos (scm. "seek/end"))
                     Pos))
 
 (declare command-line [--> [list string]])
