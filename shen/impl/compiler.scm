@@ -15,6 +15,28 @@
   (set! *gensym-counter* (+ 1 *gensym-counter*))
   (string->symbol (string-append prefix (number->string *gensym-counter*))))
 
+(define *yields-boolean*
+  '(or and
+    kl.=
+    null? string? vector? number? pair?
+    < > >= <= = eq? equal?
+    kl.element? kl.symbol? kl.not kl.variable? kl.boolean?
+    kl.empty? kl.shen.pvar? kl.tuple?))
+
+(define (yields-boolean? expr)
+  (cond
+   ((boolean? expr) #t)
+   ((pair? expr)
+    (or (memq (car expr) *yields-boolean*)
+        (and (eq? 'l2r (car expr))
+             (yields-boolean? (car (cdr expr))))))
+   (else #f)))
+
+(define (force-boolean expr)
+  (if (yields-boolean? expr)
+      expr
+      `(assert-boolean ,expr)))
+
 (define (compile-expression expr scope)
   (define (unbound? maybe-sym)
     (unbound-symbol? maybe-sym scope))
@@ -38,13 +60,13 @@
     (('lambda var body)
      `(lambda (,var) ,(ce body var)))
     (('and expr1 expr2)
-     `(and (assert-boolean ,(ce expr1))
-           (assert-boolean ,(ce expr2))))
+     `(and ,(force-boolean (ce expr1))
+           ,(force-boolean (ce expr2))))
     (('or expr1 expr2)
-     `(or (assert-boolean ,(ce expr1))
-          (assert-boolean ,(ce expr2))))
+     `(or ,(force-boolean (ce expr1))
+          ,(force-boolean (ce expr2))))
     (('if test then else)
-     `(if (assert-boolean ,(ce test))
+     `(if ,(force-boolean (ce test))
           ,(ce then)
           ,(ce else)))
     (('trap-error expression ('lambda (v) body))
@@ -94,7 +116,7 @@
      (let ((compiled-test (compile-expression test scope))
            (compiled-body (compile-expression body scope))
            (compiled-rest (emit-cond-clauses rest scope)))
-       `(((assert-boolean ,compiled-test) ,compiled-body)
+       `((,(force-boolean compiled-test) ,compiled-body)
          ,@compiled-rest)))))
 
 (define (emit-equality-check v1 v2 scope)
@@ -103,10 +125,10 @@
              (equal? '(fail) v1)
              (equal? '(fail) v2))
          `(eq? ,(compile-expression v1 scope)
-                   ,(compile-expression v2 scope)))
+               ,(compile-expression v2 scope)))
         ((or (string? v1) (string? v2))
          `(equal? ,(compile-expression v1 scope)
-                      ,(compile-expression v2 scope)))
+                  ,(compile-expression v2 scope)))
         ((null? v1) `(null? ,(compile-expression v2 scope)))
         ((null? v2) `(null? ,(compile-expression v1 scope)))
         (else `(kl.= ,(compile-expression v1 scope)
