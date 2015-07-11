@@ -1,7 +1,7 @@
 "Copyright (c) 2012-2015 Bruno Deferrari.  All rights reserved.
 BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause"
 
-(defun open-append (V1248) (let FullPath (scm.path-resolve V1248 (value *home-directory*)) (let Mode (scm. "(scm.+ scm.open/create scm.open/write scm.open/append)") (let Fd (scm.open FullPath Mode) (scm.open-output-file-descriptor Fd)))))
+(defun open-append (V1266) (let FullPath (scm.path-resolve V1266 (value *home-directory*)) (let Mode (scm. "(+ open/create open/write open/append)") (let Fd (scm.open FullPath Mode) (scm.open-output-file-descriptor Fd)))))
 
 
 

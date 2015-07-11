@@ -1,33 +1,33 @@
 "Copyright (c) 2012-2015 Bruno Deferrari.  All rights reserved.
 BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause"
 
-(defun cd (V1252) (let Dir (if (= V1252 "") "" (scm.string-append V1252 "/")) (let NewDir (scm.change-directory Dir) (set *home-directory* (scm.current-directory)))))
+(defun cd (V1270) (let Dir (if (= V1270 "") "" (scm.string-append V1270 "/")) (let NewDir (scm.change-directory Dir) (set *home-directory* (scm.current-directory)))))
 
-(defun hash (V1255 V1256) (let Res (scm.hash V1255 V1256) (scm.if (scm.eq? 0 Res) 1 Res)))
+(defun hash (V1273 V1274) (let Res (scm.hash V1273 V1274) (scm.if (scm.eq? 0 Res) 1 Res)))
 
-(defun not (V1258) (scm.not V1258))
+(defun not (V1276) (scm.not V1276))
 
-(defun boolean? (V1260) (scm.boolean? V1260))
+(defun boolean? (V1278) (scm.boolean? V1278))
 
-(defun integer? (V1262) (scm.integer? V1262))
+(defun integer? (V1280) (scm.integer? V1280))
 
-(defun variable? (V1264) (scm.and (scm.symbol? V1264) (scm.char-upper-case? (scm.string-ref (scm.symbol->string V1264) 0))))
+(defun variable? (V1282) (scm.and (scm.symbol? V1282) (scm.char-upper-case? (scm.string-ref (scm.symbol->string V1282) 0))))
 
-(defun symbol? (V1266) (scm.symbol? V1266))
+(defun symbol? (V1284) (scm.symbol? V1284))
 
-(defun shen.pvar? (V1268) (scm.and (absvector? V1268) (scm.and (scm.> (scm.vector-length V1268) 0) (scm.eq? (scm.vector-ref V1268 0) shen.pvar))))
+(defun shen.pvar? (V1286) (scm.and (absvector? V1286) (scm.and (scm.> (scm.vector-length V1286) 0) (scm.eq? (scm.vector-ref V1286 0) shen.pvar))))
 
-(defun shen.numbyte? (V1270) (scm.and (scm.>= V1270 48) (scm.<= V1270 57)))
+(defun shen.numbyte? (V1288) (scm.and (scm.>= V1288 48) (scm.<= V1288 57)))
 
-(defun shen.byte->digit (V1272) (scm.- V1272 48))
+(defun shen.byte->digit (V1290) (scm.- V1290 48))
 
-(defun shen.lookup-func (V1275 V1276) (let Entry (scm.assq V1275 V1276) (scm.if Entry (scm.cdr Entry) (simple-error (scm.string-append (scm.symbol->string V1275) " has no lambda expansion\n")))))
+(defun shen.lookup-func (V1293 V1294) (let Entry (scm.assq V1293 V1294) (scm.if Entry (scm.cdr Entry) (simple-error (scm.string-append (scm.symbol->string V1293) " has no lambda expansion\n")))))
 
-(defun shen.sysfunc? (V1278) (scm.shen-sysfunc? V1278))
+(defun shen.sysfunc? (V1296) (scm.shen-sysfunc? V1296))
 
-(defun read-file-as-bytelist (V1280) (scm.read-file-as-bytelist V1280))
+(defun read-file-as-bytelist (V1298) (scm.read-file-as-bytelist V1298))
 
-(defun read-file-as-string (V1282) (scm.read-file-as-string V1282))
+(defun read-file-as-string (V1300) (scm.read-file-as-string V1300))
 
 
 
