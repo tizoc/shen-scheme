@@ -4,18 +4,7 @@
 (define-library (shen init)
   (import
 
-   (rename (shen primitives)
-     (kl:intern           kl.intern)
-     (kl:str              kl.str)
-     (kl:set              kl.set)
-     (kl:value            kl.value)
-     (kl:error-to-string  kl.error-to-string)
-     (kl:=                kl.=)
-     (kl:eval-kl          kl.eval-kl)
-     (kl:open             kl.open)
-     (kl:close            kl.close)
-     (kl:get-time         kl.get-time))
-
+   (shen primitives)
    (shen overwrites-internal)
 
    (scheme base)
@@ -56,13 +45,13 @@
               file-position set-file-position!
               current-directory change-directory))))
 
-  (export kl.shen.shen
-          kl.shen.quiet-load)
+  (export kl:shen.shen
+          kl:shen.quiet-load)
 
   (include "impl/init.scm")
 
   ;; Avoid warning about shen.demod not being defined yet
-  (begin (define (kl.shen.demod Val) Val))
+  (begin (define (kl:shen.demod Val) Val))
 
   (include "compiled/toplevel.kl.scm")
   (include "compiled/core.kl.scm")
@@ -85,4 +74,4 @@
    (gauche (include "compiled/extensions-gauche.kl.scm")))
 
   (begin
-    (kl.cd "")))
+    (kl:cd "")))

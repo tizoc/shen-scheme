@@ -17,11 +17,11 @@
 
 (define *yields-boolean*
   '(or and
-    kl.=
+    kl:=
     null? string? vector? number? pair?
     < > >= <= = eq? equal?
-    kl.element? kl.symbol? kl.not kl.variable? kl.boolean?
-    kl.empty? kl.shen.pvar? kl.tuple?))
+    kl:element? kl:symbol? kl:not kl:variable? kl:boolean?
+    kl:empty? kl:shen.pvar? kl:tuple?))
 
 (define (yields-boolean? expr)
   (cond
@@ -131,7 +131,7 @@
                   ,(compile-expression v2 scope)))
         ((null? v1) `(null? ,(compile-expression v2 scope)))
         ((null? v2) `(null? ,(compile-expression v1 scope)))
-        (else `(kl.= ,(compile-expression v1 scope)
+        (else `(kl:= ,(compile-expression v1 scope)
                      ,(compile-expression v2 scope)))))
 
 (define binary-op-mappings
@@ -169,7 +169,7 @@
     (if (and (> opl 4)
              (string=? "scm." (substring sop 0 4)))
         (string->symbol (substring sop 4 opl))
-        (string->symbol (string-append "kl." sop)))))
+        (string->symbol (string-append "kl:" sop)))))
 
 (define (emit-application op params scope)
   (let* ((arity (function-arity op))
