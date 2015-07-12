@@ -12,6 +12,7 @@
             (srfi 69)))
    (gauche
     (import (util match)
+            (scheme cxr)
             (shen support gauche srfi-69))))
 
   (export kl->scheme

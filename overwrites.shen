@@ -2,7 +2,9 @@
 \\ BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause
 
 (define cd
-  Val -> (let Dir (if (= Val "") "" (scm.string-append Val "/"))
+  Val -> (let Dir (if (= Val "")
+                      (scm.current-directory)
+                      (scm.string-append Val "/"))
               NewDir (scm.change-directory Dir)
            (set *home-directory* (scm.current-directory))))
 

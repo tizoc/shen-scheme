@@ -1,7 +1,7 @@
 "Copyright (c) 2012-2015 Bruno Deferrari.  All rights reserved.
 BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause"
 
-(defun cd (V1270) (let Dir (if (= V1270 "") "" (scm.string-append V1270 "/")) (let NewDir (scm.change-directory Dir) (set *home-directory* (scm.current-directory)))))
+(defun cd (V1270) (let Dir (if (= V1270 "") (scm.current-directory) (scm.string-append V1270 "/")) (let NewDir (scm.change-directory Dir) (set *home-directory* (scm.current-directory)))))
 
 (defun hash (V1273 V1274) (let Res (scm.hash V1273 V1274) (scm.if (scm.eq? 0 Res) 1 Res)))
 

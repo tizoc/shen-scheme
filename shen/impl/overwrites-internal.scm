@@ -19,7 +19,7 @@
 (define shen-*system* #f)
 
 (define (init-*system*)
-  (set! shen-*system* (make-hash-table eq?))
+  (set! shen-*system* (make-hash-table))
 
   (for-each
    (lambda (sym) (hash-table-set! shen-*system*
