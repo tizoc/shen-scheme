@@ -4,6 +4,14 @@
 (define-library (shen runner)
   (import (scheme base)
           (shen init))
+
+  (cond-expand
+   (gauche
+    (import (gauche base))
+    (begin
+      ((setter port-buffering) (current-output-port) :none)
+      ((setter port-buffering) (current-input-port) :none))))
+
   (begin
     (define (main arguments)
       (cond ((= 1 (length arguments)) (kl:shen.shen))
