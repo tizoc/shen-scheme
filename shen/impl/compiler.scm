@@ -216,9 +216,10 @@
 
 ;; Enforce left-to-right evaluation if needed
 (define (left-to-right expr)
-  (if (or (memq (car expr) '(trap-error set and or if freeze thaw
-                             scm.and scm.if scm.or scm.cond scm.lambda
-                             scm.let scm.letrec scm.let*))
+  (if (or (memq (car expr)
+                '(trap-error set and or if freeze thaw lambda
+                  scm.and scm.if scm.or scm.cond scm.lambda
+                  scm.let scm.letrec scm.let*))
           (< (length (filter pair? expr)) 2))
       expr
       `(l2r ,expr ())))
