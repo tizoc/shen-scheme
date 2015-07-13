@@ -59,7 +59,19 @@ The initial heap size can be increased by using chibi-scheme's `-h` option:
 
 Version 0.95 or newer of Gauche is required to run shen-scheme.
 
-**TODO**: complete and document
+To launch the Shen REPL do:
+
+    gosh -I. -mshen.runner shen/runner.sld
+
+To run a script do:
+
+    gosh -I. -mshen.runner shen/runner.sld script.shen
+
+or
+
+    gosh -I. -mshen.runner shen/runner.sld script.shen arg1 arg2 arg3 ...
+
+to pass arguments to it.
 
 ### (shen init) module
 
