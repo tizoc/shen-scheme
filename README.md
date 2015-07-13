@@ -104,7 +104,7 @@ To send literal, unprocessed code to the underlying interpreter the `scm.` form 
 (1-) (scm. "(define (func-name x) (display x) (newline))")
 #<undef>
 
-(2-) (func-name "test")
+(2-) (scm.func-name "test")
 test
 #<undef>
 
