@@ -55,6 +55,10 @@ The initial heap size can be increased by using chibi-scheme's `-h` option:
 
     chibi-scheme -h50M -Rshen.runner
 
+For convenience a `shen-gauche.scm` script is included for POSIX systems:
+
+    ./shen-chibi script.shen arg1 arg2 arg3 ...
+
 ### Gauche
 
 Version 0.95 or newer of Gauche is required to run shen-scheme.
@@ -75,7 +79,7 @@ to pass arguments to it.
 
 For convenience a `shen-gauche.scm` script is included for POSIX systems:
 
-    ./shen-gauche.scm script.shen arg1 arg2 arg3 ...
+    ./shen-gauche script.shen arg1 arg2 arg3 ...
 
 ### (shen init) module
 

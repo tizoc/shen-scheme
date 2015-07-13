@@ -1,4 +1,7 @@
-#!/usr/bin/env gosh -I. -mshen.runner
+#!/bin/sh
+#|
+exec /usr/bin/env gosh -I`(dirname $0)`/.. -mshen.runner $0 $@
+|#
 
 (import (gauche base) (scheme base))
 
