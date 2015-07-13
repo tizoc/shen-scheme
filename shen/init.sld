@@ -8,6 +8,7 @@
    (shen overwrites-internal)
 
    (scheme base)
+   (scheme write)
    (scheme char)
    (scheme file)
    (scheme eval)
