@@ -1,9 +1,10 @@
-chibi-shen, a chibi-scheme port of the Shen language
+shen-scheme, a Scheme port of the Shen language
 ====================================================
 
 * [Shen](http://shenlanguage.org)
-* [chibi-scheme](http://code.google.com/p/chibi-scheme>)
-* [chibi-shen](https://github.com/tizoc/chibi-shen)
+* [chibi-scheme](http://synthcode.com/wiki/chibi-scheme)
+* [gauche](http://practical-scheme.net/gauche/)
+* [shen-scheme](https://github.com/tizoc/chibi-shen)
 
 Shen is a portable functional programming language by [Mark Tarver](http://marktarver.com) that offers
 
@@ -14,6 +15,11 @@ Shen is a portable functional programming language by [Mark Tarver](http://markt
 - static type checking,
 - an integrated fully functional Prolog,
 - and an inbuilt compiler-compiler.
+
+shen-scheme is a port of the Shen language that runs on top of Sheme implementations. Right now the following implementations are supported:
+
+* [chibi-scheme](http://synthcode.com/wiki/chibi-scheme)
+* [gauche](http://practical-scheme.net/gauche/)
 
 Building
 --------
@@ -27,7 +33,9 @@ The resulting code will live under the `shen/compiled/` directory.
 Running
 -------
 
-Version 0.7 of chibi-scheme is needed to run chibi-shen. Other versions may work, but testing and development are done against that version.
+##### chibi-scheme
+
+Version 0.7.3 or newer of chibi-scheme is needed to run shen-scheme. Other versions may work, but testing and development are done against that version.
 
 To launch the Shen REPL do:
 
@@ -47,7 +55,20 @@ The initial heap size can be increased by using chibi-scheme's `-h` option:
 
     chibi-scheme -h50M -Rshen.runner
 
-The `(shen init)` module exports two functions, `shen.shen` for launching the shen REPL and `shen.load` for loading Shen scripts:
+##### Gauche
+
+Version 0.95 or newer of Gauche is required to run shen-scheme.
+
+**TODO**: complete and document
+
+##### (shen init) module
+
+The `(shen init)` module exports the following functions:
+
+* `kl:shen.shen` for launching the shen REPL.
+* `kl:shen.quiet-load` for loading Shen scripts.
+* `kl:eval-kl` for evaluating Klambda code.
+* `kl:eval` for evaluating Shen code.
 
 ```
 # cat test.shen
@@ -55,15 +76,15 @@ The `(shen init)` module exports two functions, `shen.shen` for launching the sh
 (nl)
 # chibi-scheme
 > (import (shen init))
-> (shen.load "test.shen")
+> (kl:shen.quiet-load "test.shen")
 [1 2 3 4]
 ((1 2 3 4) 0)
-> (shen.shen)
+> (kl:shen.shen)
 
 Shen, copyright (C) 2010-2015 Mark Tarver
-www.shenlanguage.org, Shen 17
+www.shenlanguage.org, Shen 19.2
 running under Scheme, implementation: chibi-scheme
-port 0.10 ported by Bruno Deferrari
+port 0.14 ported by Bruno Deferrari
 
 
 (0-) 
@@ -77,10 +98,10 @@ Scheme functions live under the `scm` namespace (`scm.` prefix). For example: `(
 To send literal, unprocessed code to the underlying interpreter the `scm.` form can be used:
 
 ```
-(0-) (scm. "(scm.+ 1 2 3 4)")
+(0-) (scm. "(+ 1 2 3 4)")
 10
 
-(1-) (scm. "(scm.define (func-name x) (scm.display x) (scm.newline))")
+(1-) (scm. "(define (func-name x) (display x) (newline))")
 #<undef>
 
 (2-) (func-name "test")
@@ -88,8 +109,6 @@ test
 #<undef>
 
 ```
-
-Note that the `scm.` prefix is still required, because Scheme functions have been imported inside the Shen environment with an `scm.` prefix, and all compiled code runs inside this environment.
 
 Because Scheme functions can have variable numbers of arguments and the code passed to `scm.` is not preprocessed, any imported function that is intended to support partial application has to be wrapped with a `defun`:
 
@@ -119,8 +138,8 @@ It takes two arguments: a module identifier, and a list of lists of which the fi
 Example:
 
 ```
-(6-) (scm.import-from-module [srfi 27] [[scm.random-integer random-integer] [scm.random-real random-real]])
-[[scm.random-integer random-integer] [scm.random-real random-real]]
+(6-) (scm.import-from-module [srfi 27] [[random-integer random-integer] [random-real random-real]])
+[[random-integer random-integer] [random-real random-real]]
 
 (7-) (scm.random-integer 1000)
 927
