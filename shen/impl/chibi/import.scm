@@ -8,8 +8,10 @@
       ('() (reverse acc))
       (`((,name ,original-name) . ,rest)
        (loop rest (cons (cons name original-name) acc)))
+      (`(,(? symbol? name) . ,rest)
+       (loop rest (cons (cons name name) acc)))
       (else
-       (error "Bad import spec (expects a list of [imported-name original-name]" rest)))))
+       (error "Bad import spec (expects a list of symbols and/or [imported-name original-name]" rest)))))
 
 (define (import-from-module module-path spec)
   (let* ((imports (import-spec-to-assoc spec))
