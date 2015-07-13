@@ -18,7 +18,7 @@
             (only (meta) module-env %import)
             (only (chibi modules) load-module))
     (include "impl/chibi/import.scm")
-    (export scm.import-from-module))
+    (export import-from-module))
    (gauche
     (import (util match)
             (shen support gauche srfi-69)

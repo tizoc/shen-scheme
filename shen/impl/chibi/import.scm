@@ -8,7 +8,7 @@
       (else
        (error "Bad import spec (expects a list of [imported-name original-name]" rest)))))
 
-(define (scm.import-from-module module-path spec)
+(define (import-from-module module-path spec)
   (let* ((imports (import-spec-to-assoc spec))
          (module (or (load-module module-path)
                      (error "Module not found" module-path)))
