@@ -33,7 +33,7 @@ The resulting code will live under the `shen/compiled/` directory.
 Running
 -------
 
-##### chibi-scheme
+### chibi-scheme
 
 Version 0.7.3 or newer of chibi-scheme is needed to run shen-scheme. Other versions may work, but testing and development are done against that version.
 
@@ -55,13 +55,13 @@ The initial heap size can be increased by using chibi-scheme's `-h` option:
 
     chibi-scheme -h50M -Rshen.runner
 
-##### Gauche
+### Gauche
 
 Version 0.95 or newer of Gauche is required to run shen-scheme.
 
 **TODO**: complete and document
 
-##### (shen init) module
+### (shen init) module
 
 The `(shen init)` module exports the following functions:
 
