@@ -22,9 +22,10 @@
    (gauche
     (import (util match)
             (shen support gauche srfi-69)
-            (only (rename (file util)
-                    (resolve-path path-resolve))
-              path-resolve))))
+            (only (file util) build-path expand-path))
+    (begin
+      (define (path-resolve subpath base)
+        (build-path (expand-path base) subpath)))))
 
   (export
 
