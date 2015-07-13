@@ -26,7 +26,10 @@
               seek/end seek/cur seek/set
               set-file-position! file-position)))
    (gauche
-    (import (only (shen support gauche srfi-69) hash)
+    (import (only (rename (gauche base)
+                    (current-module current-environment))
+              current-environment)
+            (only (shen support gauche srfi-69) hash)
             (only (rename (file util)
                     (resolve-path path-resolve))
               path-resolve)
@@ -40,12 +43,12 @@
                     (sys-chdir change-directory))
               current-directory
               change-directory
-              open-output-file-descriptor
               seek/cur seek/set seek/end
               file-position set-file-position!
               current-directory change-directory))))
 
   (export kl:shen.shen
+          kl:eval
           kl:shen.quiet-load)
 
   (include "impl/init.scm")
