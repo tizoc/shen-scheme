@@ -73,6 +73,10 @@ or
 
 to pass arguments to it.
 
+For convenience a `shen-gauche.scm` script is included for POSIX systems:
+
+    ./shen-gauche.scm script.shen arg1 arg2 arg3 ...
+
 ### (shen init) module
 
 The `(shen init)` module exports the following functions:
