@@ -49,6 +49,7 @@
 
   (export kl:shen.shen
           kl:eval
+          kl:eval-kl
           kl:shen.quiet-load)
 
   (include "impl/init.scm")
