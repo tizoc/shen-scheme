@@ -1,3 +1,19 @@
+0.14:
+
+	* Support for Gauche Scheme.
+
+	* Statically resolve nesting for dynamic function calls.
+
+	* Slightly better equality check.
+
+	* Remove unnecessary `assert-boolean` calls when compilation.
+
+	* Overwrites are now generated from a .shen file.
+
+	* `scm.` prefix not needed anymore in the Scheme side.
+
+	* Better performance overall.
+
 0.13:
 
 	* Updated for Shen 19.2.
