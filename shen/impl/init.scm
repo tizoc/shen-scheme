@@ -2,8 +2,11 @@
 ;; BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause
 
 (kl:set (quote *language*) "Scheme")
-(kl:set (quote *implementation*) "chibi-scheme")
-(kl:set (quote *port*) "0.13")
+(kl:set (quote *implementation*)
+        (cond-expand
+         (chibi "chibi-scheme")
+         (gauche "gauche")))
+(kl:set (quote *port*) "0.14")
 (kl:set (quote *porters*) "Bruno Deferrari")
 (kl:set (quote *sterror*) (current-error-port))
 (kl:set (quote *stinput*) (current-input-port))
