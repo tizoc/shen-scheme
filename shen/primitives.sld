@@ -24,12 +24,16 @@
             (gauche base)
             (scheme cxr)
             (shen support gauche srfi-69)
-            (only (file util) build-path expand-path))
+            (only (file util)
+                  build-path expand-path absolute-path?))
     (include "impl/gauche/import.scm")
     (export import-from-module)
     (begin
       (define (path-resolve subpath base)
-        (build-path (expand-path base) subpath)))))
+        (let ((subpath (expand-path subpath)))
+          (if (absolute-path? subpath)
+              subpath
+              (build-path (expand-path base) subpath)))))))
 
   (export
 

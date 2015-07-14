@@ -29,9 +29,7 @@
    (gauche
     (import (gauche base)
             (only (shen support gauche srfi-69) hash)
-            (only (rename (file util)
-                    (resolve-path path-resolve))
-              path-resolve)
+            (only (file util) expand-path build-path absolute-path?)
             (only (rename (gauche base)
                     (SEEK_CUR seek/cur)
                     (SEEK_SET seek/set)
@@ -44,7 +42,13 @@
               change-directory
               seek/cur seek/set seek/end
               file-position set-file-position!
-              current-directory change-directory))))
+              current-directory change-directory))
+    (begin
+      (define (path-resolve subpath base)
+        (let ((subpath (expand-path subpath)))
+          (if (absolute-path? subpath)
+              subpath
+              (build-path (expand-path base) subpath)))))))
 
   (export kl:shen.shen
           kl:eval
