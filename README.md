@@ -153,9 +153,9 @@ Importing bindings from Scheme modules
 
 The `scm.import-from-module` function imports bindings from Scheme modules into Shen's environment.
 
-It takes two arguments: a module identifier, and a list of lists of which the first element is a symbol with the name the imported binding is going to have inside Shen's environment, and the second the name the binding inside the module.
+It takes two arguments: a module identifier, and a list of lists of which the first element is a symbol with the name the imported binding is going to have inside Shen's environment, and the second the name the binding inside the module. If the exported name is the same as the original name, a symbol can be used in place of the list.
 
-Example:
+Example (chibi):
 
 ```
 (6-) (scm.import-from-module [srfi 27] [[random-integer random-integer] [random-real random-real]])
@@ -166,6 +166,16 @@ Example:
 
 (8-) (scm.random-real)
 0.155211571676289
+```
+
+Example (gauche):
+
+```
+(0-) (scm.import-from-module file.util [home-directory])
+[home-directory]
+
+(1-) (scm.home-directory)
+"/Users/bruno"
 ```
 
 Extensions to core Shen

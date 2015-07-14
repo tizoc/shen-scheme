@@ -27,9 +27,7 @@
               seek/end seek/cur seek/set
               set-file-position! file-position)))
    (gauche
-    (import (only (rename (gauche base)
-                    (current-module current-environment))
-              current-environment)
+    (import (gauche base)
             (only (shen support gauche srfi-69) hash)
             (only (rename (file util)
                     (resolve-path path-resolve))

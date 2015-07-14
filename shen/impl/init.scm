@@ -11,4 +11,6 @@
 (kl:set (quote *sterror*) (current-error-port))
 (kl:set (quote *stinput*) (current-input-port))
 (kl:set (quote *stoutput*) (current-output-port))
-(set-shen-environment! (current-environment))
+(set-shen-environment! (cond-expand
+                        (chibi (current-environment))
+                        (gauche (current-module))))
