@@ -204,6 +204,8 @@ Extensions to core Shen
 * `(stream-set-position-from-current Stream RelativePosition)` with type `(stream A) --> number --> number`: Sets the stream position to a value relative to the current position.
 * `(stream-set-position-from-end Stream RelativePosition)` with type `(stream A) --> number --> number`: Sets the stream position to a value relative to the end position.
 
+**Note:** Gauche's stream-position behaves correctly now, but in the current version of chibi-scheme, when the file is opened in append mode, `stream-position` doesn't behave correctly.
+
 License
 -------
 
