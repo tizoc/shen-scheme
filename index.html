@@ -1,42 +1,32 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en-us">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Chibi-shen by tizoc</title>
-
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <meta charset="UTF-8">
+    <title>Shen/Scheme by tizoc</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
   <body>
-    <div class="wrapper">
-      <header>
-        <h1 class="header">Chibi-shen</h1>
-        <p class="header">Shen implementation on top of chibi-scheme</p>
+    <section class="page-header">
+      <h1 class="project-name">Shen/Scheme</h1>
+      <h2 class="project-tagline">Shen/Scheme implementation.</h2>
+      <a href="https://github.com/tizoc/shen-scheme" class="btn">View on GitHub</a>
+      <a href="https://github.com/tizoc/shen-scheme/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/tizoc/shen-scheme/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-        <ul>
-          <li class="download"><a class="buttons" href="https://github.com/tizoc/chibi-shen/zipball/master">Download ZIP</a></li>
-          <li class="download"><a class="buttons" href="https://github.com/tizoc/chibi-shen/tarball/master">Download TAR</a></li>
-          <li><a class="buttons github" href="https://github.com/tizoc/chibi-shen">View On GitHub</a></li>
-        </ul>
-
-        <p class="header">This project is maintained by <a class="header name" href="https://github.com/tizoc">tizoc</a></p>
-
-
-      </header>
-      <section>
-        <h1>
-<a id="chibi-shen-a-chibi-scheme-port-of-the-shen-language" class="anchor" href="#chibi-shen-a-chibi-scheme-port-of-the-shen-language" aria-hidden="true"><span class="octicon octicon-link"></span></a>chibi-shen, a chibi-scheme port of the Shen language</h1>
+    <section class="main-content">
+      <h1>
+<a id="shenscheme-a-scheme-port-of-the-shen-language" class="anchor" href="#shenscheme-a-scheme-port-of-the-shen-language" aria-hidden="true"><span class="octicon octicon-link"></span></a>Shen/Scheme, a Scheme port of the Shen language</h1>
 
 <ul>
 <li><a href="http://shenlanguage.org">Shen</a></li>
-<li><a href="http://code.google.com/p/chibi-scheme">chibi-scheme</a></li>
-<li><a href="https://github.com/tizoc/chibi-shen">chibi-shen</a></li>
+<li><a href="http://synthcode.com/wiki/chibi-scheme">chibi-scheme</a></li>
+<li><a href="http://practical-scheme.net/gauche/">gauche</a></li>
+<li><a href="https://github.com/tizoc/shen-scheme">shen-scheme</a></li>
 </ul>
 
 <p>Shen is a portable functional programming language by <a href="http://marktarver.com">Mark Tarver</a> that offers</p>
@@ -49,6 +39,13 @@
 <li>static type checking,</li>
 <li>an integrated fully functional Prolog,</li>
 <li>and an inbuilt compiler-compiler.</li>
+</ul>
+
+<p>shen-scheme is a port of the Shen language that runs on top of Sheme implementations. Right now the following implementations are supported:</p>
+
+<ul>
+<li><a href="http://synthcode.com/wiki/chibi-scheme">chibi-scheme</a></li>
+<li><a href="http://practical-scheme.net/gauche/">gauche</a></li>
 </ul>
 
 <h2>
@@ -64,7 +61,10 @@
 <h2>
 <a id="running" class="anchor" href="#running" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running</h2>
 
-<p>Version 0.7 of chibi-scheme is needed to run chibi-shen. Other versions may work, but testing and development are done against that version.</p>
+<h3>
+<a id="chibi-scheme" class="anchor" href="#chibi-scheme" aria-hidden="true"><span class="octicon octicon-link"></span></a>chibi-scheme</h3>
+
+<p>Version 0.7.3 or newer of chibi-scheme is needed to run shen-scheme. Other versions may work, but testing and development are done against that version.</p>
 
 <p>To launch the Shen REPL do:</p>
 
@@ -76,27 +76,80 @@
 <pre><code>chibi-scheme -Rshen.runner script.shen
 </code></pre>
 
+<p>or</p>
+
+<pre><code>chibi-scheme -Rshen.runner script.shen arg1 arg2 arg3 ...
+</code></pre>
+
+<p>to pass arguments to it.</p>
+
 <p>The initial heap size can be increased by using chibi-scheme's <code>-h</code> option:</p>
 
 <pre><code>chibi-scheme -h50M -Rshen.runner
 </code></pre>
 
-<p>The <code>(shen init)</code> module exports two functions, <code>shen.shen</code> for launching the shen REPL and <code>shen.load</code> for loading Shen scripts:</p>
+<p>For convenience a <code>bin/shen-chibi</code> script is included for POSIX systems:</p>
+
+<pre><code>./bin/shen-chibi script.shen arg1 arg2 arg3 ...
+</code></pre>
+
+<h3>
+<a id="gauche" class="anchor" href="#gauche" aria-hidden="true"><span class="octicon octicon-link"></span></a>Gauche</h3>
+
+<p>Version 0.95 or newer of Gauche is required to run shen-scheme.</p>
+
+<p>To launch the Shen REPL do:</p>
+
+<pre><code>gosh -I. -mshen.runner shen/runner.sld
+</code></pre>
+
+<p>To run a script do:</p>
+
+<pre><code>gosh -I. -mshen.runner shen/runner.sld script.shen
+</code></pre>
+
+<p>or</p>
+
+<pre><code>gosh -I. -mshen.runner shen/runner.sld script.shen arg1 arg2 arg3 ...
+</code></pre>
+
+<p>to pass arguments to it.</p>
+
+<p>For convenience a <code>bin/shen-gauche</code> script is included for POSIX systems:</p>
+
+<pre><code>./bin/shen-gauche script.shen arg1 arg2 arg3 ...
+</code></pre>
+
+<h3>
+<a id="shen-init-module" class="anchor" href="#shen-init-module" aria-hidden="true"><span class="octicon octicon-link"></span></a>(shen init) module</h3>
+
+<p>The <code>(shen init)</code> module exports the following functions:</p>
+
+<ul>
+<li>
+<code>kl:shen.shen</code> for launching the shen REPL.</li>
+<li>
+<code>kl:shen.quiet-load</code> for loading Shen scripts.</li>
+<li>
+<code>kl:eval-kl</code> for evaluating Klambda code.</li>
+<li>
+<code>kl:eval</code> for evaluating Shen code.</li>
+</ul>
 
 <pre><code># cat test.shen
 (print [1 2 3 4])
 (nl)
 # chibi-scheme
 &gt; (import (shen init))
-&gt; (shen.load "test.shen")
+&gt; (kl:shen.quiet-load "test.shen")
 [1 2 3 4]
 ((1 2 3 4) 0)
-&gt; (shen.shen)
+&gt; (kl:shen.shen)
 
 Shen, copyright (C) 2010-2015 Mark Tarver
-www.shenlanguage.org, Shen 17
+www.shenlanguage.org, Shen 19.2
 running under Scheme, implementation: chibi-scheme
-port 0.10 ported by Bruno Deferrari
+port 0.14 ported by Bruno Deferrari
 
 
 (0-) 
@@ -109,19 +162,17 @@ port 0.10 ported by Bruno Deferrari
 
 <p>To send literal, unprocessed code to the underlying interpreter the <code>scm.</code> form can be used:</p>
 
-<pre><code>(0-) (scm. "(scm.+ 1 2 3 4)")
+<pre><code>(0-) (scm. "(+ 1 2 3 4)")
 10
 
-(1-) (scm. "(scm.define (func-name x) (scm.display x) (scm.newline))")
+(1-) (scm. "(define (func-name x) (display x) (newline))")
 #&lt;undef&gt;
 
-(2-) (func-name "test")
+(2-) (scm.func-name "test")
 test
 #&lt;undef&gt;
 
 </code></pre>
-
-<p>Note that the <code>scm.</code> prefix is still required, because Scheme functions have been imported inside the Shen environment with an <code>scm.</code> prefix, and all compiled code runs inside this environment.</p>
 
 <p>Because Scheme functions can have variable numbers of arguments and the code passed to <code>scm.</code> is not preprocessed, any imported function that is intended to support partial application has to be wrapped with a <code>defun</code>:</p>
 
@@ -145,12 +196,12 @@ for-each
 
 <p>The <code>scm.import-from-module</code> function imports bindings from Scheme modules into Shen's environment.</p>
 
-<p>It takes two arguments: a module identifier, and a list of lists of which the first element is a symbol with the name the imported binding is going to have inside Shen's environment, and the second the name the binding inside the module.</p>
+<p>It takes two arguments: a module identifier, and a list of lists of which the first element is a symbol with the name the imported binding is going to have inside Shen's environment, and the second the name the binding inside the module. If the exported name is the same as the original name, a symbol can be used in place of the list.</p>
 
-<p>Example:</p>
+<p>Example (chibi):</p>
 
-<pre><code>(6-) (scm.import-from-module [srfi 27] [[scm.random-integer random-integer] [scm.random-real random-real]])
-[[scm.random-integer random-integer] [scm.random-real random-real]]
+<pre><code>(6-) (scm.import-from-module [srfi 27] [[random-integer random-integer] [random-real random-real]])
+[[random-integer random-integer] [random-real random-real]]
 
 (7-) (scm.random-integer 1000)
 927
@@ -159,19 +210,83 @@ for-each
 0.155211571676289
 </code></pre>
 
+<p>Example (gauche):</p>
+
+<pre><code>(0-) (scm.import-from-module file.util [home-directory])
+[home-directory]
+
+(1-) (scm.home-directory)
+"/Users/bruno"
+</code></pre>
+
+<h2>
+<a id="extensions-to-core-shen" class="anchor" href="#extensions-to-core-shen" aria-hidden="true"><span class="octicon octicon-link"></span></a>Extensions to core Shen</h2>
+
+<h5>
+<a id="command-line-arguments" class="anchor" href="#command-line-arguments" aria-hidden="true"><span class="octicon octicon-link"></span></a>Command line arguments</h5>
+
+<ul>
+<li>
+<code>(command-line)</code> with type <code>--&gt; (list string)</code>: Returns a list containing all comand line elements. The first element is the program name, and the remaining elements are the arguments passed to it.</li>
+</ul>
+
+<h5>
+<a id="process-exit" class="anchor" href="#process-exit" aria-hidden="true"><span class="octicon octicon-link"></span></a>Process exit</h5>
+
+<ul>
+<li>
+<code>(exit ExitCode)</code> with type <code>number --&gt; unit</code>: Exits the process using the specified exit code.</li>
+</ul>
+
+<h5>
+<a id="standard-error-stream" class="anchor" href="#standard-error-stream" aria-hidden="true"><span class="octicon octicon-link"></span></a>Standard error stream</h5>
+
+<ul>
+<li>
+<code>(sterror)</code> with type <code>--&gt; (stream out)</code>: Returns the standard error stream.</li>
+</ul>
+
+<h5>
+<a id="file-operations" class="anchor" href="#file-operations" aria-hidden="true"><span class="octicon octicon-link"></span></a>File operations</h5>
+
+<ul>
+<li>
+<code>(open-append Filepath)</code> with type <code>string --&gt; (stream out)</code>: Opens a file for output in "append" mode that doesn't truncate the file and returns a stream positioned at the end of the file.</li>
+</ul>
+
+<h5>
+<a id="stream-position-operations" class="anchor" href="#stream-position-operations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stream position operations</h5>
+
+<ul>
+<li>
+<code>(stream-position Stream)</code> with type <code>(stream A) --&gt; number</code>: Returns the stream position.</li>
+<li>
+<code>(stream-set-position Stream AbsolutePosition)</code> with type <code>(stream A) --&gt; number --&gt; number</code>: Sets the stream position.</li>
+<li>
+<code>(stream-set-position-from-current Stream RelativePosition)</code> with type <code>(stream A) --&gt; number --&gt; number</code>: Sets the stream position to a value relative to the current position.</li>
+<li>
+<code>(stream-set-position-from-end Stream RelativePosition)</code> with type <code>(stream A) --&gt; number --&gt; number</code>: Sets the stream position to a value relative to the end position.</li>
+</ul>
+
+<p><strong>Note:</strong> Gauche's stream-position behaves correctly now, but in the current version of chibi-scheme, when the file is opened in append mode, <code>stream-position</code> doesn't behave correctly.</p>
+
 <h2>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
 
 <ul>
 <li>Shen, Copyright © 2010-2015 Mark Tarver - <a href="http://www.shenlanguage.org/license.pdf">License</a>.</li>
-<li>chibi-shen, Copyright © 2012-2015 Bruno Deferrari under <a href="http://opensource.org/licenses/BSD-3-Clause">BSD 3-Clause License</a>.</li>
+<li>shen-scheme, Copyright © 2012-2015 Bruno Deferrari under <a href="http://opensource.org/licenses/BSD-3-Clause">BSD 3-Clause License</a>.</li>
 </ul>
-      </section>
-      <footer>
-        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/tizoc/shen-scheme">Shen/Scheme</a> is maintained by <a href="https://github.com/tizoc">tizoc</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-		
+
+    </section>
+
+  
   </body>
 </html>
+
