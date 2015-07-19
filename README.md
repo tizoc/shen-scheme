@@ -1,10 +1,10 @@
-shen-scheme, a Scheme port of the Shen language
+Shen/Scheme, a Scheme port of the Shen language
 ====================================================
 
 * [Shen](http://shenlanguage.org)
 * [chibi-scheme](http://synthcode.com/wiki/chibi-scheme)
 * [gauche](http://practical-scheme.net/gauche/)
-* [shen-scheme](https://github.com/tizoc/chibi-shen)
+* [shen-scheme](https://github.com/tizoc/shen-scheme)
 
 Shen is a portable functional programming language by [Mark Tarver](http://marktarver.com) that offers
 
@@ -210,4 +210,4 @@ License
 -------
 
 - Shen, Copyright © 2010-2015 Mark Tarver - [License](http://www.shenlanguage.org/license.pdf).
-- chibi-shen, Copyright © 2012-2015 Bruno Deferrari under [BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause).
+- shen-scheme, Copyright © 2012-2015 Bruno Deferrari under [BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause).
