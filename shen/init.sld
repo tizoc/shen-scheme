@@ -16,8 +16,7 @@
 
   (cond-expand
    (chibi
-    (import (only (srfi 69) hash)
-            (only (chibi pathname) path-resolve)
+    (import (only (chibi pathname) path-resolve)
             (only (chibi filesystem)
               change-directory current-directory
               open open/append open/write open/create
@@ -28,7 +27,6 @@
               set-file-position! file-position)))
    (gauche
     (import (gauche base)
-            (only (shen support gauche srfi-69) hash)
             (only (file util) expand-path build-path absolute-path?)
             (only (rename (gauche base)
                     (SEEK_CUR seek/cur)
@@ -49,6 +47,9 @@
           (if (absolute-path? subpath)
               subpath
               (build-path (expand-path base) subpath)))))))
+
+  ;; Import after other gauche stuff
+  (import (only (srfi 69) hash))
 
   (export kl:shen.shen
           kl:eval

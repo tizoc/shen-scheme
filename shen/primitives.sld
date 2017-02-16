@@ -8,12 +8,12 @@
           (scheme file)
           (scheme time)
           (scheme char)
+          (srfi 69)
           (shen compiler))
 
   (cond-expand
    (chibi
     (import (chibi match)
-            (srfi 69)
             (only (chibi pathname) path-resolve)
             (only (meta) module-env %import)
             (only (chibi modules) load-module))
@@ -23,7 +23,6 @@
     (import (util match)
             (gauche base)
             (scheme cxr)
-            (shen support gauche srfi-69)
             (only (file util)
                   build-path expand-path absolute-path?))
     (include "impl/gauche/import.scm")
