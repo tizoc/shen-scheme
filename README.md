@@ -61,7 +61,7 @@ For convenience a `bin/shen-chibi` script is included for POSIX systems:
 
 ### Gauche
 
-Version 0.95 or newer of Gauche is required to run shen-scheme.
+Version 0.9.5 or newer of Gauche is required to run shen-scheme.
 
 To launch the Shen REPL do:
 
