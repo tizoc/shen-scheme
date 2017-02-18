@@ -61,6 +61,19 @@
   ;; Avoid warning about shen.demod not being defined yet
   (begin (define (kl:shen.demod Val) Val))
 
+  ;; Silence startup warnings
+  (cond-expand
+   (chibi (begin (define undefined-function-msg-prefix "undefined variable: ")))
+   (gauche (begin (define undefined-function-msg-prefix "unbound variable: "))))
+
+  (begin
+    (define (undefined-function-stub name)
+      (let ((msg (string-append undefined-function-msg-prefix name)))
+        (lambda args (error msg))))
+
+    (define kl:package (undefined-function-stub "kl:package"))
+    (define kl:receive (undefined-function-stub "kl:receive")))
+
   (include "compiled/toplevel.kl.scm")
   (include "compiled/core.kl.scm")
   (include "compiled/sys.kl.scm")
