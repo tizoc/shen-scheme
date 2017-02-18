@@ -51,7 +51,7 @@
   ;; Import after other gauche stuff
   (import (only (srfi 69) hash))
 
-  (export kl:shen.shen
+  (export kl:shen
           kl:eval
           kl:eval-kl
           kl:shen.quiet-load)
