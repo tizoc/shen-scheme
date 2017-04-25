@@ -18,7 +18,6 @@
 
   (export
    read-file-as-bytelist
-   read-file-as-string
-   shen-sysfunc?)
+   read-file-as-string)
 
   (include "impl/overwrites-internal.scm"))

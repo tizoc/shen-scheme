@@ -15,23 +15,3 @@
               result
               (loop (- position 1)
                     (cons (bytevector-u8-ref bytes position) result))))))))
-
-(define shen-*system* #f)
-
-(define (init-*system*)
-  (set! shen-*system* (make-hash-table))
-
-  (for-each
-   (lambda (sym) (hash-table-set! shen-*system*
-                                  (case sym
-                                    ((#t) 'true)
-                                    ((#f) 'false)
-                                    (else sym)) #t))
-   (kl:eval-kl
-    '(get shen shen.external-symbols (value *property-vector*))))
-
-  shen-*system*)
-
-(define (shen-sysfunc? val)
-  (let ((table (or shen-*system* (init-*system*))))
-    (hash-table-ref/default table val #f)))
