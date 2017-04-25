@@ -133,18 +133,18 @@
                         [cons X* Y*])))
   [++ X] -> (successor (normal_form X))
   [-- X] -> (predecessor (normal_form X))
-  \*[cases X1 | Xn] -> (let Case1 (normal_form X1)
-  (if (= Case1 "no match")
-  [cases | Xn]
-  Case1))
+\*[cases X1 | Xn] -> (let Case1 (normal_form X1)
+                           (if (= Case1 "no match")
+                               [cases | Xn]
+                               Case1))
   [cases] -> "error!"
   [where X Y] -> [if X Y "no match"]
   [y-combinator [/. X Y]] -> (replace X [y-combinator [/. X Y]] Y)
   [X Y] -> (let X* (normal_form X)
-  (let Y* (normal_form Y)
-  (if (or (eval_error? X*) (eval_error? Y*))
-  "error!"
-  [X* Y*])))*\
+             (let Y* (normal_form Y)
+               (if (or (eval_error? X*) (eval_error? Y*))
+                   "error!"
+                   [X* Y*])))*\
   X -> X)
 
 (define eval_error?
