@@ -7,6 +7,6 @@
 
   (begin
     (define (main arguments)
-      (cond ((= 1 (length arguments)) (kl:shen))
+      (cond ((= 1 (length arguments)) (kl:shen.shen))
             (else (kl:shen.quiet-load (cadr arguments)))))))
 

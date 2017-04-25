@@ -9,10 +9,8 @@
            (set *home-directory* (scm.current-directory))))
 
 (define hash
-  Val Bound -> (let Res (scm.hash Val Bound)
-                 (scm.if (scm.eq? 0 Res)
-                     1
-                     Res)))
+  Val Bound -> (scm.hash Val Bound))
+
 (define not
   Val -> (scm.not Val))
 
@@ -43,22 +41,27 @@
 (define shen.byte->digit
   N -> (scm.- N 48))
 
-(define shen.lookup-func
-  F SymbolTable ->
-    (let Entry (scm.assq F SymbolTable)
-      (scm.if
-       Entry
-       (scm.cdr Entry)
-       (simple-error (scm.string-append
-                      (scm.symbol->string F)
-                      " has no lambda expansion\n")))))
+(define shen.dict
+  Size -> (scm.make-hash-table))
+
+(define shen.dict?
+  X -> (scm.hash-table? X))
+
+(define shen.<-dict/or
+  Dict K Or -> (scm.hash-table-ref Dict K Or))
+
+(define shen.dict->
+  Dict K V -> (scm.hash-table-set! Dict K V))
+
+(define shen.dict-rm
+  Dict K -> (scm.hash-table-delete! Dict K))
 
 \\ Definitions for these are on shen/overwrites-internal.scm
 
-(define shen.sysfunc?
-  Val -> (scm.shen-sysfunc? Val))
-
 (define read-file-as-bytelist
+  Filename -> (scm.read-file-as-bytelist Filename))
+
+(define read-file-as-charlist
   Filename -> (scm.read-file-as-bytelist Filename))
 
 (define read-file-as-string
