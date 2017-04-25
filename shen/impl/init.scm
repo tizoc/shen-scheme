@@ -6,7 +6,7 @@
         (cond-expand
          (chibi "chibi-scheme")
          (gauche "gauche")))
-(kl:set (quote *port*) "0.14")
+(kl:set (quote *port*) "0.15")
 (kl:set (quote *porters*) "Bruno Deferrari")
 (kl:set (quote *sterror*) (current-error-port))
 (kl:set (quote *stinput*) (current-input-port))
