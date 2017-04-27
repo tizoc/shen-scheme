@@ -42,6 +42,8 @@
    assert-boolean
    full-path-for-file
 
+   value/or
+
    kl:intern
    kl:str
    kl:set

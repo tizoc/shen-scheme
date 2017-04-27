@@ -50,7 +50,9 @@
 
   ;; Import after other gauche stuff
   (import (only (srfi 69) hash make-hash-table hash-table-ref hash-table?
-                          hash-table-set! hash-table-delete! hash-by-identity))
+                          hash-table-set! hash-table-delete! hash-by-identity
+                          hash-table-values hash-table-keys
+                          hash-table-fold hash-table-size))
 
   (export kl:shen.shen
           kl:eval

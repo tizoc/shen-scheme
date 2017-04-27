@@ -51,6 +51,9 @@
                   key
                   (lambda () (error "variable has no value:" key))))
 
+(define (value/or key default)
+  (hash-table-ref *shen-globals* key default))
+
 ;; Error Handling
 ;;
 

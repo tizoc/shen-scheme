@@ -41,20 +41,43 @@
 (define shen.byte->digit
   N -> (scm.- N 48))
 
-(define shen.dict
+(define dict
   Size -> (scm.make-hash-table))
 
-(define shen.dict?
+(define dict?
   X -> (scm.hash-table? X))
 
-(define shen.<-dict/or
-  Dict K Or -> (scm.hash-table-ref Dict K Or))
+(define dict-count
+  Dict -> (scm.hash-table-size Dict))
 
-(define shen.dict->
+(define dict->
   Dict K V -> (scm.hash-table-set! Dict K V))
 
-(define shen.dict-rm
+(define <-dict/or
+  Dict K Or -> (scm.hash-table-ref Dict K Or))
+
+(define dict-rm
   Dict K -> (scm.hash-table-delete! Dict K))
+
+(define dict-fold
+  Dict F Init -> (scm.hash-table-fold Dict F Init))
+
+(define dict-keys
+  Dict -> (scm.hash-table-keys Dict))
+
+(define dict-values
+  Dict -> (scm.hash-table-values Dict))
+
+(define exit
+  Code -> (scm.exit Code))
+
+(define value/or
+  Var Or -> (scm.value/or Var Or))
+
+(define <-address/or
+  Vector N Or -> (if (>= N (scm.vector-length Vector))
+                     (thaw Or)
+                     (scm.vector-ref Vector N)))
 
 \\ Definitions for these are on shen/overwrites-internal.scm
 

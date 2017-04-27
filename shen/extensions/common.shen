@@ -5,12 +5,6 @@
   File -> (let Contents (read-file File)
             (map (/. X (shen.eval-without-macros X)) Contents)))
 
-(define sterror
-  -> (value *sterror*))
-
-(define exit
-  Code -> (scm.exit (scm.exact Code)))
-
 (define command-line
   -> (scm.command-line))
 
@@ -30,9 +24,7 @@
                     Pos))
 
 (declare command-line [--> [list string]])
-(declare exit [number --> unit])
 (declare open-append [string --> [stream out]])
-(declare sterror [--> [stream out]])
 (declare stream-position [[stream A] --> number])
 (declare stream-set-position [[stream A] --> [number --> number]])
 (declare stream-set-position-from-current [[stream A] --> [number --> number]])
