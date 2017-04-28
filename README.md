@@ -185,14 +185,6 @@ Extensions to core Shen
 
 * `(command-line)` with type `--> (list string)`: Returns a list containing all comand line elements. The first element is the program name, and the remaining elements are the arguments passed to it.
 
-##### Process exit
-
-* `(exit ExitCode)` with type `number --> unit`: Exits the process using the specified exit code.
-
-##### Standard error stream
-
-* `(sterror)` with type `--> (stream out)`: Returns the standard error stream.
-
 ##### File operations
 
 * `(open-append Filepath)` with type `string --> (stream out)`: Opens a file for output in "append" mode that doesn't truncate the file and returns a stream positioned at the end of the file.
