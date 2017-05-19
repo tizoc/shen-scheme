@@ -56,6 +56,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 
 (declare cn (cons string (cons --> (cons (cons string (cons --> (cons string ()))) ()))))
 
+(declare command-line (cons --> (cons (cons list (cons string ())) ())))
+
 (declare compile (cons (cons A (cons shen.==> (cons B ()))) (cons --> (cons (cons A (cons --> (cons (cons (cons A (cons --> (cons B ()))) (cons --> (cons B ()))) ()))) ()))))
 
 (declare cons? (cons A (cons --> (cons boolean ()))))

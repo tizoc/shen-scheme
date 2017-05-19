@@ -182,7 +182,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 
 (defun shen.dict-fold-h (V3126 V3127 V3128 V3129 V3130) (cond ((= V3130 V3129) V3128) (true (let B (shen.<-dict-bucket V3127 V3129) (let Acc (shen.bucket-fold V3126 B V3128) (shen.dict-fold-h V3126 V3127 Acc (+ 1 V3129) V3130))))))
 
-(defun shen.bucket-fold (V3134 V3135 V3136) (cond ((= () V3135) V3136) ((and (cons? V3135) (cons? (hd V3135))) (V3134 (hd (hd V3135)) (tl (hd V3135)) (fold-right V3134 (tl V3135) V3136))) (true (shen.f_error shen.bucket-fold))))
+(defun shen.bucket-fold (V3134 V3135 V3136) (cond ((= () V3135) V3136) ((and (cons? V3135) (cons? (hd V3135))) (V3134 (hd (hd V3135)) (tl (hd V3135)) (shen.bucket-fold V3134 (tl V3135) V3136))) (true (shen.f_error shen.bucket-fold))))
 
 (defun dict-keys (V3138) (dict-fold (lambda K (lambda _ (lambda Acc (cons K Acc)))) V3138 ()))
 
@@ -282,7 +282,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 
 (defun stoutput () (value *stoutput*))
 
-(defun sterror () (value shen.*sterror*))
+(defun sterror () (value *sterror*))
+
+(defun command-line () (value *argv*))
 
 (defun string->symbol (V3364) (let Symbol (intern V3364) (if (symbol? Symbol) Symbol (simple-error (cn "cannot intern " (shen.app V3364 " to a symbol" shen.s))))))
 
