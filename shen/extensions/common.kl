@@ -3,8 +3,6 @@ BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause"
 
 (defun shen.quiet-load (V1401) (let Contents (read-file V1401) (map (lambda X (shen.eval-without-macros X)) Contents)))
 
-(defun command-line () (scm.command-line))
-
 (defun stream-position (V1403) (scm.file-position V1403))
 
 (defun stream-set-position (V1406 V1407) (do (scm.set-file-position! V1406 V1407 (scm. "seek/set")) V1407))
@@ -12,8 +10,6 @@ BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause"
 (defun stream-set-position-from-current (V1410 V1411) (do (scm.set-file-position! V1410 V1411 (scm. "seek/cur")) V1411))
 
 (defun stream-set-position-from-end (V1414 V1415) (do (scm.set-file-position! V1414 V1415 (scm. "seek/end")) V1415))
-
-(declare command-line (cons --> (cons (cons list (cons string ())) ())))
 
 (declare open-append (cons string (cons --> (cons (cons stream (cons out ())) ()))))
 

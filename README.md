@@ -181,10 +181,6 @@ Example (gauche):
 Extensions to core Shen
 -----------------------
 
-##### Command line arguments
-
-* `(command-line)` with type `--> (list string)`: Returns a list containing all comand line elements. The first element is the program name, and the remaining elements are the arguments passed to it.
-
 ##### File operations
 
 * `(open-append Filepath)` with type `string --> (stream out)`: Opens a file for output in "append" mode that doesn't truncate the file and returns a stream positioned at the end of the file.

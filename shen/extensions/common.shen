@@ -5,9 +5,6 @@
   File -> (let Contents (read-file File)
             (map (/. X (shen.eval-without-macros X)) Contents)))
 
-(define command-line
-  -> (scm.command-line))
-
 (define stream-position
   Stream -> (scm.file-position Stream))
 
@@ -23,7 +20,6 @@
   Stream Pos -> (do (scm.set-file-position! Stream Pos (scm. "seek/end"))
                     Pos))
 
-(declare command-line [--> [list string]])
 (declare open-append [string --> [stream out]])
 (declare stream-position [[stream A] --> number])
 (declare stream-set-position [[stream A] --> [number --> number]])
