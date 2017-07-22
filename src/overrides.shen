@@ -53,7 +53,8 @@
   Dict -> (scm.hashtable-size Dict))
 
 (define dict->
-  Dict K V -> (scm.hashtable-set! Dict K V))
+  Dict K V -> (do (scm.hashtable-set! Dict K V)
+                  V))
 
 (define <-dict/or
   Dict K Or -> (let Res (scm.hashtable-ref Dict K $%value-not-found%$)
@@ -62,7 +63,8 @@
                      Res)))
 
 (define dict-rm
-  Dict K -> (scm.hashtable-delete! Dict K))
+  Dict K -> (do (scm.hashtable-delete! Dict K)
+                K))
 
 \* hashtable-fold defined in prelude.scm *\
 (define dict-fold
