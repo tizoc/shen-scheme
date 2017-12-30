@@ -1,10 +1,12 @@
 #include "scheme.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
+#include <limits.h>
 
 #ifndef DEFAULT_BOOTFILE_PATH
-#  define DEFAULT_BOOTFILE_PATH "./shen.boot"
+#  define DEFAULT_BOOTFILE_PATH NULL
 #endif
 
 static void custom_init(void) {}
@@ -14,7 +16,17 @@ int main(int argc, char *argv[]) {
   char *bfpath = getenv("SHEN_BOOTFILE_PATH");
 
   if (bfpath == NULL) {
-    bfpath = DEFAULT_BOOTFILE_PATH;
+    if (DEFAULT_BOOTFILE_PATH != NULL) {
+      bfpath = DEFAULT_BOOTFILE_PATH;
+    } else {
+      char buf[PATH_MAX];
+      char *last_slash;
+
+      realpath(argv[0], buf);
+      last_slash = strrchr(buf, '/') + 1;
+      strlcpy(last_slash, "shen.boot", last_slash - buf);
+      bfpath = buf;
+    }
   }
 
   if (access(bfpath, F_OK) == -1) {
