@@ -236,14 +236,20 @@
                        (program-definition)
                        Filename))
 
-(define unix-shebang
-  -> "#! /usr/bin/env chez --script")
+(define initialization-body
+  -> "(suppress-greeting #t)
+
+(scheme-start
+  (lambda fns
+    (initialize-shen)
+    (kl:shen.run-shen fns)
+    (exit 0)))")
 
 (define program-definition
-  -> (make-string "~A~%~A~%~A~%(initialize-shen)~%(kl:shen.run-shen (command-line))~%"
-                  (unix-shebang)
+  -> (make-string "~A~%~A~%~A~%"
                   (shen-scheme-license)
-                  (loader-body)))
+                  (loader-body)
+                  (initialization-body)))
 
 \* library-definition is unused for now *\
 
