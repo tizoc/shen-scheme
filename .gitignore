@@ -1,0 +1,8 @@
+/tmp
+/kl
+/shen-sources
+/shen-chez.scm
+/shen-scheme
+/shen.boot
+*.o
+/_build
