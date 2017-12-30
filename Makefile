@@ -14,14 +14,16 @@ CFLAGS += -m64
 all: shen-scheme shen.boot
 
 $(csdir):
+	echo "Downloading and uncompressing Chez..."
 	mkdir -p _build
 	cd _build && curl -L 'https://github.com/cisco/ChezScheme/releases/download/v9.5/csv9.5.tar.gz' | tar xz
 
 $(kernel): $(csdir)
+	echo "Building Chez..."
 	cd $(csdir) && ./configure --threads && make
 
-shen-scheme: main.o $(kernel)
-	cc -o $@ $< $(kernel) -liconv -lncurses
+shen-scheme: $(kernel) main.o
+	cc -o $@ main.o $(kernel) -liconv -lncurses
 
 main.o: main.c
 	cc -c -o $@ $< -I$(bootpath) -Wall -Wextra -pedantic $(CFLAGS)
