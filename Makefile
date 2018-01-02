@@ -23,12 +23,12 @@ $(kernel): $(csdir)
 	cd $(csdir) && ./configure --threads && make
 
 shen-scheme: $(kernel) main.o
-	cc -o $@ main.o $(kernel) -liconv -lncurses
+	$(CC) -o $@ main.o $(kernel) -liconv -lncurses
 
 main.o: main.c
-	cc -c -o $@ $< -I$(bootpath) -Wall -Wextra -pedantic $(CFLAGS)
+	$(CC) -c -o $@ $< -I$(bootpath) -Wall -Wextra -pedantic $(CFLAGS)
 
-shen.boot: $(psboot) $(csboot) shen-chez.scm
+shen.boot: $(psboot) $(csboot) shen-chez.scm src/* compiled/*.scm
 	echo '(make-boot-file "shen.boot" (list)  "./$(psboot)" "./$(csboot)" "shen-chez.scm")' | "$(scmexe)" -q -b "./$(psboot)" -b "./$(csboot)"
 
 test-shen: shen-scheme shen.boot
