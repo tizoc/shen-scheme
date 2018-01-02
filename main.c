@@ -2,11 +2,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <limits.h>
+
+#ifdef _WIN32
+#   include <windows.h>
+#   define F_OK 0
+#   define PATH_MAX _MAX_PATH
+#   define PATH_SEPARATOR '\\'
+#   define access _access
+#   define strlcpy strncpy
+#   define realpath(path, expanded) GetFullPathName(path, PATH_MAX, expanded, NULL)
+#else
+#   include <unistd.h>
+#   include <limits.h>
+#   define PATH_SEPARATOR '/'
+#endif
 
 #ifndef DEFAULT_BOOTFILE_PATH
-#  define DEFAULT_BOOTFILE_PATH NULL
+#   define DEFAULT_BOOTFILE_PATH NULL
 #endif
 
 static void custom_init(void) {}
@@ -23,7 +35,7 @@ int main(int argc, char *argv[]) {
       char *last_slash;
 
       realpath(argv[0], buf);
-      last_slash = strrchr(buf, '/') + 1;
+      last_slash = strrchr(buf, PATH_SEPARATOR) + 1;
       strlcpy(last_slash, "shen.boot", last_slash - buf);
       bfpath = buf;
     }
