@@ -186,9 +186,12 @@
        (nest-call (compile-expression Op Scope)
                   Args)))
 
-(define scm-prefixed?
-  Sym -> (scm-prefixed? (explode Sym)) where (symbol? Sym)
+(define scm-prefixed-h?
   [($ scm.) | _] -> true
+  _ -> false)
+
+(define scm-prefixed?
+  Sym -> (scm-prefixed-h? (explode Sym)) where (symbol? Sym)
   _ -> false)
 
 (define remove-scm-prefix
@@ -197,7 +200,8 @@
 
 (define prefix-op
   Sym -> (remove-scm-prefix Sym) where (scm-prefixed? Sym)
-  Sym -> (concat (value *kl-prefix*) Sym))
+  Sym -> (concat (value *kl-prefix*) Sym) where (symbol? Sym)
+  NotSym -> NotSym)
 
 (define not-fail
   Obj F -> (F Obj) where (not (= Obj (fail)))
