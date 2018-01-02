@@ -4,10 +4,10 @@
 \* How to use:
 
     (load "build.shen")
-    (build program "shen.scm")
+    (build program "shen-scheme.scm")
 
   The call to `build` will generate Scheme code files in "compiled/*.scm",
-  and a "shen.scm" file containing a R6RS library definition.
+  and a "shen-scheme.scm" file containing a program or R6RS library definition.
   All initialization code will be contained in a `shen-initialize`
   function that has to be called to initialize the Shen environment
   before using it.
