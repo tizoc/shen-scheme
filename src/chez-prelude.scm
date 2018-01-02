@@ -19,16 +19,24 @@
         (default)
         res)))
 
+(define (kl-var-clean sym)
+  (if (symbol? sym)
+      (let* ((str (symbol->string sym))
+             (len (string-length str)))
+        (if (and (> len 3)
+                 (string=? "kl:" (substring str 0 3)))
+         (string->symbol (substring str 3 len))
+         sym))
+      sym))
+
 (define (error-message e)
   (let ((msg (condition-message e))
         (irritants (condition-irritants e)))
-    (if (null? irritants)
+    (if (format-condition? msg)
         msg
         (call-with-string-output-port
          (lambda (out)
-           (display msg out)
-           (display ": " out)
-           (write (car irritants) out))))))
+           (apply format out msg (map kl-var-clean irritants)))))))
 
 (define (full-path-for-file filename)
   (if (path-absolute? filename)
