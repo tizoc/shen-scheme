@@ -22,11 +22,11 @@ $(kernel): $(csdir)
 	echo "Building Chez..."
 	cd $(csdir) && ./configure --threads && make
 
-shen-scheme: $(kernel) main.o
-	$(CC) -o $@ main.o $(kernel) -liconv -lncurses
+shen-scheme: $(kernel) main.o lib/whereami.o
+	$(CC) -o $@ $^ -liconv -lncurses
 
-main.o: main.c
-	$(CC) -c -o $@ $< -I$(bootpath) -Wall -Wextra -pedantic $(CFLAGS)
+%.o: %.c
+	$(CC) -c -o $@ $< -I$(bootpath) -I./lib -Wall -Wextra -pedantic $(CFLAGS)
 
 shen.boot: $(psboot) $(csboot) shen-chez.scm src/* compiled/*.scm
 	echo '(make-boot-file "shen.boot" (list)  "./$(psboot)" "./$(csboot)" "shen-chez.scm")' | "$(scmexe)" -q -b "./$(psboot)" -b "./$(csboot)"

@@ -1,20 +1,18 @@
-#include "scheme.h"
+#include <scheme.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <whereami.h>
 
 #ifdef _WIN32
 #   include <windows.h>
 #   define F_OK 0
 #   define PATH_MAX _MAX_PATH
-#   define PATH_SEPARATOR '\\'
 #   define access _access
 #   define strlcpy strncpy
-#   define realpath(path, expanded) GetFullPathName(path, PATH_MAX, expanded, NULL)
 #else
 #   include <unistd.h>
 #   include <limits.h>
-#   define PATH_SEPARATOR '/'
 #endif
 
 #ifndef DEFAULT_BOOTFILE_PATH
@@ -26,17 +24,16 @@ static void custom_init(void) {}
 int main(int argc, char *argv[]) {
   int status;
   char *bfpath = getenv("SHEN_BOOTFILE_PATH");
+  char buf[PATH_MAX];
 
   if (bfpath == NULL) {
     if (DEFAULT_BOOTFILE_PATH != NULL) {
       bfpath = DEFAULT_BOOTFILE_PATH;
     } else {
-      char buf[PATH_MAX];
-      char *last_slash;
-
-      realpath(argv[0], buf);
-      last_slash = strrchr(buf, PATH_SEPARATOR) + 1;
-      strlcpy(last_slash, "shen.boot", last_slash - buf);
+      int dirlen;
+      wai_getExecutablePath(buf, sizeof(buf), &dirlen);
+      dirlen++;
+      strlcpy(buf + dirlen, "shen.boot", sizeof(buf) - dirlen);
       bfpath = buf;
     }
   }
