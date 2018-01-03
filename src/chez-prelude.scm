@@ -32,11 +32,9 @@
 (define (error-message e)
   (let ((msg (condition-message e))
         (irritants (condition-irritants e)))
-    (if (format-condition? msg)
-        msg
-        (call-with-string-output-port
-         (lambda (out)
-           (apply format out msg (map kl-var-clean irritants)))))))
+    (if (format-condition? e)
+        (apply format msg (map kl-var-clean irritants))
+        msg)))
 
 (define (full-path-for-file filename)
   (if (path-absolute? filename)
