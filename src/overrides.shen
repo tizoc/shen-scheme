@@ -1,12 +1,9 @@
 \* Copyright (c) 2012-2017 Bruno Deferrari.  All rights reserved. *\
 \* BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause *\
 
-\\ TODO: handle relative dirs?
 (define cd
-  Val -> (let Dir (if (= Val "")
-                      (scm.current-directory)
-                      (scm.string-append Val "/"))
-              NewDir (scm.current-directory Dir)
+  "" -> (cd (value shen.*initial-home-directory*))
+  Dir -> (let NewDir (scm.current-directory Dir)
            (set *home-directory* (scm.current-directory))))
 
 (define hash
