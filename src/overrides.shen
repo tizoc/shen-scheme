@@ -34,8 +34,7 @@
          (= (scm.vector-ref V 0) shen.pvar))))
 
 (define shen.numbyte?
-  N -> (let N (scm.exact N)
-         (scm.and (scm.fx>=? N 48) (scm.fx<=? N 57))))
+  N -> (scm.and (scm.fx>=? N 48) (scm.fx<=? N 57)))
 
 (define shen.byte->digit
   N -> (scm.fx- (scm.exact N) 48))
