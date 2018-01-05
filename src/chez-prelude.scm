@@ -32,9 +32,10 @@
 (define (error-message e)
   (let ((msg (condition-message e))
         (irritants (condition-irritants e)))
-    (if (format-condition? e)
-        (apply format msg (map kl-var-clean irritants))
-        msg)))
+    (cond ((format-condition? e)
+           (apply format msg (map kl-var-clean irritants)))
+          ((null? irritants) msg)
+          (else (format "~a: ~{~s~}" msg irritants)))))
 
 (define (full-path-for-file filename)
   (if (path-absolute? filename)
