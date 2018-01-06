@@ -2,7 +2,7 @@
 \* BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause *\
 
 (package _scm [begin quote string->symbol null? car cdr pair? else exact
-                     vector-ref vector-set! make-vector string inexact
+                     vector-ref vector-set! make-vector string non-rational-/
                      string-append integer->char char->integer
                      string-ref string-length substring
                      eq? equal? scm.import import]
@@ -18,9 +18,6 @@
 (define unbound-symbol?
   Sym Scope -> (not (element? Sym Scope)) where (symbol? Sym)
   _ _ -> false)
-
-(define int
-  Exp -> [exact Exp])
 
 (define compile-expression
   [] _ -> [quote []]
@@ -41,25 +38,23 @@
                              (compile-expression E2 Scope)]
   [freeze Exp] Scope -> [lambda [] (compile-expression Exp Scope)]
   [= A B] Scope -> (emit-equality-check A B Scope)
-  [/ A B] Scope -> [/ [inexact (compile-expression A Scope)]
-                      (compile-expression B Scope)]
   [type Exp _] Scope -> (compile-expression Exp Scope)
   \* TODO: first argument to error can be the function name for better
      error messages, take advantage of it *\
   [simple-error Msg] Scope -> [error false (compile-expression Msg Scope)]
-  [n->string N] Scope -> [string [integer->char (int (compile-expression N Scope))]]
+  [n->string N] Scope -> [string [integer->char (compile-expression N Scope)]]
   [string->n S] Scope -> [char->integer [string-ref (compile-expression S Scope) 0]]
   [pos S N] Scope -> [string [string-ref (compile-expression S Scope)
-                                         (int (compile-expression N Scope))]]
+                                         (compile-expression N Scope)]]
   [tlstr S] Scope -> [let [[tmp (compile-expression S Scope)]]
                        [substring tmp 1 [string-length tmp]]]
-  [absvector N] Scope -> [make-vector (int (compile-expression N Scope))
+  [absvector N] Scope -> [make-vector (compile-expression N Scope)
                                       [(prefix-op fail)]]
   [<-address V N] Scope -> [vector-ref (compile-expression V Scope)
-                                       (int (compile-expression N Scope))]
+                                       (compile-expression N Scope)]
   [address-> V N X] Scope -> [let [[tmp (compile-expression V Scope)]]
                                [vector-set! tmp
-                                            (int (compile-expression N Scope))
+                                            (compile-expression N Scope)
                                             (compile-expression X Scope)]
                                tmp]
   [scm.import | Rest] _ -> [import | Rest]
@@ -134,6 +129,7 @@
   +               -> +
   -               -> -
   *               -> *
+  /               -> non-rational-/
   >               -> >
   <               -> <
   >=              -> >=

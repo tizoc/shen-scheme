@@ -17,6 +17,15 @@
         ((equal? name "false") #f)
         (else (string->symbol name))))
 
+;; Numbers
+;;
+
+(define (non-rational-/ x y)
+  (let ((result (/ x y)))
+    (if (rational? result)
+        (inexact result)
+        result)))
+
 ;; Strings
 ;;
 
