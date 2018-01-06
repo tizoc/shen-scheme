@@ -5,7 +5,7 @@
                      vector-ref vector-set! make-vector string non-rational-/
                      string-append integer->char char->integer
                      string-ref string-length substring
-                     eq? equal? scm.import import *repl*]
+                     eq? equal? scm.import import *toplevel*]
 
 (define initialize-compiler
   -> (do (set *yields-boolean2* [or and < > >= <= =])
@@ -20,7 +20,7 @@
   _ _ -> false)
 
 \* Used to keep track of the function being compiled for error messages *\
-(set *compiling-function* [*repl*])
+(set *compiling-function* [*toplevel*])
 
 (define compile-expression
   [] _ -> [quote []]
