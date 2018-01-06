@@ -20,7 +20,7 @@
   _ _ -> false)
 
 \* Used to keep track of the function being compiled for error messages *\
-(set *current-function* *repl*)
+(set *compiling-function* [*repl*])
 
 (define compile-expression
   [] _ -> [quote []]
@@ -42,7 +42,7 @@
   [freeze Exp] Scope -> [lambda [] (compile-expression Exp Scope)]
   [= A B] Scope -> (emit-equality-check A B Scope)
   [type Exp _] Scope -> (compile-expression Exp Scope)
-  [simple-error Msg] Scope -> [error [quote (value *current-function*)]
+  [simple-error Msg] Scope -> [error [quote (hd (value *compiling-function*))]
                                      (compile-expression Msg Scope)]
   [n->string N] Scope -> [string [integer->char (compile-expression N Scope)]]
   [string->n S] Scope -> [char->integer [string-ref (compile-expression S Scope) 0]]
@@ -260,12 +260,12 @@
 
 (define kl->scheme
   [defun Name Args Body] ->
-    (let _ (set *current-function* Name)
+    (let _ (set *compiling-function* [Name | (value *compiling-function*)])
          Code [begin
                 [define [(prefix-op Name) | Args]
                   (compile-expression Body Args)]
                   [quote Name]]
-         _ (set *current-function* *repl*)
+         _ (set *compiling-function* (tl (value *compiling-function*)))
       Code)
   Exp -> (compile-expression Exp []))
 
