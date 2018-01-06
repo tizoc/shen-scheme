@@ -93,3 +93,21 @@
 
 (define read-file-as-string
   Filename -> (scm.read-file-as-string Filename))
+
+\* To print location of errors *\
+
+(package shen [scm.error-location]
+
+(define loop
+  -> (do (initialise_environment)
+         (prompt)
+         (trap-error
+          (read-evaluate-print)
+          (/. E (let _ (pr (error-to-string E) (stoutput))
+                  (pr (cn " -- ERROR FROM: " (str (scm.error-location E)))
+                      (stoutput)))))
+         (if (value *continue-repl-loop*)
+             (loop)
+             exit)))
+
+)
