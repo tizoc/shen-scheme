@@ -30,10 +30,12 @@
       sym))
 
 (define (error-message e)
-  (let ((msg (condition-message e))
-        (irritants (condition-irritants e)))
+  (let* ((who (and (who-condition? e) (condition-who e)))
+         (basemsg (condition-message e))
+         (msg (if who (format "~a << in ~:s >>" basemsg who) basemsg))
+         (irritants (condition-irritants e)))
     (cond ((format-condition? e)
-           (apply format msg (map kl-var-clean irritants)))
+           (apply format msg (map kl-var-clean irritants )))
           ((null? irritants) msg)
           (else (format "~a: ~{~s~}" msg irritants)))))
 
