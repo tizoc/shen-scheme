@@ -22,9 +22,9 @@
 
 (define (non-rational-/ x y)
   (let ((result (/ x y)))
-    (if (rational? result)
-        (inexact result)
-        result)))
+    (if (integer? result)
+        result
+        (inexact result))))
 
 ;; Strings
 ;;
