@@ -103,9 +103,7 @@
          (prompt)
          (trap-error
           (read-evaluate-print)
-          (/. E (let _ (pr (error-to-string E) (stoutput))
-                  (pr (cn " -- ERROR FROM: " (str (scm.error-location E)))
-                      (stoutput)))))
+          (/. E (output "Exception in ~A: ~A" (scm.error-location E) (error-to-string E))))
          (if (value *continue-repl-loop*)
              (loop)
              exit)))
