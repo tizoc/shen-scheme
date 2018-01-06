@@ -3,8 +3,8 @@
 
 (define-syntax raise-error
   (syntax-rules ()
-    ((_ message obj ...)
-     (error #f message obj ...))))
+    ((_ location message obj ...)
+     (error location message obj ...))))
 
 (define *shen-globals* (make-eq-hashtable))
 
@@ -31,13 +31,15 @@
 
 (define (error-message e)
   (let* ((who (and (who-condition? e) (condition-who e)))
-         (basemsg (condition-message e))
-         (msg (if who (format "~a << in ~:s >>" basemsg who) basemsg))
+         (msg (condition-message e))
+         (location-info (if who (format " (ERROR FROM: ~s)" who) ""))
          (irritants (condition-irritants e)))
     (cond ((format-condition? e)
-           (apply format msg (map kl-var-clean irritants )))
-          ((null? irritants) msg)
-          (else (format "~a: ~{~s~}" msg irritants)))))
+           (string-append (apply format msg (map kl-var-clean irritants))
+                          location-info))
+          ((null? irritants) (string-append msg location-info))
+          (else (string-append (format "~a: ~{~s~}" msg irritants)
+                               location-info)))))
 
 (define (full-path-for-file filename)
   (if (path-absolute? filename)

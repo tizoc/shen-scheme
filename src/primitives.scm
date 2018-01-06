@@ -7,7 +7,7 @@
 (define (kl:_scm.assert-boolean value)
   (if (boolean? value)
       value
-      (raise-error "expected a boolean, got" value)))
+      (raise-error '_scm.assert-boolean "expected a boolean in if/and/or expression, got" value)))
 
 ;; Symbols
 ;;
@@ -48,7 +48,7 @@
 
 (define (kl:value var)
   (shen-global-get var
-                   (lambda () (raise-error "variable has no value" var))))
+                   (lambda () (raise-error 'value "variable has no value" var))))
 
 (define (value/or var default)
   (shen-global-get var default))
@@ -96,15 +96,15 @@
     (case direction
       ((in) (if (file-exists? full-path)
                 (open-binary-input-file full-path)
-                (raise-error "File does not exist" full-path)))
+                (raise-error 'open "File does not exist" full-path)))
       ((out) (open-binary-output-file full-path))
-      (else (raise-error "Invalid direction" direction)))))
+      (else (raise-error 'open "Invalid direction" direction)))))
 
 (define (kl:close stream)
   (cond
    ((input-port? stream) (close-input-port stream))
    ((output-port? stream) (close-output-port stream))
-   (else (raise-error "invalid stream" stream))))
+   (else (raise-error 'close "invalid stream" stream))))
 
 (define (kl:write-byte byte o)
   (write-byte byte o))
@@ -120,5 +120,5 @@
     ((unix) (time->float (current-time 'time-utc)))
     ((real) (time->float (current-time 'time-monotonic)))
     ((run) (time->float (current-time 'time-process)))
-    (else (raise-error "get-time does not understand the parameter" sym))))
+    (else (raise-error 'get-time "invalid option" sym))))
 

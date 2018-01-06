@@ -5,7 +5,7 @@
                      vector-ref vector-set! make-vector string non-rational-/
                      string-append integer->char char->integer
                      string-ref string-length substring
-                     eq? equal? scm.import import]
+                     eq? equal? scm.import import *repl*]
 
 (define initialize-compiler
   -> (do (set *yields-boolean2* [or and < > >= <= =])
@@ -18,6 +18,9 @@
 (define unbound-symbol?
   Sym Scope -> (not (element? Sym Scope)) where (symbol? Sym)
   _ _ -> false)
+
+\* Used to keep track of the function being compiled for error messages *\
+(set *current-function* *repl*)
 
 (define compile-expression
   [] _ -> [quote []]
@@ -39,9 +42,8 @@
   [freeze Exp] Scope -> [lambda [] (compile-expression Exp Scope)]
   [= A B] Scope -> (emit-equality-check A B Scope)
   [type Exp _] Scope -> (compile-expression Exp Scope)
-  \* TODO: first argument to error can be the function name for better
-     error messages, take advantage of it *\
-  [simple-error Msg] Scope -> [error false (compile-expression Msg Scope)]
+  [simple-error Msg] Scope -> [error [quote (value *current-function*)]
+                                     (compile-expression Msg Scope)]
   [n->string N] Scope -> [string [integer->char (compile-expression N Scope)]]
   [string->n S] Scope -> [char->integer [string-ref (compile-expression S Scope) 0]]
   [pos S N] Scope -> [string [string-ref (compile-expression S Scope)
@@ -257,10 +259,14 @@
   Op Arg -> [Op Arg])
 
 (define kl->scheme
-  [defun Name Args Body] -> [begin
-                             [define [(prefix-op Name) | Args]
-                               (compile-expression Body Args)]
-                             [quote Name]]
+  [defun Name Args Body] ->
+    (let _ (set *current-function* Name)
+         Code [begin
+                [define [(prefix-op Name) | Args]
+                  (compile-expression Body Args)]
+                  [quote Name]]
+         _ (set *current-function* *repl*)
+      Code)
   Exp -> (compile-expression Exp []))
 
 )
