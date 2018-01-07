@@ -7,7 +7,7 @@
            (set *home-directory* (scm.current-directory))))
 
 (define hash
-  Val Bound -> (scm.fxmod (scm.equal-hash Val) (scm.exact Bound)))
+  Val Bound -> (scm.fxmod (scm.equal-hash Val) Bound))
 
 (define not
   Val -> (scm.not Val))
@@ -37,10 +37,10 @@
   N -> (scm.and (scm.fx>=? N 48) (scm.fx<=? N 57)))
 
 (define shen.byte->digit
-  N -> (scm.fx- (scm.exact N) 48))
+  N -> (scm.fx- N 48))
 
 (define dict
-  Size -> (scm.make-eqv-hashtable (scm.exact Size)))
+  Size -> (scm.make-eqv-hashtable Size))
 
 (define dict?
   X -> (scm.hashtable? X))

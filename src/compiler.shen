@@ -1,7 +1,7 @@
 \* Copyright (c) 2012-2017 Bruno Deferrari.  All rights reserved.    *\
 \* BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause *\
 
-(package _scm [begin quote string->symbol null? car cdr pair? else exact
+(package _scm [begin quote string->symbol null? car cdr pair? else
                      vector-ref vector-set! make-vector string non-rational-/
                      string-append integer->char char->integer
                      string-ref string-length substring
