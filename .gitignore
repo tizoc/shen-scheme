@@ -2,6 +2,7 @@
 /kl
 /shen-sources
 /shen-chez.scm
+/shen-scheme.scm
 /shen-scheme
 /shen.boot
 *.o
