@@ -3,8 +3,6 @@ Shen/Scheme, a Scheme port of the Shen language
 
 * [Shen](http://shenlanguage.org)
 * [chez-scheme](https://cisco.github.io/ChezScheme)
-* [chibi-scheme](http://synthcode.com/wiki/chibi-scheme)
-* [gauche](http://practical-scheme.net/gauche/)
 * [shen-scheme](https://github.com/tizoc/shen-scheme)
 
 Shen is a portable functional programming language by [Mark Tarver](http://marktarver.com) that offers
@@ -31,6 +29,12 @@ The following implementations were supported in version 0.15, but are not suppor
 Building
 --------
 
+### Building from the source distribution
+
+Running `make` should do the job. It will download and compile Chez under the `_build` directory, and then the `shen-scheme` binary and `shen.boot` boot files.
+
+    make
+
 ### Building from scratch
 
 This step is only necessary if cloning from this repository, the release tarballs include pregenerated `.scm` files.
@@ -38,24 +42,23 @@ This step is only necessary if cloning from this repository, the release tarball
 To build from source, obtain a [copy of the Shen kernel distribution](https://github.com/Shen-Language/shen-sources/releases) and copy the `.kl` files to the `kl/` directory of shen-scheme. Then with a working Shen implementation do:
 
     (load "scripts/build.shen")
-    (build program "shen-chez.scm")
+    (build program "shen-scheme.scm")
 
-This will produce `.scm` files in the `compiled/` and a `shen-chez.scm` file in the current directory.
+This will produce `.scm` files in the `compiled/` directory and a `shen-scheme.scm` file in the current directory.
 
-### Creating a runnable executable
+After doing this the procedure is the same as building from the source distribution.
 
-The `shen-chez.scm` file can then be compiled into runnable file using Chez Scheme:
-
-    (compile-script "shen-chez.scm" "shen-chez")
-
-The resulting `shen-chez` file can be then copied to a directory in your PATH.
-
-**TODO**: *add instructions for Windows*
-  
 Running
 -------
 
-`shen-chez` will start the Shen REPL. `shen-chez --script <some shen file>` will run a script.
+`shen-scheme` will start the Shen REPL. `shen-scheme --script <some shen file>` will run a script.
+
+Boot file search path
+---------------------
+
+If the environment variable `SHEN_BOOTFILE_PATH` has a value, it will be used as the path to the boot file to load.
+If not, it will be searched on at the location defined by the compile-time variable `DEFAULT_BOOTFILE_PATH`.
+If the value of `DEFAULT_BOOTFILE_PATH` is `NULL`, then a `shen.boot` file placed at the same directory as the `shen-scheme` executable will be loaded.
 
 Native Calls
 ------------
@@ -76,14 +79,14 @@ my-for-each
 10
 0
 
-(2-) (for-each (function print))
+(2-) (my-for-each (function print))
 #<procedure>
 ```
 
 Importing bindings from Scheme modules
 --------------------------------------
 
-[import expressions](https://cisco.github.io/ChezScheme/csug9.4/libraries.html#./libraries:h4) are supported through the `scm.` prefix. Names will be imported under the `scm.` namespace.
+[import expressions](https://cisco.github.io/ChezScheme/csug9.5/libraries.html#./libraries:h4) are supported through the `scm.` prefix. Names will be imported under the `scm.` namespace.
 
 Example:
 

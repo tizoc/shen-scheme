@@ -1,6 +1,16 @@
+0.16
+
+	* Updated for Shen 20.1.
+
+	* Totally rewritten compiler in Shen.
+
+	* Swiched platform to Chez Scheme.
+
+	* Dropped support for Gauche Scheme and Chibi Scheme.
+
 0.15
 
-	* Updated for Shen 20.0
+	* Updated for Shen 20.0.
 
 0.14:
 
