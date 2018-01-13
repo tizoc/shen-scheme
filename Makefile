@@ -60,7 +60,7 @@ $(cskernel): $(csdir)
 
 $(exe): $(cskernel) main$(objext) lib/whereami$(objext)
 ifeq ($(os), windows)
-	cmd.exe /c "$(csdir)$(S)c$(S)vs.bat amd64 && link.exe /out:$(exe) /machine:X64 /incremental:no /release /nologo main$(objext) $(csbinpath)$(S)csv95.lib  /DEFAULTLIB:rpcrt4.lib /DEFAULTLIB:User32.lib /DEFAULTLIB:Advapi32.lib /DEFAULTLIB:Ole32.lib"
+	cmd.exe /c "$(csdir)$(S)c$(S)vs.bat amd64 && link.exe /out:$(exe) /machine:X64 /incremental:no /release /nologo main$(objext) lib/whereami$(objext) $(csbinpath)$(S)csv95.lib  /DEFAULTLIB:rpcrt4.lib /DEFAULTLIB:User32.lib /DEFAULTLIB:Advapi32.lib /DEFAULTLIB:Ole32.lib"
 else
 	$(CC) -o $@ $^ -liconv -lncurses
 endif
