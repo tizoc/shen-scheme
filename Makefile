@@ -34,6 +34,8 @@ scmexe = $(csbinpath)$(S)scheme
 klsources_dir ?= kl
 compiled_dir ?= compiled
 exe ?= shen-scheme$(binext)
+prefix ?= /usr/local
+bootfile_path ?= \"$(prefix)/lib/shen-scheme/shen.boot\"
 
 git_tag ?= $(shell git tag -l --contains HEAD 2> /dev/null)
 ifeq ("$(git_tag)","")
@@ -67,7 +69,7 @@ endif
 ifeq ($(os), windows)
 	cmd.exe /c "$(csdir)$(S)c$(S)vs.bat amd64 && cl.exe /c /nologo /W3 /D_CRT_SECURE_NO_WARNINGS /I$(csbootpath) /I.$(S)lib /MD /Fo$@ $<"
 else
-	$(CC) -c -o $@ $< -I$(csbootpath) -I./lib -Wall -Wextra -pedantic $(CFLAGS)
+	$(CC) -c -o $@ $< -D DEFAULT_BOOTFILE_PATH=$(bootfile_path)  -I$(csbootpath) -I./lib -Wall -Wextra -pedantic $(CFLAGS)
 endif
 
 shen.boot: $(psboot) $(csboot) shen-scheme.scm src/* $(compiled_dir)/*.scm
@@ -83,6 +85,13 @@ test-compiler: $(exe) shen.boot
 
 .PHONY: test
 test: test-shen test-compiler
+
+.PHONY: install
+install: $(exe) shen.boot
+	mkdir -p $(DESTDIR)$(prefix)/bin
+	mkdir -p $(DESTDIR)$(prefix)/lib/shen-scheme
+	install -m 0755 $(exe) $(DESTDIR)$(prefix)/bin
+	install -m 0644 shen.boot $(DESTDIR)$(prefix)/lib/shen-scheme
 
 .PHONY: source-release
 source-release:
