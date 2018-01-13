@@ -39,46 +39,43 @@
 (define shen.byte->digit
   N -> (scm.fx- N 48))
 
-(define dict
+(define shen.dict
   Size -> (scm.make-eqv-hashtable Size))
 
-(define dict?
+(define shen.dict?
   X -> (scm.hashtable? X))
 
-(define dict-count
+(define shen.dict-count
   Dict -> (scm.hashtable-size Dict))
 
-(define dict->
+(define shen.dict->
   Dict K V -> (do (scm.hashtable-set! Dict K V)
                   V))
 
-(define <-dict/or
+(define shen.<-dict/or
   Dict K Or -> (let Res (scm.hashtable-ref Dict K $%value-not-found%$)
                  (if (scm.eq? Res $%value-not-found%$)
                      (thaw Or)
                      Res)))
 
-(define dict-rm
+(define shen.dict-rm
   Dict K -> (do (scm.hashtable-delete! Dict K)
                 K))
 
 \* hashtable-fold defined in prelude.scm *\
-(define dict-fold
+(define shen.dict-fold
   Dict F Init -> (scm.hashtable-fold Dict F Init))
 
-(define dict-keys
+(define shen.dict-keys
   Dict -> (scm.hashtable-keys Dict))
 
-(define dict-values
+(define shen.dict-values
   Dict -> (scm.hashtable-values Dict))
 
-(define exit
-  Code -> (scm.exit Code))
-
-(define value/or
+(define shen.value/or
   Var Or -> (scm.value/or Var Or))
 
-(define <-address/or
+(define shen.<-address/or
   Vector N Or -> (if (>= N (scm.vector-length Vector))
                      (thaw Or)
                      (scm.vector-ref Vector N)))
@@ -88,7 +85,7 @@
 (define read-file-as-bytelist
   Filename -> (scm.read-file-as-bytelist Filename))
 
-(define read-file-as-charlist
+(define shen.read-file-as-charlist
   Filename -> (scm.read-file-as-bytelist Filename))
 
 (define read-file-as-string

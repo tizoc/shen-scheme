@@ -24,6 +24,7 @@
       ["toplevel"
        "core"
        "sys"
+       "dict"
        "sequent"
        "yacc"
        "reader"
@@ -201,6 +202,7 @@
 (include c#34;compiled/toplevel.scmc#34;)
 (include c#34;compiled/core.scmc#34;)
 (include c#34;compiled/sys.scmc#34;)
+(include c#34;compiled/dict.scmc#34;)
 (include c#34;compiled/sequent.scmc#34;)
 (include c#34;compiled/yacc.scmc#34;)
 (include c#34;compiled/reader.scmc#34;)
