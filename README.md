@@ -111,4 +111,4 @@ License
 -------
 
 - Shen, Copyright © 2010-2015 Mark Tarver - [License](http://www.shenlanguage.org/license.pdf).
-- shen-scheme, Copyright © 2012-2017 Bruno Deferrari under [BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause).
+- shen-scheme, Copyright © 2012-2018 Bruno Deferrari under [BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause).
