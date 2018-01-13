@@ -7,3 +7,4 @@
 /shen.boot
 *.o
 /_build
+/_dist
