@@ -35,9 +35,9 @@ klsources_dir ?= kl
 compiled_dir ?= compiled
 exe ?= shen-scheme$(binext)
 
-git_tag ?= $(shell git tag -l --contains HEAD)
+git_tag ?= $(shell git tag -l --contains HEAD 2> /dev/null)
 ifeq ("$(git_tag)","")
-	git_tag = $(shell git rev-parse --short HEAD)
+	git_tag = $(shell git rev-parse --short HEAD 2> /dev/null)
 endif
 archive_name = shen-scheme-$(git_tag)-src
 
