@@ -74,7 +74,7 @@ shen.boot: $(psboot) $(csboot) shen-scheme.scm src/* $(compiled_dir)/*.scm
 	echo '(make-boot-file "shen.boot" (list)  "$(psboot)" "$(csboot)" "shen-scheme.scm")' | "$(scmexe)" -q -b "$(psboot)" -b "$(csboot)"
 
 .PHONY: test-shen
-test-shen: $(exe)shen.boot
+test-shen: $(exe) shen.boot
 	./$(exe) --script scripts/run-shen-tests.shen
 
 .PHONY: test-compiler
