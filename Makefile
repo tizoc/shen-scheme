@@ -77,14 +77,18 @@ shen.boot: $(psboot) $(csboot) shen-scheme.scm src/* $(compiled_dir)/*.scm
 
 .PHONY: test-shen
 test-shen: $(exe) shen.boot
-	./$(exe) --script scripts/run-shen-tests.shen
+	env SHEN_BOOTFILE_PATH="./shen.boot" ./$(exe) --script scripts/run-shen-tests.shen
 
 .PHONY: test-compiler
 test-compiler: $(exe) shen.boot
-	./$(exe) --script scripts/run-compiler-tests.shen
+	env SHEN_BOOTFILE_PATH="./shen.boot" ./$(exe) --script scripts/run-compiler-tests.shen
 
 .PHONY: test
 test: test-shen test-compiler
+
+.PHONY: run
+run: $(exe) shen.boot
+	env SHEN_BOOTFILE_PATH="./shen.boot" ./$(exe)
 
 .PHONY: install
 install: $(exe) shen.boot
