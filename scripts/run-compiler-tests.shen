@@ -8,7 +8,7 @@
   -> [lambda [X] (subst X Y (subst-vars Body RBody))]
 
   [let [[X V]] Body] [let [[Y RV]] RBody]
-  -> [let [[X RV]] (subst X Y (subst-vars Body RBody))]
+  -> [let [[X (subst-vars V RV)]] (subst X Y (subst-vars Body RBody))]
 
   [X | Xs] [Y | Ys]
   -> [(subst-vars X Y) | (subst-vars Xs Ys)]

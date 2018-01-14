@@ -84,11 +84,11 @@
  (_scm.kl->scheme [trap-error [+ 1 2] [lambda E 0]])
  [guard [E [else 0]] [+ 1 2]])
 
-(define handle-error E -> 0)
+(define default D E -> D)
 
 (assert-equal
- (_scm.kl->scheme [trap-error [+ 1 2] [function handle-error]])
- [let [[?handler [(_scm.prefix-op function) [quote handle-error]]]]
+ (_scm.kl->scheme [trap-error [+ 1 2] [default 0]])
+ [let [[?handler [[lambda [X] [lambda [Y] [(_scm.prefix-op default) X Y]]] 0]]]
    [guard [?exn [else [?handler ?exn]]]
     [+ 1 2]]])
 
