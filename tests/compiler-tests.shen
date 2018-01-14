@@ -82,16 +82,15 @@
 
 (assert-equal
  (_scm.kl->scheme [trap-error [+ 1 2] [lambda E 0]])
- (cases
-  (= (implementation) "gambit-scheme")
-  [with-exception-catcher
-   [lambda [E] 0]
-   [lambda [] [+ 1 2]]]
+ [guard [E [else 0]] [+ 1 2]])
 
-  true
-  [let [[?handler [lambda [E] 0]]]
-    [guard [?exn [else [?handler ?exn]]]
-      [+ 1 2]]]))
+(define handle-error E -> 0)
+
+(assert-equal
+ (_scm.kl->scheme [trap-error [+ 1 2] [function handle-error]])
+ [let [[?handler [(_scm.prefix-op function) [quote handle-error]]]]
+   [guard [?exn [else [?handler ?exn]]]
+    [+ 1 2]]])
 
 (assert-equal
  (_scm.kl->scheme [do 1 2])
@@ -163,17 +162,17 @@
 (set _scm.*compiling-shen-sources* true)
 
 (assert-equal
- (_scm.kl->scheme [trap-error [value varname] [lambda (protect E) default]])
+ (_scm.kl->scheme [trap-error [value varname] [lambda E default]])
  (_scm.kl->scheme [scm.value/or varname [freeze default]]))
 
 (assert-equal
- (_scm.kl->scheme [trap-error [<-address (protect Var) [+ 10 10]] [lambda (protect E) default]])
- (_scm.kl->scheme [scm.<-address/or (protect Var) [+ 10 10] [freeze default]]))
+ (_scm.kl->scheme [trap-error [<-address Var [+ 10 10]] [lambda E default]])
+ (_scm.kl->scheme [scm.<-address/or Var [+ 10 10] [freeze default]]))
 
 (assert-equal
- (_scm.kl->scheme [trap-error [<-vector (protect Var) [+ 10 10]] [lambda (protect E) default]])
- (_scm.kl->scheme [scm.<-vector/or (protect Var) [+ 10 10] [freeze default]]))
+ (_scm.kl->scheme [trap-error [<-vector Var [+ 10 10]] [lambda E default]])
+ (_scm.kl->scheme [scm.<-vector/or Var [+ 10 10] [freeze default]]))
 
 (assert-equal
- (_scm.kl->scheme [trap-error [get (protect Var) prop (protect Dict)] [lambda (protect E) default]])
- (_scm.kl->scheme [scm.get/or (protect Var) prop (protect Dict) [freeze default]]))
+ (_scm.kl->scheme [trap-error [get Var prop Dict] [lambda E default]])
+ (_scm.kl->scheme [scm.get/or Var prop Dict [freeze default]]))
