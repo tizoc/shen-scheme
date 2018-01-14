@@ -1,3 +1,9 @@
+Unreleased:
+
+	* Updated for Shen 21.
+
+	* Reduce overhead of `trap-error` in most situations.
+
 0.16
 
 	* Updated for Shen 20.1.
