@@ -107,6 +107,7 @@
   S -> "|{|" where (= { S)
   S -> "|}|" where (= } S)
   S -> "|;|" where (= ; S)
+  S -> "|,|" where (= "," (str S))
   S -> (str S))
 
 (define concat-strings
