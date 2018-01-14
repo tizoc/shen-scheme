@@ -50,9 +50,6 @@
   (shen-global-get var
                    (lambda () (raise-error 'value "variable has no value" var))))
 
-(define (value/or var default)
-  (shen-global-get var default))
-
 ;; Error Handling
 ;;
 
@@ -122,3 +119,27 @@
     ((run) (time->float (current-time 'time-process)))
     (else (raise-error 'get-time "invalid option" sym))))
 
+;; Others
+
+(define (value/or var default)
+  (shen-global-get var default))
+
+(define (get/or var prop dict default)
+  (let* ((entry (hashtable-ref dict var '()))
+         (res (assq prop entry)))
+    (if (not res)
+        (default)
+        (cdr res))))
+
+(define (<-address/or vector n default)
+  (if (>= n (vector-length vector))
+      (default)
+      (vector-ref vector n)))
+
+(define (<-vector/or vector n default)
+  (if (or (zero? n) (>= n (vector-length vector)))
+      (default)
+      (let ((elt (vector-ref vector n)))
+        (if (eq? elt 'shen.fail!)
+            (default)
+            elt))))

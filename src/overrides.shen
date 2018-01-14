@@ -52,11 +52,11 @@
   Dict K V -> (do (scm.hashtable-set! Dict K V)
                   V))
 
-(define shen.<-dict/or
-  Dict K Or -> (let Res (scm.hashtable-ref Dict K $%value-not-found%$)
-                 (if (scm.eq? Res $%value-not-found%$)
-                     (thaw Or)
-                     Res)))
+(define shen.<-dict
+  Dict K -> (let Res (scm.hashtable-ref Dict K $%value-not-found%$)
+              (if (scm.eq? Res $%value-not-found%$)
+                  (error "value ~A not found in dict~%" K)
+                  Res)))
 
 (define shen.dict-rm
   Dict K -> (do (scm.hashtable-delete! Dict K)
@@ -71,14 +71,6 @@
 
 (define shen.dict-values
   Dict -> (scm.hashtable-values Dict))
-
-(define shen.value/or
-  Var Or -> (scm.value/or Var Or))
-
-(define shen.<-address/or
-  Vector N Or -> (if (>= N (scm.vector-length Vector))
-                     (thaw Or)
-                     (scm.vector-ref Vector N)))
 
 \* read-file-as-* defined in prelude.scm *\
 

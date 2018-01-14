@@ -159,3 +159,21 @@
 (assert-equal
  (_scm.kl->scheme [takes-?-args 1 2 3])
  [(_scm.prefix-op takes-?-args) 1 2 3])
+
+(set _scm.*compiling-shen-sources* true)
+
+(assert-equal
+ (_scm.kl->scheme [trap-error [value varname] [lambda (protect E) default]])
+ (_scm.kl->scheme [scm.value/or varname [freeze default]]))
+
+(assert-equal
+ (_scm.kl->scheme [trap-error [<-address (protect Var) [+ 10 10]] [lambda (protect E) default]])
+ (_scm.kl->scheme [scm.<-address/or (protect Var) [+ 10 10] [freeze default]]))
+
+(assert-equal
+ (_scm.kl->scheme [trap-error [<-vector (protect Var) [+ 10 10]] [lambda (protect E) default]])
+ (_scm.kl->scheme [scm.<-vector/or (protect Var) [+ 10 10] [freeze default]]))
+
+(assert-equal
+ (_scm.kl->scheme [trap-error [get (protect Var) prop (protect Dict)] [lambda (protect E) default]])
+ (_scm.kl->scheme [scm.get/or (protect Var) prop (protect Dict) [freeze default]]))

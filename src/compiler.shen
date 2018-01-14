@@ -5,10 +5,12 @@
                      vector-ref vector-set! make-vector string non-rational-/
                      string-append integer->char char->integer
                      string-ref string-length substring
-                     eq? equal? scm.import import *toplevel*]
+                     eq? equal? scm.import import *toplevel*
+                     scm.value/or scm.get/or scm.<-vector/or scm.<-address/or]
 
 (define initialize-compiler
-  -> (do (set *yields-boolean2* [or and < > >= <= =])
+  -> (do (set *compiling-shen-sources* false)
+         (set *yields-boolean2* [or and < > >= <= =])
          (set *yields-boolean1*
                [not
                 string? vector? number? cons? absvector? element? symbol?
@@ -103,12 +105,37 @@
        [[CompiledTest CompiledBody]
         | CompiledRest]))
 
-(define emit-trap-error         \* TODO: optimize Handler *\
-  Exp Handler Scope
+(define emit-trap-error
+  [F | Rest] Handler Scope <- (emit-trap-error-optimize [F | Rest] Handler Scope)
+      where (and (value *compiling-shen-sources*)
+                 (element? F [value <-vector <-address get]))
+
+  Exp Handler Scope         \* TODO: optimize Handler *\
   -> [let [[(intern "?handler") (compile-expression Handler Scope)]]
        [(intern "guard") [(intern "?exn") [else [(intern "?handler")
                                                  (intern "?exn")]]]
         (compile-expression Exp Scope)]])
+
+\*
+NOTE: This transformation assumes that:
+- the operand expressions will not raise their own exception,
+- the operands are of the right type,
+- the Handler doesn't make use of the error
+otherwise the result is not semantically equivalent to the original code.
+
+For this reason it is only enabled when compiling the Shen Kernel sources
+but not otherwise.
+*\
+(define emit-trap-error-optimize
+  [value X] [lambda E Handler] Scope
+  -> (compile-expression [scm.value/or X [freeze Handler]] Scope)
+  [<-vector X N] [lambda E Handler] Scope
+  -> (compile-expression [scm.<-vector/or X N [freeze Handler]] Scope)
+  [<-address X N] [lambda E Handler] Scope
+  -> (compile-expression [scm.<-address/or X N [freeze Handler]] Scope)
+  [get X P D] [lambda E Handler] Scope
+  -> (compile-expression [scm.get/or X P D [freeze Handler]] Scope)
+  _ _ _ -> (fail))
 
 (define emit-equality-check
   V1 V2 Scope -> [eq? (compile-expression V1 Scope)

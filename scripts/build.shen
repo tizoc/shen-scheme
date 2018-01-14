@@ -17,6 +17,7 @@
 (load "src/compiler.shen")
 
 (_scm.initialize-compiler)
+(set _scm.*compiling-shen-sources* true)
 
 (set *maximum-print-sequence-size* 10000)
 
@@ -53,6 +54,18 @@
 (define prefix-fn
   F -> (_scm.prefix-op F))
 
+(define for-each
+  _ [] -> true
+  F [X | Rest] -> (do (F X) (for-each F Rest)))
+
+(define filter
+  F Xs -> (filter-h F [] Xs))
+
+(define filter-h
+  _ Acc [] -> (reverse Acc)
+  F Acc [X | Xs] -> (filter-h F [X | Acc] Xs) where (F X)
+  F Acc [_ | Xs] -> (filter-h F Acc Xs))
+
 \* Function overrides are defined in "overrides.shen".
    To avoid duplicate declarations, such overrides
    are registered and the original definitions are
@@ -66,7 +79,7 @@
                (read-file "src/overrides.shen")))
 
 (define overidden?
-  [defun Name | _] -> (get/or Name overidden (freeze false))
+  [defun Name | _] -> (trap-error (get Name overidden) (/. E false))
   _ -> false)
 
 \* R6RS libraries require an explicit list of exported functions
