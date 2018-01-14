@@ -110,7 +110,11 @@
       where (and (value *compiling-shen-sources*)
                  (element? F [value <-vector <-address get]))
 
-  Exp Handler Scope         \* TODO: optimize Handler *\
+  Exp [lambda E Handler] Scope
+  -> [(intern "guard") [E [else (compile-expression Handler [E | Scope])]]
+       (compile-expression Exp Scope)]
+
+  Exp Handler Scope
   -> [let [[(intern "?handler") (compile-expression Handler Scope)]]
        [(intern "guard") [(intern "?exn") [else [(intern "?handler")
                                                  (intern "?exn")]]]
