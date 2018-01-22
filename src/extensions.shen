@@ -10,6 +10,8 @@
   -> (do (scm.initialize-shen)
          (set *argv* [Script | Args])
          (shen.quiet-load Script))
+  [Exe "--eval" Code | Args]
+  -> (output "~A~%" (eval (head (read-from-string Code))))
   Argv
   -> (do (scm.initialize-shen)
          (set *argv* Argv)
