@@ -5,7 +5,8 @@
                      vector-ref vector-set! make-vector string non-rational-/
                      string-append integer->char char->integer
                      string-ref string-length substring
-                     eq? equal? scm.import import *toplevel*
+                     eq? equal? scm. scm.import import *toplevel*
+                     scm.with-input-from-string scm.read
                      scm.value/or scm.get/or scm.<-vector/or scm.<-address/or]
 
 (define initialize-compiler
@@ -62,6 +63,9 @@
                                             (compile-expression X Scope)]
                                tmp]
   [scm.import | Rest] _ -> [import | Rest]
+  [scm. Code] _ -> (if (string? Code)
+                       (scm.with-input-from-string Code (freeze (scm.read)))
+                       (error "scm. excepts a string, not ~A" Code))
   [Op | Args] Scope -> (emit-application Op Args Scope)
   X _ -> X                      \* literal *\
   )

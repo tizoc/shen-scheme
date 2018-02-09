@@ -176,3 +176,15 @@
 (assert-equal
  (_scm.kl->scheme [trap-error [get Var prop Dict] [lambda E default]])
  (_scm.kl->scheme [scm.get/or Var prop Dict [freeze default]]))
+
+(assert-equal
+  (_scm.kl->scheme [scm. "(+ 1 2)"])
+  [+ 1 2])
+
+(assert-equal
+  (_scm.kl->scheme [scm. "symbol"])
+  symbol)
+
+(assert-equal
+  (_scm.kl->scheme [scm. "(lambda () 1)"])
+  [lambda [] 1])
