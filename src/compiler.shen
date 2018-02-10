@@ -44,6 +44,7 @@
                              (compile-expression E2 Scope)]
   [freeze Exp] Scope -> [lambda [] (compile-expression Exp Scope)]
   [= A B] Scope -> (emit-equality-check A B Scope)
+  [intern S] _ -> [quote (intern S)] where (string? S)
   [type Exp _] Scope -> (compile-expression Exp Scope)
   [simple-error Msg] Scope -> [error [quote (hd (value *compiling-function*))]
                                      (compile-expression Msg Scope)]
