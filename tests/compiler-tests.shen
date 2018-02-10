@@ -61,6 +61,10 @@
  [quote ;])
 
 (assert-equal
+ (_scm.kl->scheme ,)
+ [quote ,])
+
+(assert-equal
  (_scm.kl->scheme some-symbol)
  [quote some-symbol])
 

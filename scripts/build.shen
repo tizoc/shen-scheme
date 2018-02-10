@@ -97,6 +97,7 @@
 (define sexp->string
   true -> "#t"
   false -> "#f"
+  Comma -> "|,|" where (= Comma ,)
   Sym -> (symbol->string Sym) where (symbol? Sym)
   [Sexp | Sexps] -> (@s "(" (concat-strings (map (/. X (sexp->string X))
                                                  [Sexp | Sexps]))
@@ -107,7 +108,6 @@
   S -> "|{|" where (= { S)
   S -> "|}|" where (= } S)
   S -> "|;|" where (= ; S)
-  S -> "|,|" where (= "," (str S))
   S -> (str S))
 
 (define concat-strings

@@ -19,7 +19,7 @@
          (set *kl-prefix* (intern "kl:"))))
 
 (define unbound-symbol?
-  Sym Scope -> (not (element? Sym Scope)) where (symbol? Sym)
+  Sym Scope -> (not (element? Sym Scope)) where (or (symbol? Sym) (= Sym ,))
   _ _ -> false)
 
 \* Used to keep track of the function being compiled for error messages *\
