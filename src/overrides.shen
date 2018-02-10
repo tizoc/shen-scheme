@@ -40,7 +40,7 @@
   N -> (scm.fx- N 48))
 
 (define shen.dict
-  Size -> (scm.make-eqv-hashtable Size))
+  Size -> (scm.make-equal-hashtable Size))
 
 (define shen.dict?
   X -> (scm.hashtable? X))

@@ -121,6 +121,9 @@
 
 ;; Others
 
+(define (make-equal-hashtable size)
+  (make-hashtable equal-hash equal? size))
+
 (define (value/or var default)
   (shen-global-get var default))
 
