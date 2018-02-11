@@ -4,6 +4,18 @@ Unreleased:
 
 	* Reduce overhead of `trap-error` in most situations.
 
+	* Return numbers when calling `intern` with numeric strings.
+
+	* Optimise calls to `(intern "StringConstant")`.
+
+	* Add support for `(scm. "(literal scheme code)")` forms.
+
+	* Add `--eval <expression>` command-line option.
+
+	* Fix dicts not working properly with some key value types.
+
+    * Fix `symbol?` override so that it behaves like the Shen Kernel version.
+
 0.16
 
 	* Updated for Shen 20.1.
