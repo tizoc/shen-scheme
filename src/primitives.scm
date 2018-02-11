@@ -15,7 +15,8 @@
 (define (kl:intern name)
   (cond ((equal? name "true") #t)
         ((equal? name "false") #f)
-        (else (string->symbol name))))
+        (else (or (string->number name)
+                  (string->symbol name)))))
 
 ;; Numbers
 ;;
@@ -146,3 +147,23 @@
         (if (eq? elt 'shen.fail!)
             (default)
             elt))))
+
+(define symbol-character?
+  (let ((specials (string->list "=*/+-_?$!@~><&%{}:;`#'.")))
+    (lambda (c)
+      (or (char-alphabetic? c)
+          (char-numeric? c)
+          (not (eq? #f (memq c specials)))))))
+
+(define (string-all? pred s)
+  (let ((stop (string-length s)))
+    (let loop ((i 0))
+      (cond ((= i stop) #t)
+            ((pred (string-ref s i)) (loop (+ i 1)))
+            (else #f)))))
+
+(define (analyse-symbol? s)
+  (and (> (string-length s) 0)
+       (not (char-numeric? (string-ref s 0)))
+       (symbol-character? (string-ref s 0))
+       (string-all? symbol-character? s)))

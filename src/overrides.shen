@@ -23,8 +23,12 @@
           (scm.symbol? Val)
           (scm.char-upper-case? (scm.string-ref (scm.symbol->string Val) 0))))
 
+(define shen.analyse-symbol?
+  S -> (scm.analyse-symbol? S))
+
 (define symbol?
-  Val -> (and (scm.symbol? Val) (not (scm.eq? Val ,))))
+  Val -> (and (scm.symbol? Val)
+              (shen.analyse-symbol? (str Val))))
 
 (define shen.pvar?
   V -> (scm.and
