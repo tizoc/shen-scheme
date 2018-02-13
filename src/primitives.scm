@@ -15,7 +15,9 @@
 (define (kl:intern name)
   (cond ((equal? name "true") #t)
         ((equal? name "false") #f)
-        (else (or (string->number name)
+        (else (or (and (> (string-length name) 1)
+                      (char-numeric? (string-ref name 0))
+                      (string->number name))
                   (string->symbol name)))))
 
 ;; Numbers
