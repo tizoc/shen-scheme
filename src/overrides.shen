@@ -91,14 +91,16 @@
 
 (package shen [scm.error-location]
 
-(define loop
-  -> (do (initialise_environment)
-         (prompt)
-         (trap-error
-          (read-evaluate-print)
-          (/. E (output "Exception in ~A: ~A" (scm.error-location E) (error-to-string E))))
-         (if (value *continue-repl-loop*)
-             (loop)
-             exit)))
+(define toplevel-display-exception
+  E -> (let Msg (error-to-string E)
+            Loc (scm.error-location E)
+        (if (interactive-error? E Loc Msg)
+            (output "~A" Msg)
+            (output "Exception in ~A: ~A" Loc Msg))))
+
+(define interactive-error?
+  E shen.toplineread_loop "line read aborted" -> true
+  E shen.f_error "aborted" -> true
+  _ _ _ -> false)
 
 )
