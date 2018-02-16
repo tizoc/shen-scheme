@@ -52,3 +52,15 @@ int main(int argc, char *argv[]) {
 
   exit(status);
 }
+
+// These are to avoid the need for linking in ncurses
+
+void *setupterm;
+void *tputs;
+void *cur_term;
+
+// These are to avoid the need for linking in iconv
+
+void *iconv;
+void *iconv_close;
+void *iconv_open;
