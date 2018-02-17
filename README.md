@@ -57,7 +57,9 @@ After doing this the procedure is the same as building from the source distribut
 Running
 -------
 
-`shen-scheme` will start the Shen REPL. `shen-scheme --script <some shen file>` will run a script.
+`shen-scheme` will start the Shen REPL.
+`shen-scheme --script <some shen file>` will run a script.
+`shen-scheme --eval <shen expression>` will evaluate an expression.
 
 Boot file search path
 ---------------------
@@ -92,6 +94,25 @@ my-for-each
 
 (2-) (my-for-each (function print))
 #<procedure>
+```
+
+Literal Scheme Code
+-------------------
+
+Scheme code can be compiled as-is with the `scm.` special form that takes a string with Scheme code as an argument.
+
+Example:
+
+```
+(0-) (scm. "(+ 1 2)")
+3
+
+(1-) (scm. "(begin (display c#34;testc#34;) (newline))")
+test
+#<void>
+
+(2-) (scm. "(list #t #f (quote symbol) 'symbol)")
+[true false symbol symbol]
 ```
 
 Importing bindings from Scheme modules
