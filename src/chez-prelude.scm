@@ -61,7 +61,10 @@
 
 (define (write-byte byte o)
   (put-u8 o byte)
-  (flush-output-port o)
+  (let ((name (port-name o)))
+    (if (or (equal? name "stdout") (equal? name "stderr"))
+        (flush-output-port o)
+        #f))
   byte)
 
 (define (read-byte i)
