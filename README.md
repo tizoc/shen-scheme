@@ -41,6 +41,21 @@ then to install:
 
 This will install the `shen-scheme` binary to `$(prefix)/bin/shen-scheme` and the boot file to `$(prefix)/lib/shen-scheme/shen.boot`.
 
+It is recommented that Windows users download the [binary distribution](https://github.com/tizoc/shen-scheme/releases).
+
+OSX users can use homebrew to install Shen/Scheme:
+
+```
+$ brew install Shen-Language/homebrew-shen/shen-scheme
+==> Installing shen-language/shen/shen-scheme
+==> Downloading https://github.com/tizoc/shen-scheme/releases/download/0.17/shen-scheme-0.17-src.tar.gz
+Already downloaded: /Users/bruno/Library/Caches/Homebrew/shen-scheme-0.17.tar.gz
+==> Downloading https://github.com/cisco/ChezScheme/archive/v9.5.tar.gz
+Already downloaded: /Users/bruno/Library/Caches/Homebrew/shen-scheme--chezscheme-9.5.tar.gz
+==> make install prefix=/usr/local/Cellar/shen-scheme/0.17
+  /usr/local/Cellar/shen-scheme/0.17: 7 files, 2.8MB, built in 1 minute 16 seconds
+```
+
 ### Building from scratch
 
 This step is only necessary if cloning from this repository, the release tarballs include pregenerated `.scm` files.
