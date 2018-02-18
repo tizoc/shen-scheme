@@ -101,6 +101,7 @@
 (define interactive-error?
   E shen.toplineread_loop "line read aborted" -> true
   E shen.f_error "aborted" -> true
+  E shen.typecheck-and-evaluate "type error" -> true
   _ _ _ -> false)
 
 )
