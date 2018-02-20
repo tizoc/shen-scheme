@@ -18,6 +18,14 @@
 (define integer?
   Val -> (scm.integer? Val))
 
+(define pr
+  String Sink -> (trap-error
+                  (let _ (scm.put-bytevector Sink (scm.string->utf8 String))
+                       _ (scm.and (scm.should-flush? Sink)
+                                  (scm.flush-output-port Sink))
+                    String)
+                  (/. E String)))
+
 (define variable?
   Val -> (scm.and
           (scm.symbol? Val)

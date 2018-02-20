@@ -59,12 +59,14 @@
   (+ (time-second t)
      (/ (time-nanosecond t) 1e+9)))
 
+(define (should-flush? p)
+  (let ((name (port-name o)))
+    (or (equal? name "stdout") (equal? name "stderr"))))
+
 (define (write-byte byte o)
   (put-u8 o byte)
-  (let ((name (port-name o)))
-    (if (or (equal? name "stdout") (equal? name "stderr"))
-        (flush-output-port o)
-        #f))
+  (and (should-flush? o)
+       (flush-output-port o))
   byte)
 
 (define (read-byte i)
