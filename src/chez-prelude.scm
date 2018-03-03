@@ -60,7 +60,7 @@
      (/ (time-nanosecond t) 1e+9)))
 
 (define (should-flush? p)
-  (let ((name (port-name o)))
+  (let ((name (port-name p)))
     (or (equal? name "stdout") (equal? name "stderr"))))
 
 (define (write-byte byte o)
