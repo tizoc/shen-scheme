@@ -31,7 +31,7 @@
 
 (define (error-message e)
   (let* ((msg (condition-message e))
-         (irritants (condition-irritants e)))
+         (irritants (if (irritants-condition? e) (condition-irritants e) '())))
     (cond ((format-condition? e)
            (apply format msg (map kl-var-clean irritants)))
           ((null? irritants) msg)
