@@ -258,7 +258,7 @@
 (scheme-start
   (lambda fns
     (initialize-shen)
-    (kl:shen.run-shen fns)
+    (kl:shen-scheme.run-shen fns)
     (exit 0)))")
 
 (define program-definition
