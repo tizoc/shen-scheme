@@ -36,6 +36,7 @@ compiled_dir ?= compiled
 exe ?= shen-scheme$(binext)
 prefix ?= /usr/local
 home_path ?= \"$(prefix)/lib/shen-scheme\"
+bootfile = boot/shen.boot
 
 git_tag ?= $(shell git tag -l --contains HEAD 2> /dev/null)
 ifeq ("$(git_tag)","")
@@ -47,7 +48,7 @@ CFLAGS += -m64
 
 .DEFAULT: all
 .PHONY: all
-all: $(exe) shen.boot
+all: $(exe) $(bootfile)
 
 $(csdir):
 	echo "Downloading and uncompressing Chez..."
@@ -72,30 +73,30 @@ else
 	$(CC) -c -o $@ $< -D DEFAULT_SHEN_SCHEME_HOME_PATH=$(home_path)  -I$(csbootpath) -I./lib -Wall -Wextra -pedantic $(CFLAGS)
 endif
 
-shen.boot: $(psboot) $(csboot) shen-scheme.scm src/* $(compiled_dir)/*.scm
-	echo '(make-boot-file "shen.boot" (list)  "$(psboot)" "$(csboot)" "shen-scheme.scm")' | "$(scmexe)" -q -b "$(psboot)" -b "$(csboot)"
+$(bootfile): $(psboot) $(csboot) shen-scheme.scm src/* $(compiled_dir)/*.scm
+	echo '(make-boot-file "$(bootfile)" (list)  "$(psboot)" "$(csboot)" "shen-scheme.scm")' | "$(scmexe)" -q -b "$(psboot)" -b "$(csboot)"
 
 .PHONY: test-shen
-test-shen: $(exe) shen.boot
-	env SHEN_SCHEME_BOOT="./shen.boot" ./$(exe) --script scripts/run-shen-tests.shen
+test-shen: $(exe) $(bootfile)
+	env SHEN_SCHEME_HOME=. ./$(exe) --script scripts/run-shen-tests.shen
 
 .PHONY: test-compiler
-test-compiler: $(exe) shen.boot
-	env SHEN_SCHEME_BOOT="./shen.boot" ./$(exe) --script scripts/run-compiler-tests.shen
+test-compiler: $(exe) $(bootfile)
+	env SHEN_SCHEME_HOME=. ./$(exe) --script scripts/run-compiler-tests.shen
 
 .PHONY: test
 test: test-shen test-compiler
 
 .PHONY: run
-run: $(exe) shen.boot
-	env SHEN_SCHEME_BOOT="./shen.boot" ./$(exe)
+run: $(exe) $(bootfile)
+	env SHEN_SCHEME_HOME=. ./$(exe)
 
 .PHONY: install
-install: $(exe) shen.boot
+install: $(exe) $(bootfile)
 	mkdir -p $(DESTDIR)$(prefix)/bin
 	mkdir -p $(DESTDIR)$(home_path)
 	install -m 0755 $(exe) $(DESTDIR)$(prefix)/bin
-	install -m 0644 shen.boot $(DESTDIR)$(home_path)/boot
+	install -m 0644 $(bootfile) $(DESTDIR)$(home_path)/boot
 
 .PHONY: source-release
 source-release:
@@ -110,4 +111,4 @@ source-release:
 
 .PHONY: clean
 clean:
-	rm -f $(exe) shen.boot *.o *.obj
+	rm -f $(exe) $(bootfile) *.o *.obj
