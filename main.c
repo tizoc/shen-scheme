@@ -2,51 +2,87 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <whereami.h>
 
 #ifdef _WIN32
 #   include <windows.h>
+#   include <io.h>
 #   define F_OK 0
 #   define PATH_MAX _MAX_PATH
 #   define access _access
 #   define strlcpy strncpy
+#   define PATH_SEPARATOR "\\"
 #else
 #   include <unistd.h>
 #   include <limits.h>
+#   define PATH_SEPARATOR "/"
 #endif
 
-#ifndef DEFAULT_BOOTFILE_PATH
-#   define DEFAULT_BOOTFILE_PATH NULL
+#ifndef DEFAULT_SHEN_SCHEME_HOME_PATH
+#   define DEFAULT_SHEN_SCHEME_HOME_PATH NULL
 #endif
 
-static void custom_init(void) {}
+#ifndef DEFAULT_SHEN_SCHEME_BOOTFILE_PATH
+#   define DEFAULT_SHEN_SCHEME_BOOTFILE_PATH NULL
+#endif
 
-int main(int argc, char *argv[]) {
-  int status;
-  char *bfpath = getenv("SHEN_BOOTFILE_PATH");
-  char buf[PATH_MAX];
+static char shen_scheme_home_path[PATH_MAX];
+static char shen_scheme_bootfile_path[PATH_MAX];
 
-  if (bfpath == NULL) {
-    if (DEFAULT_BOOTFILE_PATH != NULL) {
-      bfpath = DEFAULT_BOOTFILE_PATH;
+static void initialize_paths() {
+  char *sshpath = getenv("SHEN_SCHEME_HOME");
+  char *ssbfpath = getenv("SHEN_SCHEME_BOOT");
+
+  if (sshpath) {
+    strlcpy(shen_scheme_home_path, sshpath, PATH_MAX);
+  } else {
+    if (DEFAULT_SHEN_SCHEME_HOME_PATH != NULL) {
+      strlcpy(shen_scheme_home_path, DEFAULT_SHEN_SCHEME_HOME_PATH, PATH_MAX);
     } else {
-      int dirlen;
-      wai_getExecutablePath(buf, sizeof(buf), &dirlen);
-      dirlen++;
-      strlcpy(buf + dirlen, "shen.boot", sizeof(buf) - dirlen);
-      bfpath = buf;
+#ifdef _WIN32
+      /* On Windows, use the executable directory as home path */
+      HMODULE hModule = GetModuleHandle(NULL);
+      GetModuleFileName(hModule, shen_scheme_home_path, PATH_MAX);
+      for (size_t i = strlen(shen_scheme_home_path); i >=0; --i) {
+        if (shen_scheme_home_path[i] == '\\')
+        {
+          shen_scheme_home_path[i] = '\0';
+          break;
+        }
+      }
+#else
+      fputs("ERROR: no SHEN_SCHEME_HOME path was specified", stderr);
+      exit(1);
+#endif
     }
   }
 
-  if (access(bfpath, F_OK) == -1) {
+  if (ssbfpath) {
+    strlcpy(shen_scheme_bootfile_path, ssbfpath, PATH_MAX);
+  } else {
+    snprintf(shen_scheme_bootfile_path, PATH_MAX, "%s%sboot%sshen.boot",
+             shen_scheme_home_path, PATH_SEPARATOR, PATH_SEPARATOR);
+  }
+}
+
+static const char *get_shen_scheme_home_path() {
+  return shen_scheme_home_path;
+}
+
+int main(int argc, char *argv[]) {
+  int status;
+
+  initialize_paths();
+
+  if (access(shen_scheme_bootfile_path, F_OK) == -1) {
     fprintf(stderr, "ERROR: boot file '%s' doesn't exist or is not readable.\n",
-            bfpath);
+            shen_scheme_bootfile_path);
     exit(1);
   }
 
   Sscheme_init(NULL);
-  Sregister_boot_file(bfpath);
-  Sbuild_heap(NULL, custom_init);
+  Sregister_boot_file(shen_scheme_bootfile_path);
+  Sbuild_heap(NULL, NULL);
+  Sforeign_symbol("get_shen_scheme_home_path", (void*)get_shen_scheme_home_path);
   status = Sscheme_start(argc + 1, (const char**)argv - 1);
   Sscheme_deinit();
 

@@ -35,7 +35,7 @@ klsources_dir ?= kl
 compiled_dir ?= compiled
 exe ?= shen-scheme$(binext)
 prefix ?= /usr/local
-bootfile_path ?= \"$(prefix)/lib/shen-scheme/shen.boot\"
+home_path ?= \"$(prefix)/lib/shen-scheme\"
 
 git_tag ?= $(shell git tag -l --contains HEAD 2> /dev/null)
 ifeq ("$(git_tag)","")
@@ -58,9 +58,9 @@ $(cskernel): $(csdir)
 	echo "Building Chez..."
 	cd $(csdir) && ./configure --threads && make
 
-$(exe): $(cskernel) main$(objext) lib/whereami$(objext)
+$(exe): $(cskernel) main$(objext)
 ifeq ($(os), windows)
-	cmd.exe /c "$(csdir)$(S)c$(S)vs.bat amd64 && link.exe /out:$(exe) /machine:X64 /incremental:no /release /nologo main$(objext) lib/whereami$(objext) $(csbootpath)$(S)csv95mt.lib /DEFAULTLIB:rpcrt4.lib /DEFAULTLIB:User32.lib /DEFAULTLIB:Advapi32.lib /DEFAULTLIB:Ole32.lib"
+	cmd.exe /c "$(csdir)$(S)c$(S)vs.bat amd64 && link.exe /out:$(exe) /machine:X64 /incremental:no /release /nologo main$(objext) $(csbootpath)$(S)csv95mt.lib /DEFAULTLIB:rpcrt4.lib /DEFAULTLIB:User32.lib /DEFAULTLIB:Advapi32.lib /DEFAULTLIB:Ole32.lib"
 else
 	$(CC) -o $@ $^
 endif
@@ -69,7 +69,7 @@ endif
 ifeq ($(os), windows)
 	cmd.exe /c "$(csdir)$(S)c$(S)vs.bat amd64 && cl.exe /c /nologo /W3 /D_CRT_SECURE_NO_WARNINGS /I$(csbootpath) /I.$(S)lib /MT /Fo$@ $<"
 else
-	$(CC) -c -o $@ $< -D DEFAULT_BOOTFILE_PATH=$(bootfile_path)  -I$(csbootpath) -I./lib -Wall -Wextra -pedantic $(CFLAGS)
+	$(CC) -c -o $@ $< -D DEFAULT_SHEN_SCHEME_HOME_PATH=$(home_path)  -I$(csbootpath) -I./lib -Wall -Wextra -pedantic $(CFLAGS)
 endif
 
 shen.boot: $(psboot) $(csboot) shen-scheme.scm src/* $(compiled_dir)/*.scm
@@ -77,25 +77,25 @@ shen.boot: $(psboot) $(csboot) shen-scheme.scm src/* $(compiled_dir)/*.scm
 
 .PHONY: test-shen
 test-shen: $(exe) shen.boot
-	env SHEN_BOOTFILE_PATH="./shen.boot" ./$(exe) --script scripts/run-shen-tests.shen
+	env SHEN_SCHEME_BOOT="./shen.boot" ./$(exe) --script scripts/run-shen-tests.shen
 
 .PHONY: test-compiler
 test-compiler: $(exe) shen.boot
-	env SHEN_BOOTFILE_PATH="./shen.boot" ./$(exe) --script scripts/run-compiler-tests.shen
+	env SHEN_SCHEME_BOOT="./shen.boot" ./$(exe) --script scripts/run-compiler-tests.shen
 
 .PHONY: test
 test: test-shen test-compiler
 
 .PHONY: run
 run: $(exe) shen.boot
-	env SHEN_BOOTFILE_PATH="./shen.boot" ./$(exe)
+	env SHEN_SCHEME_BOOT="./shen.boot" ./$(exe)
 
 .PHONY: install
 install: $(exe) shen.boot
 	mkdir -p $(DESTDIR)$(prefix)/bin
-	mkdir -p $(DESTDIR)$(prefix)/lib/shen-scheme
+	mkdir -p $(DESTDIR)$(home_path)
 	install -m 0755 $(exe) $(DESTDIR)$(prefix)/bin
-	install -m 0644 shen.boot $(DESTDIR)$(prefix)/lib/shen-scheme
+	install -m 0644 shen.boot $(DESTDIR)$(home_path)/boot
 
 .PHONY: source-release
 source-release:
