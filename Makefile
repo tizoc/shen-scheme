@@ -21,7 +21,8 @@ else
 	cskernelname = kernel
 endif
 
-csdir ?= _build$(S)csv9.5
+csversion ?= 9.5
+csdir ?= _build$(S)csv$(csversion)
 cslicense = $(csdir)$(S)LICENSE
 cscopyright = $(csdir)$(S)NOTICE
 csbootpath = $(csdir)$(S)$(m)$(S)boot$(S)$(m)
@@ -53,7 +54,7 @@ all: $(exe) $(bootfile)
 $(csdir):
 	echo "Downloading and uncompressing Chez..."
 	mkdir -p _build
-	cd _build && curl -L 'https://github.com/cisco/ChezScheme/releases/download/v9.5/csv9.5.tar.gz' | tar xz
+	cd _build && curl -L 'https://github.com/cisco/ChezScheme/releases/download/v$(csversion)/csv$(csversion).tar.gz' | tar xz
 
 $(cskernel): $(csdir)
 	echo "Building Chez..."
