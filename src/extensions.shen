@@ -16,3 +16,6 @@
   -> (do (scm.initialize-shen)
          (set *argv* Argv)
          (shen.shen)))
+
+(define shen-scheme.find-library
+  Name -> (scm.string-append (scm.get-shen-scheme-home-path) "/libraries/" Name))
