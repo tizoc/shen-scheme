@@ -97,6 +97,13 @@
 (define read-file-as-string
   Filename -> (scm.read-file-as-string Filename))
 
+\* vectors *\
+
+(define vector
+  N -> (let Vector (scm.make-vector (+ N 1) (fail))
+            ZeroStamp (address-> Vector 0 N)
+          Vector))
+
 \* To print location of errors *\
 
 (package shen [scm.error-location]
