@@ -97,6 +97,11 @@
 (define read-file-as-string
   Filename -> (scm.read-file-as-string Filename))
 
+\* tuples *\
+
+(define @p
+  X Y -> (scm.vector shen.tuple X Y))
+
 \* vectors *\
 
 (define vector
