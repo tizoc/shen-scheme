@@ -109,6 +109,17 @@
             ZeroStamp (address-> Vector 0 N)
           Vector))
 
+\* consider scm. prefixed names sysfuncs *\
+
+(package shen [scm.symbol? _scm.scm-prefixed?]
+
+(define sysfunc?
+  F -> (and (scm.symbol? F)
+            (or (element? F (get (intern "shen") external-symbols))
+                (_scm.scm-prefixed? F))))
+
+)
+
 \* To print location of errors *\
 
 (package shen [scm.error-location]
