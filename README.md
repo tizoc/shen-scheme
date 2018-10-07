@@ -41,7 +41,7 @@ then to install:
 
 This will install the `shen-scheme` binary to `$(prefix)/bin/shen-scheme` and the boot file to `$(prefix)/lib/shen-scheme/shen.boot`.
 
-It is recommented that Windows users download the [binary distribution](https://github.com/tizoc/shen-scheme/releases).
+Windows users can download the [binary distribution](https://github.com/tizoc/shen-scheme/releases).
 
 OSX users can use homebrew to install Shen/Scheme:
 
