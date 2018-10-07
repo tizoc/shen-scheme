@@ -1,3 +1,21 @@
+Unreleased:
+
+	* Updated for Shen 21.1.
+
+	* Don't flush ports after calling `write-byte` unless the port is stdout or stderr.
+
+	* Override `pr` with a better performing implementation.
+
+	* Override `vector` constructor with better performing implementation.
+
+	* Override `@p` tuple constructor with better performing implementation.
+
+	* Make `sysfunc?` return true for `scm.` prefixed symbols.
+
+	* Add `shen-scheme.find-library` function that returns a path where libraries can be added.
+
+	* Remove "whoami" dependency.
+
 0.17:
 
 	* Updated for Shen 21.
@@ -14,7 +32,7 @@
 
 	* Fix dicts not working properly with some key value types.
 
-    * Fix `symbol?` override so that it behaves like the Shen Kernel version.
+	* Fix `symbol?` override so that it behaves like the Shen Kernel version.
 
 0.16
 
