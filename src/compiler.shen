@@ -28,7 +28,7 @@
 (define compile-expression
   [] _ -> [quote []]
   Sym Scope -> (emit-symbol Sym) where (unbound-symbol? Sym Scope)
-  [let Var Value Body] Scope -> (emit-let Var Value Body [Var | Scope])
+  [let Var Value Body] Scope -> (emit-let Var Value Body Scope)
   [cond | Clauses] Scope -> (emit-cond Clauses Scope)
   [if Test Then Else] Scope -> (emit-if Test Then Else Scope)
   [lambda Var Body] Scope -> [lambda [Var]
