@@ -2,5 +2,8 @@ notifications:
   email: false
 language: generic
 script:
+  - make fetch-kernel
+  - make fetch-shencl
+  - make precompile
   - make
   - make test

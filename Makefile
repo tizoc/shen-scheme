@@ -13,14 +13,17 @@ ifeq ($(os), windows)
 	S = \\\\
 	objext = .obj
 	binext = .exe
+	archiveext = .zip
 	cskernelname = mainmd
 else
 	S = /
 	objext = .o
 	binext =
+	archiveext = .tar.gz
 	cskernelname = kernel
 endif
 
+shenversion ?= 21.1
 csversion ?= 9.5.2
 csdir ?= _build$(S)csv$(csversion)
 cslicense = $(csdir)$(S)LICENSE
@@ -76,6 +79,20 @@ endif
 
 $(bootfile): $(psboot) $(csboot) shen-scheme.scm src/* $(compiled_dir)/*.scm
 	echo '(make-boot-file "$(bootfile)" (list)  "$(psboot)" "$(csboot)" "shen-scheme.scm")' | "$(scmexe)" -q -b "$(psboot)" -b "$(csboot)"
+
+.PHONY: fetch-kernel
+fetch-kernel:
+	curl -L 'https://github.com/Shen-Language/shen-sources/releases/download/shen-$(shenversion)/ShenOSKernel-$(shenversion).tar.gz' | tar xz
+	cp ShenOSKernel-$(shenversion)$(S)klambda$(S)*.kl kl
+
+.PHONY: fetch-shencl
+fetch-shencl:
+	mkdir -p shencl
+	curl -L 'https://github.com/Shen-Language/shen-cl/releases/download/v2.3.0/shen-cl-v2.3.0-$(os)-prebuilt$(archiveext)' | tar xz -C shencl
+
+.PHONY: precompile
+precompile:
+	shencl$(S)shen$(binext) --load scripts/do-build.shen > /dev/null
 
 .PHONY: test-shen
 test-shen: $(exe) $(bootfile)
