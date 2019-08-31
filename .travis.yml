@@ -1,10 +1,6 @@
 notifications:
   email: false
 language: generic
-addons:
-  apt:
-    packages:
-      - clang
 script:
   - make
   - make test
