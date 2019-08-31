@@ -14,12 +14,12 @@
 #   include <unistd.h>
 #   include <limits.h>
 #   define PATH_SEPARATOR "/"
+#   ifdef __APPLE__
+#     define strcpy_s(dest, size, src) strlcpy(dest, src, size)
+#   else
+#     define strcpy_s(dest, size, src) snprintf(dest, size, "%s", src)
+#   endif
 #endif
-
-#ifdef __APPLE__
-#   define strcpy_s(dest, max, src) strlcpy(dest, src, max)
-#endif
-
 #ifndef DEFAULT_SHEN_SCHEME_HOME_PATH
 #   define DEFAULT_SHEN_SCHEME_HOME_PATH NULL
 #endif
