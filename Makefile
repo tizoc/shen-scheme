@@ -21,7 +21,7 @@ else
 	cskernelname = kernel
 endif
 
-csversion ?= 9.5
+csversion ?= 9.5.2
 csdir ?= _build$(S)csv$(csversion)
 cslicense = $(csdir)$(S)LICENSE
 cscopyright = $(csdir)$(S)NOTICE
