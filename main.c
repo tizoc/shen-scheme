@@ -9,12 +9,15 @@
 #   define F_OK 0
 #   define PATH_MAX _MAX_PATH
 #   define access _access
-#   define strlcpy strncpy
 #   define PATH_SEPARATOR "\\"
 #else
 #   include <unistd.h>
 #   include <limits.h>
 #   define PATH_SEPARATOR "/"
+#endif
+
+#ifdef __APPLE__
+#   define strcpy_s(dest, max, src) strlcpy(dest, src, max)
 #endif
 
 #ifndef DEFAULT_SHEN_SCHEME_HOME_PATH
@@ -33,10 +36,10 @@ static void initialize_paths() {
   char *ssbfpath = getenv("SHEN_SCHEME_BOOT");
 
   if (sshpath) {
-    strlcpy(shen_scheme_home_path, sshpath, PATH_MAX);
+    strcpy_s(shen_scheme_home_path, PATH_MAX, sshpath);
   } else {
     if (DEFAULT_SHEN_SCHEME_HOME_PATH != NULL) {
-      strlcpy(shen_scheme_home_path, DEFAULT_SHEN_SCHEME_HOME_PATH, PATH_MAX);
+      strcpy_s(shen_scheme_home_path, PATH_MAX, DEFAULT_SHEN_SCHEME_HOME_PATH);
     } else {
 #ifdef _WIN32
       /* On Windows, use the executable directory as home path */
@@ -57,7 +60,7 @@ static void initialize_paths() {
   }
 
   if (ssbfpath) {
-    strlcpy(shen_scheme_bootfile_path, ssbfpath, PATH_MAX);
+    strcpy_s(shen_scheme_bootfile_path, PATH_MAX, ssbfpath);
   } else {
     snprintf(shen_scheme_bootfile_path, PATH_MAX, "%s%sboot%sshen.boot",
              shen_scheme_home_path, PATH_SEPARATOR, PATH_SEPARATOR);
