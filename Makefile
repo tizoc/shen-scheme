@@ -64,7 +64,7 @@ $(exe): $(cskernel) main$(objext)
 ifeq ($(os), windows)
 	cmd.exe /c "$(csdir)$(S)c$(S)vs.bat amd64 && link.exe /out:$(exe) /machine:X64 /incremental:no /release /nologo main$(objext) $(csbootpath)$(S)csv95mt.lib /DEFAULTLIB:rpcrt4.lib /DEFAULTLIB:User32.lib /DEFAULTLIB:Advapi32.lib /DEFAULTLIB:Ole32.lib"
 else
-	$(CC) -o $@ $^
+	$(CC) -o $@ $^ -lm -ldl -lpthread
 endif
 
 %$(objext): %.c
