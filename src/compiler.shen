@@ -43,6 +43,7 @@
   [do E1 E2] Scope -> [begin (compile-expression E1 Scope)
                              (compile-expression E2 Scope)]
   [freeze Exp] Scope -> [lambda [] (compile-expression Exp Scope)]
+  [thaw Exp] Scope -> [(compile-expression Exp Scope)]
   [= A B] Scope -> (emit-equality-check A B Scope)
   [intern S] _ -> [quote (intern S)] where (string? S)
   [type Exp _] Scope -> (compile-expression Exp Scope)
