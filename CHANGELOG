@@ -2,6 +2,8 @@ Unreleased:
 
 	* Updated for Shen 21.1.
 
+	* Updated Chez dependency from 9.5 to 9.5.2.
+
 	* Don't flush ports after calling `write-byte` unless the port is stdout or stderr.
 
 	* Override `pr` with a better performing implementation.
@@ -15,6 +17,12 @@ Unreleased:
 	* Add `shen-scheme.find-library` function that returns a path where libraries can be added.
 
 	* Remove "whoami" dependency.
+
+	* Fix compilation of `let`. Was not working correctly in where the variable name showed up on the right-side.
+
+	* Add support for Scheme's `letrec` through the `scm.letrec` form.
+
+	* Compile `(thaw ...)` expressions to direct function calls.
 
 0.17:
 
