@@ -6,7 +6,7 @@
                      string-append integer->char char->integer
                      string-ref string-length substring
                      eq? equal? scm. scm.import import *toplevel*
-                     scm.with-input-from-string scm.read
+                     letrec scm.letrec scm.with-input-from-string scm.read
                      scm.value/or scm.get/or scm.<-vector/or scm.<-address/or]
 
 (define initialize-compiler
@@ -65,6 +65,7 @@
                                             (compile-expression X Scope)]
                                tmp]
   [scm.import | Rest] _ -> [import | Rest]
+  [scm.letrec | Rest] Scope -> (emit-letrec Rest Scope)
   [scm. Code] _ -> (if (string? Code)
                        (scm.with-input-from-string Code (freeze (scm.read)))
                        (error "scm. excepts a string, not ~A" Code))
@@ -92,6 +93,27 @@
   Var Value Body Scope
   -> [let [[Var (compile-expression Value Scope)]]
        (compile-expression Body [Var | Scope])])
+
+(define valid-letrec-bindings?
+  [] -> true
+  [[Var Value] | Rest] -> (valid-letrec-bindings? Rest) where (variable? Var)
+  _ -> false)
+
+(define emit-letrec
+  [Bindings | Body] Scope
+  -> (let NewVars (map (/. Pair (hd Pair)) Bindings)
+          NewScope (append NewVars Scope)
+          LetBindings (emit-letrec-bindings Bindings NewScope)
+          CompiledBody (map (/. Code (compile-expression Code NewScope)) Body)
+       [letrec LetBindings | CompiledBody])
+    where (and (not (= Body []))
+               (valid-letrec-bindings? Bindings))
+  X _ -> (error "Invalid letrec bindings structure ~A" X))
+
+(define emit-letrec-bindings
+  [] _ -> []
+  [[Var Value] | Rest] Scope -> [[Var (compile-expression Value Scope)] |
+                                 (emit-letrec-bindings Rest Scope)])
 
 (define emit-if
   Test Then Else Scope

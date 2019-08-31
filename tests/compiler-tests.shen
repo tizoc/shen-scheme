@@ -192,3 +192,8 @@
 (assert-equal
   (_scm.kl->scheme [scm. "(lambda () 1)"])
   [lambda [] 1])
+
+
+(assert-equal
+  (_scm.kl->scheme [scm.letrec [[X 1] [Y 2]] [+ X Y]])
+  [letrec [[X 1] [Y 2]] [+ X Y]])
