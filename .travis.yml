@@ -1,7 +1,6 @@
 notifications:
   email: false
 language: generic
-sudo: required
 addons:
   apt:
     packages:
