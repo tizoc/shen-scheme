@@ -61,6 +61,8 @@ static void initialize_paths() {
 
   if (ssbfpath) {
     strcpy_s(shen_scheme_bootfile_path, PATH_MAX, ssbfpath);
+  } else if (DEFAULT_SHEN_SCHEME_BOOTFILE_PATH != NULL) {
+    strcpy_s(shen_scheme_bootfile_path, PATH_MAX, DEFAULT_SHEN_SCHEME_BOOTFILE_PATH);
   } else {
     snprintf(shen_scheme_bootfile_path, PATH_MAX, "%s%sboot%sshen.boot",
              shen_scheme_home_path, PATH_SEPARATOR, PATH_SEPARATOR);
