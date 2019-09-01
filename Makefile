@@ -15,12 +15,18 @@ ifeq ($(os), windows)
 	binext = .exe
 	archiveext = .zip
 	cskernelname = mainmd
+	compress = Create-Archive -DestinationPath
 else
 	S = /
 	objext = .o
 	binext =
 	archiveext = .tar.gz
 	cskernelname = kernel
+	compress = tar cvzf
+endif
+
+ifeq ($(os), linux)
+	linkerflags = -lm -ldl -lpthread -luuid
 endif
 
 shenversion ?= 21.1
@@ -67,7 +73,7 @@ $(exe): $(cskernel) main$(objext)
 ifeq ($(os), windows)
 	cmd.exe /c "$(csdir)$(S)c$(S)vs.bat amd64 && link.exe /out:$(exe) /machine:X64 /incremental:no /release /nologo main$(objext) $(csbootpath)$(S)csv95mt.lib /DEFAULTLIB:rpcrt4.lib /DEFAULTLIB:User32.lib /DEFAULTLIB:Advapi32.lib /DEFAULTLIB:Ole32.lib"
 else
-	$(CC) -o $@ $^ -lm -ldl -lpthread -luuid
+	$(CC) -o $@ $^ $(linkerflags)
 endif
 
 %$(objext): %.c
@@ -126,6 +132,15 @@ source-release:
 	rm "_dist/$(archive_name)/"*/.gitignore
 	cd _dist; tar cvzf "$(archive_name).tar.gz" "$(archive_name)/";	rm -rf "$(archive_name)/"
 	echo "Generated tarball for tag $(git_tag) as _dist/$(archive_name).tar.gz"
+
+.PHONY: binary-release
+binary-release: $(exe) $(bootfile)
+	mkdir -p "_dist/shen-scheme-$(git_tag)-$(os)-bin"
+	cp $(exe) "_dist/shen-scheme-$(git_tag)-$(os)-bin"
+	cp $(bootfile) "_dist/shen-scheme-$(git_tag)-$(os)-bin"
+	cp README.md "_dist/shen-scheme-$(git_tag)-$(os)-bin/README.txt"
+	cp LICENSE "_dist/shen-scheme-$(git_tag)-$(os)-bin/LICENSE.txt"
+	cd _dist; $(compress) "shen-scheme-$(git_tag)-$(os)-bin$(archiveext)" "shen-scheme-$(git_tag)-$(os)-bin"; rm -rf "shen-scheme-$(git_tag)-$(os)-bin"
 
 .PHONY: clean
 clean:
