@@ -86,7 +86,7 @@ If the environment variable `SHEN_BOOTFILE_PATH` has a value, it will be used as
 If not, it will be searched on at the location defined by the compile-time variable `DEFAULT_BOOTFILE_PATH`.
 If the value of `DEFAULT_BOOTFILE_PATH` is `NULL`, then a `shen.boot` file placed at the same directory as the `shen-scheme` executable will be loaded.
 
-On Windows builds `DEFAULT_FILE_PATH` defaults to `NULL`, otherwise it defaults to `$(prefix)/lib/shen-scheme/shen.boot`. It can be customized at build time by setting the `bootfile_path` variable when calling make:
+On Windows builds `DEFAULT_BOOTFILE_PATH` defaults to `NULL`, otherwise it defaults to `$(prefix)/lib/shen-scheme/shen.boot`. It can be customized at build time by setting the `bootfile_path` variable when calling make:
 
     make bootfile_path=NULL # Load from same directory as executable
     make bootfile_path=\"/home/me/shen/boot\" # Load from custom location
