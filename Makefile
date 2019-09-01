@@ -136,10 +136,13 @@ source-release:
 .PHONY: binary-release
 binary-release: $(exe) $(bootfile)
 	mkdir -p "_dist/shen-scheme-$(git_tag)-$(os)-bin"
+	mkdir -p "_dist/shen-scheme-$(git_tag)-$(os)-bin/chez-legal"
 	cp $(exe) "_dist/shen-scheme-$(git_tag)-$(os)-bin"
 	cp $(bootfile) "_dist/shen-scheme-$(git_tag)-$(os)-bin"
 	cp README.md "_dist/shen-scheme-$(git_tag)-$(os)-bin/README.txt"
 	cp LICENSE "_dist/shen-scheme-$(git_tag)-$(os)-bin/LICENSE.txt"
+	cp $(cslicense) "_dist/shen-scheme-$(git_tag)-$(os)-bin/chez-legal/LICENSE.txt"
+	cp $(cscopyright) "_dist/shen-scheme-$(git_tag)-$(os)-bin/chez-legal/NOTICE.txt"
 	cd _dist; $(compress) "shen-scheme-$(git_tag)-$(os)-bin$(archiveext)" "shen-scheme-$(git_tag)-$(os)-bin"; rm -rf "shen-scheme-$(git_tag)-$(os)-bin"
 
 .PHONY: clean
