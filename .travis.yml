@@ -1,6 +1,15 @@
 notifications:
   email: false
 language: generic
+matrix:
+  include:
+    - os: linux
+    - os: windows
+      language: shell
+install:
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+      choco install make;
+    fi;
 script:
   - make fetch-kernel
   - make fetch-shencl

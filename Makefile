@@ -16,6 +16,8 @@ ifeq ($(os), windows)
 	archiveext = .zip
 	cskernelname = mainmd
 	compress = Create-Archive -DestinationPath
+	uncompress = 7z x
+	uncompressToFlag = -o
 else
 	S = /
 	objext = .o
@@ -23,6 +25,8 @@ else
 	archiveext = .tar.gz
 	cskernelname = kernel
 	compress = tar cvzf
+	uncompress = tar xzf
+	uncompressToFlag = -C
 endif
 
 ifeq ($(os), linux)
@@ -63,7 +67,7 @@ all: $(exe) $(bootfile)
 $(csdir):
 	echo "Downloading and uncompressing Chez..."
 	mkdir -p _build
-	cd _build && curl -L 'https://github.com/cisco/ChezScheme/releases/download/v$(csversion)/csv$(csversion).tar.gz' | tar xz
+	cd _build; curl -LO 'https://github.com/cisco/ChezScheme/releases/download/v$(csversion)/csv$(csversion).tar.gz'; tar xzf csv$(csversion).tar.gz
 
 $(cskernel): $(csdir)
 	echo "Building Chez..."
@@ -71,7 +75,7 @@ $(cskernel): $(csdir)
 
 $(exe): $(cskernel) main$(objext)
 ifeq ($(os), windows)
-	cmd.exe /c "$(csdir)$(S)c$(S)vs.bat amd64 && link.exe /out:$(exe) /machine:X64 /incremental:no /release /nologo main$(objext) $(csbootpath)$(S)csv95mt.lib /DEFAULTLIB:rpcrt4.lib /DEFAULTLIB:User32.lib /DEFAULTLIB:Advapi32.lib /DEFAULTLIB:Ole32.lib"
+	cmd.exe /c "$(csdir)$(S)c$(S)vs.bat amd64 && link.exe /out:$(exe) /machine:X64 /incremental:no /release /nologo main$(objext) $(csbootpath)$(S)csv952mt.lib /DEFAULTLIB:rpcrt4.lib /DEFAULTLIB:User32.lib /DEFAULTLIB:Advapi32.lib /DEFAULTLIB:Ole32.lib"
 else
 	$(CC) -o $@ $^ $(linkerflags)
 endif
@@ -88,13 +92,15 @@ $(bootfile): $(psboot) $(csboot) shen-scheme.scm src/* $(compiled_dir)/*.scm
 
 .PHONY: fetch-kernel
 fetch-kernel:
-	curl -L 'https://github.com/Shen-Language/shen-sources/releases/download/shen-$(shenversion)/ShenOSKernel-$(shenversion).tar.gz' | tar xz
-	cp ShenOSKernel-$(shenversion)$(S)klambda$(S)*.kl kl
+	curl -LO 'https://github.com/Shen-Language/shen-sources/releases/download/shen-$(shenversion)/ShenOSKernel-$(shenversion).tar.gz'
+	tar xzf ShenOSKernel-$(shenversion).tar.gz
+	cp ShenOSKernel-$(shenversion)/klambda/*.kl kl
 
 .PHONY: fetch-shencl
 fetch-shencl:
 	mkdir -p shencl
-	curl -L 'https://github.com/Shen-Language/shen-cl/releases/download/v2.3.0/shen-cl-v2.3.0-$(os)-prebuilt$(archiveext)' | tar xz -C shencl
+	curl -LO 'https://github.com/Shen-Language/shen-cl/releases/download/v2.3.0/shen-cl-v2.3.0-$(os)-prebuilt$(archiveext)'
+	$(uncompress) shen-cl-v2.3.0-$(os)-prebuilt$(archiveext) $(uncompressToFlag)shencl
 
 .PHONY: precompile
 precompile:
