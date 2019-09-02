@@ -2,7 +2,7 @@ ifeq ($(OS), Windows_NT)
 	os = windows
 	m ?= ta6nt
 else ifeq ($(shell uname -s), Darwin)
-	os = macos
+	os = osx
 	m ?= ta6osx
 else
 	os = linux
