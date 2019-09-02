@@ -1,4 +1,4 @@
-Unreleased:
+0.18:
 
 	* Updated for Shen 21.1.
 
@@ -23,6 +23,8 @@ Unreleased:
 	* Add support for Scheme's `letrec` through the `scm.letrec` form.
 
 	* Compile `(thaw ...)` expressions to direct function calls.
+
+	* Use path relative to shen-scheme executable as home.
 
 0.17:
 

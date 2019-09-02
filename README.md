@@ -79,17 +79,14 @@ Running
 `shen-scheme --script <some shen file>` will run a script.
 `shen-scheme --eval <shen expression>` will evaluate an expression.
 
-Boot file search path
----------------------
+Home and Boot file search path
+------------------------------
 
-If the environment variable `SHEN_SCHEME_BOOT` has a value, it will be used as the path to the boot file to load.
-If not, it will be searched on at the location defined by the compile-time variable `DEFAULT_SHEN_SCHEME_BOOTFILE_PATH`.
-If the value of `DEFAULT_SHEN_SCHEME_BOOTFILE_PATH` is `NULL`, then a `shen.boot` file placed at the same directory as the `shen-scheme` executable will be loaded.
+Shen/Scheme will use as its *home directory* a path relative to the executable: `../lib/shen-scheme`.
+For example, if the executable is `/usr/local/bin/shen-bin` then the *home directory* will be `/usr/local/lib/shen-scheme`.
+This can be overriden by the `SHEN_SCHEME_HOME` environment variable.
 
-On Windows builds `DEFAULT_SHEN_SCHEME_BOOTFILE_PATH` defaults to `NULL`, otherwise it defaults to `$(prefix)/lib/shen-scheme/shen.boot`. It can be customized at build time by setting the `bootfile_path` variable when calling make:
-
-    make bootfile_path=NULL # Load from same directory as executable
-    make bootfile_path=\"/home/me/shen/boot\" # Load from custom location
+By default, the boot file will be loaded from `<shen-scheme-home>/shen.boot`, but the location can be overriden with the `SHEN_SCHEME_BOOT` environment variable.
 
 Native Calls
 ------------
@@ -150,4 +147,4 @@ License
 -------
 
 - Shen, Copyright © 2010-2015 Mark Tarver - [License](http://www.shenlanguage.org/license.pdf).
-- shen-scheme, Copyright © 2012-2018 Bruno Deferrari under [BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause).
+- shen-scheme, Copyright © 2012-2019 Bruno Deferrari under [BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause).
