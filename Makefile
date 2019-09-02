@@ -36,7 +36,8 @@ endif
 shenversion ?= 21.1
 csversion ?= 9.5.2
 build_dir ?= _build
-csdir ?= $(build_dir)$(S)csv$(csversion)
+chez_build_dir ?= $(build_dir)$(S)chez
+csdir ?= $(chez_build_dir)$(S)csv$(csversion)
 cslicense = $(csdir)$(S)LICENSE
 cscopyright = $(csdir)$(S)NOTICE
 csbootpath = $(csdir)$(S)$(m)$(S)boot$(S)$(m)
@@ -67,8 +68,8 @@ all: $(exe) $(bootfile)
 
 $(csdir):
 	echo "Downloading and uncompressing Chez..."
-	mkdir -p $(build_dir)
-	cd $(build_dir); curl -LO 'https://github.com/cisco/ChezScheme/releases/download/v$(csversion)/csv$(csversion).tar.gz'; tar xzf csv$(csversion).tar.gz
+	mkdir -p $(chez_build_dir)
+	cd $(chez_build_dir); curl -LO 'https://github.com/cisco/ChezScheme/releases/download/v$(csversion)/csv$(csversion).tar.gz'; tar xzf csv$(csversion).tar.gz; rm csv$(csversion).tar.gz
 
 $(cskernel): $(csdir)
 	echo "Building Chez..."
