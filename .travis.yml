@@ -4,6 +4,7 @@ language: generic
 matrix:
   include:
     - os: linux
+    - os: osx
     - os: windows
       language: shell
 install:
