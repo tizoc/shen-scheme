@@ -15,17 +15,11 @@
 #   include <limits.h>
 #   define PATH_SEPARATOR "/"
 #   ifdef __APPLE__
+#     include <mach-o/dyld.h>
 #     define strcpy_s(dest, size, src) strlcpy(dest, src, size)
 #   else
 #     define strcpy_s(dest, size, src) snprintf(dest, size, "%s", src)
 #   endif
-#endif
-#ifndef DEFAULT_SHEN_SCHEME_HOME_PATH
-#   define DEFAULT_SHEN_SCHEME_HOME_PATH NULL
-#endif
-
-#ifndef DEFAULT_SHEN_SCHEME_BOOTFILE_PATH
-#   define DEFAULT_SHEN_SCHEME_BOOTFILE_PATH NULL
 #endif
 
 static char shen_scheme_home_path[PATH_MAX];
@@ -34,38 +28,40 @@ static char shen_scheme_bootfile_path[PATH_MAX];
 static void initialize_paths() {
   char *sshpath = getenv("SHEN_SCHEME_HOME");
   char *ssbfpath = getenv("SHEN_SCHEME_BOOT");
+#ifdef __APPLE__
+  char tmpbuf[PATH_MAX];
+#endif
 
   if (sshpath) {
     strcpy_s(shen_scheme_home_path, PATH_MAX, sshpath);
   } else {
-    if (DEFAULT_SHEN_SCHEME_HOME_PATH != NULL) {
-      strcpy_s(shen_scheme_home_path, PATH_MAX, DEFAULT_SHEN_SCHEME_HOME_PATH);
-    } else {
-#ifdef _WIN32
-      /* On Windows, use the executable directory as home path */
-      HMODULE hModule = GetModuleHandle(NULL);
-      GetModuleFileName(hModule, shen_scheme_home_path, PATH_MAX);
+#if defined(_WIN32)
+    HMODULE hModule = GetModuleHandle(NULL);
+    GetModuleFileName(hModule, shen_scheme_home_path, PATH_MAX);
+#elif defined(__APPLE__)
+    uint32_t bufsize = PATH_MAX;
+    _NSGetExecutablePath(tmpbuf, &bufsize);
+    realpath(tmpbuf, shen_scheme_home_path);
+#else
+    readlink("/proc/self/exe", shen_scheme_home_path, PATH_MAX);
+#endif
+    for (int slashes = 2; slashes > 0; --slashes) {
       for (size_t i = strlen(shen_scheme_home_path); i >=0; --i) {
-        if (shen_scheme_home_path[i] == '\\')
-        {
+        if (shen_scheme_home_path[i] == PATH_SEPARATOR[0]) {
           shen_scheme_home_path[i] = '\0';
           break;
         }
       }
-#else
-      fputs("ERROR: no SHEN_SCHEME_HOME path was specified", stderr);
-      exit(1);
-#endif
     }
+    strncat(shen_scheme_home_path, "/lib/shen-scheme",
+            PATH_MAX - strlen(shen_scheme_home_path) - 1);
   }
 
   if (ssbfpath) {
     strcpy_s(shen_scheme_bootfile_path, PATH_MAX, ssbfpath);
-  } else if (DEFAULT_SHEN_SCHEME_BOOTFILE_PATH != NULL) {
-    strcpy_s(shen_scheme_bootfile_path, PATH_MAX, DEFAULT_SHEN_SCHEME_BOOTFILE_PATH);
   } else {
-    snprintf(shen_scheme_bootfile_path, PATH_MAX, "%s%sboot%sshen.boot",
-             shen_scheme_home_path, PATH_SEPARATOR, PATH_SEPARATOR);
+    snprintf(shen_scheme_bootfile_path, PATH_MAX, "%s%sshen.boot",
+             shen_scheme_home_path,PATH_SEPARATOR);
   }
 }
 

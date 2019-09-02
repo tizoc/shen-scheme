@@ -35,7 +35,8 @@ endif
 
 shenversion ?= 21.1
 csversion ?= 9.5.2
-csdir ?= _build$(S)csv$(csversion)
+build_dir ?= _build
+csdir ?= $(build_dir)$(S)csv$(csversion)
 cslicense = $(csdir)$(S)LICENSE
 cscopyright = $(csdir)$(S)NOTICE
 csbootpath = $(csdir)$(S)$(m)$(S)boot$(S)$(m)
@@ -47,10 +48,10 @@ csbinpath = $(csdir)$(S)$(m)$(S)bin$(S)$(m)
 scmexe = $(csbinpath)$(S)scheme
 klsources_dir ?= kl
 compiled_dir ?= compiled
-exe ?= shen-scheme$(binext)
+exe ?= $(build_dir)/bin/shen-scheme$(binext)
 prefix ?= /usr/local
 home_path ?= \"$(prefix)/lib/shen-scheme\"
-bootfile = boot/shen.boot
+bootfile = $(build_dir)/lib/shen-scheme/shen.boot
 
 git_tag ?= $(shell git tag -l --contains HEAD 2> /dev/null)
 ifeq ("$(git_tag)","")
@@ -66,14 +67,15 @@ all: $(exe) $(bootfile)
 
 $(csdir):
 	echo "Downloading and uncompressing Chez..."
-	mkdir -p _build
-	cd _build; curl -LO 'https://github.com/cisco/ChezScheme/releases/download/v$(csversion)/csv$(csversion).tar.gz'; tar xzf csv$(csversion).tar.gz
+	mkdir -p $(build_dir)
+	cd $(build_dir); curl -LO 'https://github.com/cisco/ChezScheme/releases/download/v$(csversion)/csv$(csversion).tar.gz'; tar xzf csv$(csversion).tar.gz
 
 $(cskernel): $(csdir)
 	echo "Building Chez..."
 	cd $(csdir) && ./configure --threads && make
 
 $(exe): $(cskernel) main$(objext)
+	mkdir -p $(build_dir)/bin
 ifeq ($(os), windows)
 	cmd.exe /c "$(csdir)$(S)c$(S)vs.bat amd64 && link.exe /out:$(exe) /machine:X64 /incremental:no /release /nologo main$(objext) $(csbootpath)$(S)csv952mt.lib /DEFAULTLIB:rpcrt4.lib /DEFAULTLIB:User32.lib /DEFAULTLIB:Advapi32.lib /DEFAULTLIB:Ole32.lib"
 else
@@ -84,10 +86,11 @@ endif
 ifeq ($(os), windows)
 	cmd.exe /c "$(csdir)$(S)c$(S)vs.bat amd64 && cl.exe /c /nologo /W3 /D_CRT_SECURE_NO_WARNINGS /I$(csbootpath) /I.$(S)lib /MT /Fo$@ $<"
 else
-	$(CC) -c -o $@ $< -D DEFAULT_SHEN_SCHEME_HOME_PATH=$(home_path)  -I$(csbootpath) -I./lib -Wall -Wextra -pedantic $(CFLAGS)
+	$(CC) -c -o $@ $< -I$(csbootpath) -I./lib -Wall -Wextra -pedantic $(CFLAGS)
 endif
 
 $(bootfile): $(psboot) $(csboot) shen-scheme.scm src/* $(compiled_dir)/*.scm
+	mkdir -p $(build_dir)/lib/shen-scheme
 	echo '(make-boot-file "$(bootfile)" (list)  "$(psboot)" "$(csboot)" "shen-scheme.scm")' | "$(scmexe)" -q -b "$(psboot)" -b "$(csboot)"
 
 .PHONY: fetch-kernel
@@ -108,25 +111,25 @@ precompile:
 
 .PHONY: test-shen
 test-shen: $(exe) $(bootfile)
-	env SHEN_SCHEME_HOME=. ./$(exe) --script scripts/run-shen-tests.shen
+	./$(exe) --script scripts/run-shen-tests.shen
 
 .PHONY: test-compiler
 test-compiler: $(exe) $(bootfile)
-	env SHEN_SCHEME_HOME=. ./$(exe) --script scripts/run-compiler-tests.shen
+	./$(exe) --script scripts/run-compiler-tests.shen
 
 .PHONY: test
 test: test-shen test-compiler
 
 .PHONY: run
 run: $(exe) $(bootfile)
-	env SHEN_SCHEME_HOME=. ./$(exe)
+	./$(exe)
 
 .PHONY: install
 install: $(exe) $(bootfile)
 	mkdir -p $(DESTDIR)$(prefix)/bin
 	mkdir -p $(DESTDIR)$(home_path)
 	install -m 0755 $(exe) $(DESTDIR)$(prefix)/bin
-	install -m 0644 $(bootfile) $(DESTDIR)$(home_path)/boot
+	install -m 0644 $(bootfile) $(DESTDIR)$(home_path)/
 
 .PHONY: source-release
 source-release:
@@ -142,9 +145,11 @@ source-release:
 .PHONY: binary-release
 binary-release: $(exe) $(bootfile)
 	mkdir -p "_dist/shen-scheme-$(git_tag)-$(os)-bin"
+	mkdir -p "_dist/shen-scheme-$(git_tag)-$(os)-bin/bin"
+	mkdir -p "_dist/shen-scheme-$(git_tag)-$(os)-bin/lib/shen-scheme"
 	mkdir -p "_dist/shen-scheme-$(git_tag)-$(os)-bin/chez-legal"
-	cp $(exe) "_dist/shen-scheme-$(git_tag)-$(os)-bin"
-	cp $(bootfile) "_dist/shen-scheme-$(git_tag)-$(os)-bin"
+	cp $(exe) "_dist/shen-scheme-$(git_tag)-$(os)-bin/bin"
+	cp $(bootfile) "_dist/shen-scheme-$(git_tag)-$(os)-bin/lib/shen-scheme"
 	cp README.md "_dist/shen-scheme-$(git_tag)-$(os)-bin/README.txt"
 	cp LICENSE "_dist/shen-scheme-$(git_tag)-$(os)-bin/LICENSE.txt"
 	cp $(cslicense) "_dist/shen-scheme-$(git_tag)-$(os)-bin/chez-legal/LICENSE.txt"
