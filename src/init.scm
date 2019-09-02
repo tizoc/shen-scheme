@@ -3,7 +3,7 @@
 
 (kl:set (quote *language*) "Scheme")
 (kl:set (quote *implementation*) "chez-scheme")
-(kl:set (quote *port*) "0.17")
+(kl:set (quote *port*) "0.18")
 (kl:set (quote *porters*) "Bruno Deferrari")
 (kl:set (quote *sterror*) (standard-error-port))
 (kl:set (quote *stinput*) (standard-input-port))
