@@ -15,7 +15,7 @@ ifeq ($(os), windows)
 	binext = .exe
 	archiveext = .zip
 	cskernelname = mainmd
-	compress = Create-Archive -DestinationPath
+	compress = 7z a -tzip
 	uncompress = 7z x
 	uncompressToFlag = -o
 else
