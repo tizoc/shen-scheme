@@ -3,17 +3,30 @@ notifications:
 language: generic
 matrix:
   include:
-    - os: linux
-    - os: osx
-    - os: windows
-      language: shell
+  - os: linux
+    env: BUNDLE_EXT=tar.gz
+  - os: osx
+    env: BUNDLE_EXT=tar.gz
+  - os: windows
+    language: shell
+    env: BUNDLE_EXT=zip
 install:
-  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
-      choco install make;
-    fi;
+- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco install make; fi;
 script:
-  - make fetch-kernel
-  - make fetch-shencl
-  - make precompile
-  - make
-  - make test
+- make fetch-kernel
+- make fetch-shencl
+- make precompile
+- make
+- make test
+before_deploy:
+  - make binary-release
+deploy:
+  provider: releases
+  api_key:
+    secure: Qb5dQ4uo0TS/K9PRxWlFT5sURq9wyfvTgw/xO4saoNseONAsEgxQDEtsKEFnGOrXLIWjgcfYowUno2nnXhPlTHBbvmgYBoLoJI4cj0k4/OjQLH8Ow1pX8ue6m/QfDDhrTFZFQBUR7XC0um2aEDHZrZ4KsAStrl2YZz1NBAqkK7mOU5+Ft019hKqtsz9dRK3Z0rjLwfH3nVbf2MTAFO2ftDxk9LLw0H2EcUyuToxt95iITHH3HudALC7WEeHsjimcEHm2nVexbtCeTNQ6P79k/fkm37WrLY6g7IQpc4JWyC9psp9tK0+RknTkCgVZix8wO61b8MhY5X0q/crlquJF+ThgOmtGeia/FbhYrQ12uKAYViGm/Qn+DLaMjmufkURLtTgZs8VfCgu+lkwv3E4kncvQhRg7Rv7o+hNBiq8Q5C2IqF6XSjlulK5mxiHlsrrqL1bJH4TZ8lTDHLn+mC/GkGgbPLnKY6GrE2Aqcj6QUIiog2KS7Z8HEOjlArgXovestQWBx2fNzO/1dAx8U9/NdxBrFAIaQO4iB/OT4FG1pVAP6H2Qp3u7eIBjY5W8GvlML/XfLK4Vn0jorU6jtbIYpBfZf4jCTkzDqOXUfut7nJOMCJuHrMlEvfEgbYYARG2wD7euQ4I722RdRX6H3zfi8Hn0YJl63UYpeRK50AZQ0kw=
+  file: shen-scheme-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-bin.${BUNDLE_EXT}
+  skip_cleanup: true
+  draft: true
+  on:
+    tags: true
+    repo: tizoc/shen-scheme
