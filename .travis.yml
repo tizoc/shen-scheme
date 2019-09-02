@@ -22,11 +22,16 @@ script:
 - make test
 before_deploy:
 - make binary-release
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+    make source-release;
+  fi;
 deploy:
   provider: releases
   api_key:
     secure: T+eZoq+Xf/QLYu9EahXOpa+0JHMarEEHRPPbZh7QK/6fUB6eiUvXvvPh6Bs6WtYA4ugOjPbcH9vWuOTu5WzFsppGm7/a3dBaJNw8bHlIJHM52wNuF/Gl1dj3cp+PNr/jgCh4cKNvpxuxNXT/bxkixE0zpkMBcY1fllSG2Offp7RU/TQ94Rxt1/azefhgkE2SyhY8CSLjf9DXhKEEVl04ZNL4HsgDUn4TiiRvSC1eTaN9FQPXwNczYE6G8GBAHxe56gUNZ/KPyfCGbeY46D4eD5Vc1ocUeg/ey2sOWEVOmEHHhjlAYK/QOiCZAayEn+6dfHKNK7SQOh1ejZFnsB+g3+8joDUTfqBNDAv2mXHwp5hNr1fTHjYa1ZUK/lKe2RzIFmontMPKt07BrH+G1YKipMttKxEzY4fQBc5WGRQCug4QRajYfzT6AaJcAy4vyB48XPCwWtqkb+qjR+meP4vSvoJenLeWUS3Fh6cgD9/oixPi+lhnX2qddaKUnwjRXGGKh3PP4J6d9vMZw40A+FSuAeulU8V30QNEIMslv8Y6emIhkkw1udhCSo/Ab7Q+R1C/Riw3heL3DAZyoM/ty0EXofcbsgIoQdNH7UpPq2at8OJXtFtrhqXMM0i+zJZTiq/Ot8W68+Cd3/RwQkjgwctmIp3Cquv9b80+zbMReHQIlsI=
-  file: _dist/shen-scheme-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-bin.${BUNDLE_EXT}
+  file:
+  - _dist/shen-scheme-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-bin.${BUNDLE_EXT}
+  - _dist/shen-scheme-${TRAVIS_TAG}-src.tar.gz
   skip_cleanup: true
   draft: true
   on:
