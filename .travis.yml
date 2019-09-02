@@ -16,7 +16,7 @@ install:
   fi;
 script:
 - make fetch-kernel
-- make fetch-shencl
+- make fetch-prebuilt
 - make precompile
 - make
 - make test

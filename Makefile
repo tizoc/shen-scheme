@@ -9,11 +9,6 @@ else
 	m ?= ta6le
 endif
 
-shenclos = $(os)
-ifeq ($(os), osx)
-	shenclos = macos
-endif
-
 ifeq ($(os), windows)
 	S = \\\\
 	objext = .obj
@@ -104,15 +99,15 @@ fetch-kernel:
 	tar xzf ShenOSKernel-$(shenversion).tar.gz
 	cp ShenOSKernel-$(shenversion)/klambda/*.kl kl
 
-.PHONY: fetch-shencl
-fetch-shencl:
-	mkdir -p shencl
-	curl -LO 'https://github.com/Shen-Language/shen-cl/releases/download/v2.3.0/shen-cl-v2.3.0-$(shenclos)-prebuilt$(archiveext)'
-	$(uncompress) shen-cl-v2.3.0-$(shenclos)-prebuilt$(archiveext) $(uncompressToFlag)shencl
+.PHONY: fetch-prebuilt
+fetch-prebuilt:
+	mkdir -p $(build_dir)
+	curl -LO 'https://github.com/tizoc/shen-scheme/releases/download/0.18/shen-scheme-0.18-$(os)-bin$(archiveext)'
+	$(uncompress) shen-scheme-0.18-$(os)-bin$(archiveext) $(uncompressToFlag)$(build_dir)
 
 .PHONY: precompile
 precompile:
-	shencl$(S)shen$(binext) --load scripts/do-build.shen > /dev/null
+	$(build_dir)$(S)shen-scheme-0.18-$(os)-bin$(S)bin$(S)shen-scheme$(binext) --script scripts/do-build.shen > /dev/null
 
 .PHONY: test-shen
 test-shen: $(exe) $(bootfile)
