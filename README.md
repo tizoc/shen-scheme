@@ -29,6 +29,24 @@ The following implementations were supported in version 0.15, but are not suppor
 * [chibi-scheme](http://synthcode.com/wiki/chibi-scheme)
 * [gauche](http://practical-scheme.net/gauche/)
 
+Binaries
+--------
+
+Starting with version 0.18, binaries are provided for Windows, Linux and OSX. See [releases](https://github.com/tizoc/shen-scheme/releases).
+
+OSX users can also use homebrew to install Shen/Scheme:
+
+```
+$ brew install Shen-Language/homebrew-shen/shen-scheme
+==> Installing shen-language/shen/shen-scheme
+==> Downloading https://github.com/tizoc/shen-scheme/releases/download/0.17/shen-scheme-0.17-src.tar.gz
+Already downloaded: /Users/bruno/Library/Caches/Homebrew/shen-scheme-0.17.tar.gz
+==> Downloading https://github.com/cisco/ChezScheme/archive/v9.5.tar.gz
+Already downloaded: /Users/bruno/Library/Caches/Homebrew/shen-scheme--chezscheme-9.5.tar.gz
+==> make install prefix=/usr/local/Cellar/shen-scheme/0.17
+  /usr/local/Cellar/shen-scheme/0.17: 7 files, 2.8MB, built in 1 minute 16 seconds
+```
+
 Building
 --------
 
@@ -44,20 +62,7 @@ then to install:
 
 This will install the `shen-scheme` binary to `$(prefix)/bin/shen-scheme` and the boot file to `$(prefix)/lib/shen-scheme/shen.boot`.
 
-Windows users can download the [binary distribution](https://github.com/tizoc/shen-scheme/releases).
-
-OSX users can use homebrew to install Shen/Scheme:
-
-```
-$ brew install Shen-Language/homebrew-shen/shen-scheme
-==> Installing shen-language/shen/shen-scheme
-==> Downloading https://github.com/tizoc/shen-scheme/releases/download/0.17/shen-scheme-0.17-src.tar.gz
-Already downloaded: /Users/bruno/Library/Caches/Homebrew/shen-scheme-0.17.tar.gz
-==> Downloading https://github.com/cisco/ChezScheme/archive/v9.5.tar.gz
-Already downloaded: /Users/bruno/Library/Caches/Homebrew/shen-scheme--chezscheme-9.5.tar.gz
-==> make install prefix=/usr/local/Cellar/shen-scheme/0.17
-  /usr/local/Cellar/shen-scheme/0.17: 7 files, 2.8MB, built in 1 minute 16 seconds
-```
+To build on Windows, an environment with curl, 7zip, make and Visual Studio 2017 is needed (all installable with [chocolatey](https://chocolatey.org/)).
 
 ### Building from scratch
 
