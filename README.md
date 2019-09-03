@@ -4,7 +4,7 @@
 Shen/Scheme, a Scheme port of the Shen language
 ====================================================
 
-* [Shen](http://shenlanguage.org)
+* [Shen](https://shen-language.github.io/)
 * [chez-scheme](https://cisco.github.io/ChezScheme)
 * [shen-scheme](https://github.com/tizoc/shen-scheme)
 
