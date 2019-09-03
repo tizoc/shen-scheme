@@ -10,10 +10,8 @@ matrix:
   - os: windows
     language: shell
     env: BUNDLE_EXT=zip
-install:
-- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
-    choco install make;
-  fi;
+    install:
+    - choco install make
 cache:
   directories:
   - _build/chez
