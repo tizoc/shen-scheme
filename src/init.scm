@@ -4,6 +4,7 @@
 (kl:set (quote *language*) "Scheme")
 (kl:set (quote *implementation*) "chez-scheme")
 (kl:set (quote *port*) "0.18")
+(kl:set (quote *release*) (call-with-values scheme-version-number (lambda (major minor patch) (format "~s.~s.~s" major minor patch))))
 (kl:set (quote *porters*) "Bruno Deferrari")
 (kl:set (quote *sterror*) (standard-error-port))
 (kl:set (quote *stinput*) (standard-input-port))
