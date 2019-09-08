@@ -10,5 +10,4 @@
 (kl:set (quote *stoutput*) (standard-output-port))
 (kl:set (quote *home-directory*) (current-directory))
 (kl:set (quote shen.*initial-home-directory*) (current-directory))
-(kl:set (quote *argv*) (command-line))
 (kl:_scm.initialize-compiler)

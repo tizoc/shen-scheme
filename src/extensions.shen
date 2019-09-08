@@ -7,14 +7,12 @@
 
 (define shen-scheme.run-shen
   [Exe "--script" Script | Args]
-  -> (do (scm.initialize-shen)
-         (set *argv* [Script | Args])
+  -> (do (set *argv* [Script | Args])
          (shen-scheme.quiet-load Script))
   [Exe "--eval" Code | Args]
   -> (output "~A~%" (eval (head (read-from-string Code))))
   Argv
-  -> (do (scm.initialize-shen)
-         (set *argv* Argv)
+  -> (do (set *argv* Argv)
          (shen.shen)))
 
 (define shen-scheme.find-library
