@@ -7,6 +7,7 @@
                      string-ref string-length substring
                      eq? equal? scm. scm.import import *toplevel*
                      letrec scm.letrec scm.with-input-from-string scm.read
+                     scm.define scm.goto-label scm.begin
                      scm.value/or scm.get/or scm.<-vector/or scm.<-address/or]
 
 (define initialize-compiler
@@ -66,6 +67,9 @@
                                tmp]
   [scm.import | Rest] _ -> [import | Rest]
   [scm.letrec | Rest] Scope -> (emit-letrec Rest Scope)
+  [scm.define [Name | Vars] Body] Scope -> [define [Name | Vars] (compile-expression Body (append Vars Scope))]
+  [scm.begin | Exprs] Scope -> [begin | (map (/. Exp (compile-expression Exp Scope)) Exprs)]
+  [scm.goto-label F | Args] _ -> [F | Args]
   [scm. Code] _ -> (if (string? Code)
                        (scm.with-input-from-string Code (freeze (scm.read)))
                        (error "scm. excepts a string, not ~A" Code))
@@ -317,13 +321,21 @@ but not otherwise.
   Op Arg -> (append Op [Arg]) where (cons? Op)
   Op Arg -> [Op Arg])
 
+(define compiling-function
+  Name F -> (let _ (set *compiling-function* [Name | (value *compiling-function*)])
+                 Result (thaw F)
+                 _ (set *compiling-function* (tl (value *compiling-function*)))
+              Result))
+
 (define kl->scheme
-  [defun Name Args Body] ->
-    (let _ (set *compiling-function* [Name | (value *compiling-function*)])
-         Code [define [(prefix-op Name) | Args]
-                (compile-expression Body Args)]
-         _ (set *compiling-function* (tl (value *compiling-function*)))
-      Code)
+  [defun Name Args [cond | Cases]]-> (kl->scheme
+                                       (compiling-function Name
+                                        (freeze
+                                        (factorize-defun
+                                          [defun Name Args [cond | Cases]]))))
+  [defun Name Args Body] -> (compiling-function Name
+                              (freeze [define [(prefix-op Name) | Args]
+                                        (compile-expression Body Args)]))
   Exp -> (compile-expression Exp []))
 
 )
