@@ -85,8 +85,17 @@
 ;; Eval
 ;;
 
+(define (function-name expr)
+  (let* ((qualified-name (symbol->string (caadr expr)))
+         (name (substring qualified-name 3 (string-length qualified-name))))
+    (string->symbol name)))
+
 (define (kl:eval-kl expr)
-  (eval (kl:_scm.kl->scheme expr)))
+  (let* ((scm-expr (kl:_scm.kl->scheme expr))
+         (result (eval scm-expr)))
+    (if (and (pair? scm-expr) (eq? (car scm-expr) 'define))
+        (function-name scm-expr)
+        result)))
 
 ;; Streams and I/O
 ;;

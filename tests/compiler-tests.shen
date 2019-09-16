@@ -122,9 +122,7 @@
 
 (assert-equal
  (_scm.kl->scheme [defun some-name [A B C] [cons symbol [+ A B]]])
- [begin
-  [define [(_scm.prefix-op some-name) A B C] [cons [quote symbol] [+ A B]]]
-  [quote some-name]])
+ [define [(_scm.prefix-op some-name) A B C] [cons [quote symbol] [+ A B]]])
 
 (assert-equal
  (_scm.compile-expression [F 1 2 3] [F])

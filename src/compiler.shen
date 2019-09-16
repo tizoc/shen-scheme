@@ -320,10 +320,8 @@ but not otherwise.
 (define kl->scheme
   [defun Name Args Body] ->
     (let _ (set *compiling-function* [Name | (value *compiling-function*)])
-         Code [begin
-                [define [(prefix-op Name) | Args]
-                  (compile-expression Body Args)]
-                [quote Name]]
+         Code [define [(prefix-op Name) | Args]
+                (compile-expression Body Args)]
          _ (set *compiling-function* (tl (value *compiling-function*)))
       Code)
   Exp -> (compile-expression Exp []))

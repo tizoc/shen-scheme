@@ -129,19 +129,8 @@
   Code -> (set *init-code*
                 (append (value *init-code*) Code)))
 
-\* Function definitions expressions in Kl have a result
-   value that is a symbol equal to the name of the function.
-   To behave like this, shen-scheme wraps definitions in
-   a `begin` expression containing the `define` followed
-   by the symbol value. R6RS library declarations don't
-   accept this as valid, so the `begins` have to be
-   removed when generating the Scheme files. *\
-
-(define cleanup-defun
-  [begin Exp _] -> Exp)
-
 (define compile-defun
-  Defun -> (cleanup-defun (_scm.kl->scheme Defun)))
+  Defun -> (_scm.kl->scheme Defun))
 
 (define compile-kl-file
   Prelude From To
