@@ -14,6 +14,7 @@
 
 *\
 
+(load "src/factorize-patterns.shen")
 (load "src/compiler.shen")
 
 (_scm.initialize-compiler)
@@ -43,6 +44,7 @@
       ["overrides"
        "extensions"
        "compiler"
+       "factorize-patterns"
        ])
 
 \* Required to avoid errors when processing functions with system names *\
@@ -175,6 +177,7 @@
 (define build
   As Filename
   -> (do (compile-shen-file "src/compiler.shen" "kl/compiler.kl")
+         (compile-shen-file "src/factorize-patterns.shen" "kl/factorize-patterns.kl")
          (compile-shen-file "src/overrides.shen" "kl/overrides.kl")
          (compile-shen-file "src/extensions.shen" "kl/extensions.kl")
          (for-each (/. F (compile-kl-file
@@ -202,6 +205,7 @@
 (include c#34;compiled/extensions.scmc#34;)
 
 (include c#34;compiled/compiler.scmc#34;)
+(include c#34;compiled/factorize-patterns.scmc#34;)
 (include c#34;compiled/toplevel.scmc#34;)
 (include c#34;compiled/core.scmc#34;)
 (include c#34;compiled/sys.scmc#34;)

@@ -1,3 +1,7 @@
+Unreleased:
+
+	* Implemented pattern matching optimization. Speedup goes from modest in simple patterns to huge in patterns that deconstruct larger structures.
+
 0.18:
 
 	* Updated for Shen 21.1.
