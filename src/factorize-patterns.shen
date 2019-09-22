@@ -9,6 +9,14 @@
        [defun F Params [scm.begin | (append Continuations [Body])]])
   X -> X)
 
+\*
+For Chez to be able to optimize calls to continuations
+it is important that no references are made to out-of-scope
+variables inside the continuation body.
+For that reason each continuation gets represented as
+a function that takes as arguments every variable
+that appears on it's body.
+*\
 (define free-variables-h
   [let Var Value Body] Scope Acc -> (free-variables-h Body (remove Var Scope)
                                       (free-variables-h Value Scope Acc))
@@ -23,6 +31,18 @@
 (define free-variables
   Body Scope -> (reverse (free-variables-h Body Scope [])))
 
+\*
+The first pass of the optimization takes care of re-branching
+the `cond` construct at the root of the `defun` so that
+there are no duplicated tests. It also moves repeated
+code blocks into named "labels".
+The `hoist-labels` function takes care of collecting the bodies
+of all those labels so that they can be moved to the root
+of the `defun`. As par of the process, every free variable
+is added as an argument in the declaration of the
+function that substitutes the label, and jumps to that
+label are updated to include the necessary arguments.
+*\
 (define hoist-labels
   [let-label Label LabelBody Body] Scope Acc
   -> (let Vars (free-variables LabelBody Scope)
@@ -54,6 +74,14 @@
               [let-label Label Body
                 (F [scm.goto-label Label])]))
 
+\*
+A top level `cond` construct gets translated into an equivalent tree
+of if-else branches with duplicated tests merged into one.
+All the repeated code blocks on the "else" branches algo get
+merged into a single copy and identified with an unique label.
+Places where such code would show up will instead just contain
+a pointer to that label.
+*\
 (define rebranch-h
   Test Scope TrueBranch FalseBranch Else
   -> (let NewElse (rebranch FalseBranch Scope Else)
@@ -95,6 +123,11 @@
   [pos 0 Exp] -> (concat/ (exp-var Exp) hdstr)
   Var -> Var)
 
+\*
+Selectors (hd, tl, hdv, etc) that show up more than once inside
+the code get bound in the outerscope, and instances of the
+selectors get replaced by a reference to this new variable.
+*\
 (define optimize-selectors
   Test Code -> (bind-repeating-selectors (test->selectors Test) Code))
 
