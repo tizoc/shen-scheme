@@ -80,13 +80,23 @@ updates all the label invocations accordingly.
 (define free-variables
   Body Scope -> (reverse (free-variables-h Body Scope [])))
 
+\\ NOTE: a label is only hoisted if it is invoked more than
+\\ once, otherwise its body is inlined at the single place
+\\ where it is invoked.
 (define hoist-labels
   [let-label Label LabelBody Body] Scope Acc
-  -> (let Vars (free-variables LabelBody Scope)
+  -> (let NewLabelBody+NewAcc (hoist-labels LabelBody Scope Acc)
+          Vars (free-variables LabelBody Scope)
           NewBody (subst [scm.goto-label Label | Vars] [scm.goto-label Label] Body)
-          NewLabelBody+NewAcc (hoist-labels LabelBody Scope Acc)
           Continuation [scm.define [Label | Vars] (fst NewLabelBody+NewAcc)]
           NewAcc [Continuation | (snd NewLabelBody+NewAcc)]
+       (hoist-labels NewBody Scope NewAcc))
+      where (> (occurrences [scm.goto-label Label] Body) 1)
+
+  [let-label Label LabelBody Body] Scope Acc
+  -> (let NewLabelBody+NewAcc (hoist-labels LabelBody Scope Acc)
+          NewAcc (snd NewLabelBody+NewAcc)
+          NewBody (subst (fst NewLabelBody+NewAcc) [scm.goto-label Label] Body)
        (hoist-labels NewBody Scope NewAcc))
 
   [if Test Then Else] Scope Acc
