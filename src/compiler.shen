@@ -327,12 +327,15 @@ but not otherwise.
                  _ (set *compiling-function* (tl (value *compiling-function*)))
               Result))
 
+(set *factorize-patterns* true)
+
 (define kl->scheme
   [defun Name Args [cond | Cases]] -> (kl->scheme
                                        (compiling-function Name
                                         (freeze
                                          (factorize-defun
                                            [defun Name Args [cond | Cases]]))))
+      where (value *factorize-patterns*)
   [defun Name Args Body] -> (compiling-function Name
                               (freeze [define [(prefix-op Name) | Args]
                                         (compile-expression Body Args)]))
