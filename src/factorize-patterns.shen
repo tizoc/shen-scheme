@@ -1,13 +1,11 @@
 (package _scm [scm.goto-label scm.begin scm.define $label hdstr *toplevel*]
 
-(set *continuations* [])
-
 (define factorize-defun
   [defun F Params [cond | Cases]]
   -> (let PreBody (rebranch Cases Params [shen.f-error F])
-          Body (hoist-labels PreBody Params)
-          Continuations (reverse (value *continuations*))
-          _ (set *continuations* [])
+          Body+Continuations (hoist-labels PreBody Params [])
+          Body (fst Body+Continuations)
+          Continuations (reverse (snd Body+Continuations))
        [defun F Params [scm.begin | (append Continuations [Body])]])
   X -> X)
 
@@ -26,16 +24,23 @@
   Body Scope -> (reverse (free-variables-h Body Scope [])))
 
 (define hoist-labels
-  [let-label Label LabelBody Body] Scope
+  [let-label Label LabelBody Body] Scope Acc
   -> (let Vars (free-variables LabelBody Scope)
-          NewLabelBody (hoist-labels LabelBody Scope)
           NewBody (subst [scm.goto-label Label | Vars] [scm.goto-label Label] Body)
-          Continuation [scm.define [Label | Vars] NewLabelBody]
-          _ (set *continuations* [Continuation | (value *continuations*)])
-       (hoist-labels NewBody Scope))
-  [if Test Then Else] Scope  -> [if Test (hoist-labels Then Scope) Else]
-  [let Var Val Body] Scope -> [let Var Val (hoist-labels Body [Var | Scope])]
-  Body _ -> Body)
+          NewLabelBody+NewAcc (hoist-labels LabelBody Scope Acc)
+          Continuation [scm.define [Label | Vars] (fst NewLabelBody+NewAcc)]
+          NewAcc [Continuation | (snd NewLabelBody+NewAcc)]
+       (hoist-labels NewBody Scope NewAcc))
+
+  [if Test Then Else] Scope Acc
+  -> (let NewThen+NewAcc (hoist-labels Then Scope Acc)
+       (@p [if Test (fst NewThen+NewAcc) Else] (snd NewThen+NewAcc)))
+
+  [let Var Val Body] Scope Acc
+  -> (let NewBody+NewAcc (hoist-labels Body [Var | Scope] Acc)
+       (@p [let Var Val (fst NewBody+NewAcc)] (snd NewBody+NewAcc)))
+
+  Body _ Acc -> (@p Body Acc))
 
 (define generate-label
   -> (let FName (hd (value *compiling-function*))
