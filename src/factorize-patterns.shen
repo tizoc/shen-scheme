@@ -1,4 +1,61 @@
+\* Copyright (c) 2012-2019 Bruno Deferrari.  All rights reserved.    *\
+\* BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause *\
+
 (package _scm [scm.goto-label scm.begin scm.define $label hdstr *toplevel*]
+
+\*
+
+# Pattern factorization optimization
+
+## The problem
+
+The way Shen compiles pattern matching code to Klambda can result
+in too many repeated tests and selectors, which is suboptimal.
+Since there isn't a reliable way for Shen to solve this portably,
+the task is deferred to the port.
+
+The first step is to process the `cond` construct at the root
+of the function definition, and rebuilt it into an if-else
+tree, with all the duplicated tests merged into a single instance.
+But this results in code duplication, because this restructuring
+of the code forces the bodies of the false branches to be
+duplicated.
+
+The solution to this is to remove the duplication by binding
+a continuation using this code, and to generate a jump to this
+continuation in the false branches. This requires that the underlying
+platform supports this efficiently through direct jumps, like for
+example with GOTO.
+
+The other part of the optimization involves finding duplicate
+instances of selectors, binding the result of the selector
+to a variable on the outer scope, and replacing all instances
+of such selector with a reference to this variable.
+
+## Chez specifics
+
+Chez doesn't provide an efficient GOTO-like construct, but
+for functions defined inside of the function being processed,
+if no references are made to variables in the outer scope, Chez
+is able to compile calls to these functions into very efficient
+jumps.
+
+To be able to do this, after all the continuation bodies
+have been associated with a label, a second pass is done,
+on which the bodies of the labels are lifted into functions
+at the root of the function being optimized, and also scanned
+for references to free variables which are then added as
+parameters to the lifted function. All invocations to the
+label are also updated to include the necessary arguments.
+
+The entry point is `factorize-defun`, the inputs is a `defun` declaration.
+Rebuilding of the `cond` construct is handled by the `rebranch` function.
+Selector optimization by the `optimize-selectors` function.
+Label hoisting is the second pass, handled by `hoist-labels`. It converts
+labels into functions that get hoisted to the root of the `defun` and
+updates all the label invocations accordingly.
+
+*\
 
 (define factorize-defun
   [defun F Params [cond | Cases]]
@@ -9,14 +66,6 @@
        [defun F Params [scm.begin | (append Continuations [Body])]])
   X -> X)
 
-\*
-For Chez to be able to optimize calls to continuations
-it is important that no references are made to out-of-scope
-variables inside the continuation body.
-For that reason each continuation gets represented as
-a function that takes as arguments every variable
-that appears on it's body.
-*\
 (define free-variables-h
   [let Var Value Body] Scope Acc -> (free-variables-h Body (remove Var Scope)
                                       (free-variables-h Value Scope Acc))
@@ -31,18 +80,6 @@ that appears on it's body.
 (define free-variables
   Body Scope -> (reverse (free-variables-h Body Scope [])))
 
-\*
-The first pass of the optimization takes care of re-branching
-the `cond` construct at the root of the `defun` so that
-there are no duplicated tests. It also moves repeated
-code blocks into named "labels".
-The `hoist-labels` function takes care of collecting the bodies
-of all those labels so that they can be moved to the root
-of the `defun`. As par of the process, every free variable
-is added as an argument in the declaration of the
-function that substitutes the label, and jumps to that
-label are updated to include the necessary arguments.
-*\
 (define hoist-labels
   [let-label Label LabelBody Body] Scope Acc
   -> (let Vars (free-variables LabelBody Scope)
@@ -74,14 +111,6 @@ label are updated to include the necessary arguments.
               [let-label Label Body
                 (F [scm.goto-label Label])]))
 
-\*
-A top level `cond` construct gets translated into an equivalent tree
-of if-else branches with duplicated tests merged into one.
-All the repeated code blocks on the "else" branches algo get
-merged into a single copy and identified with an unique label.
-Places where such code would show up will instead just contain
-a pointer to that label.
-*\
 (define rebranch-h
   Test Scope TrueBranch FalseBranch Else
   -> (let NewElse (rebranch FalseBranch Scope Else)
@@ -123,11 +152,6 @@ a pointer to that label.
   [pos 0 Exp] -> (concat/ (exp-var Exp) hdstr)
   Var -> Var)
 
-\*
-Selectors (hd, tl, hdv, etc) that show up more than once inside
-the code get bound in the outerscope, and instances of the
-selectors get replaced by a reference to this new variable.
-*\
 (define optimize-selectors
   Test Code -> (bind-repeating-selectors (test->selectors Test) Code))
 
