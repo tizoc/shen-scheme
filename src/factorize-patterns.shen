@@ -121,14 +121,21 @@ updates all the label invocations accordingly.
               [let-label Label Body
                 (F [scm.goto-label Label])]))
 
+\\ When an immediate child if-branch has the same
+\\ Else as the parent, merge into a single if with (and T1 T2)
+(define merge-same-else-ifs
+  [if Test1 [if Test2 Then2 Else] Else] -> [if [and Test1 Test2] Then2 Else]
+  X -> X)
+
 (define rebranch-h
   Test Scope TrueBranch FalseBranch Else
   -> (let NewElse (rebranch FalseBranch Scope Else)
-       (with-labelled-else NewElse
-         (/. GotoElse
-          [if Test
-              (optimize-selectors Test (rebranch TrueBranch Scope GotoElse))
-              GotoElse]))))
+       (merge-same-else-ifs
+        (with-labelled-else NewElse
+          (/. GotoElse
+           [if Test
+               (optimize-selectors Test (rebranch TrueBranch Scope GotoElse))
+               GotoElse])))))
 
 (define rebranch
   [] _ Else -> Else
