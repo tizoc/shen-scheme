@@ -1,18 +1,23 @@
-(package _scm [scm.goto-label scm.begin scm.define $label hdstr]
+(package _scm [scm.goto-label scm.begin scm.define $label hdstr *toplevel*]
+
+(set *continuations* [])
 
 (define factorize-defun
   [defun F Params [cond | Cases]]
-  -> (let Body (rebranch Cases Params [shen.f-error F])
-          Continuations (bind-continuations (reverse (value *continuations*)))
+  -> (let PreBody (rebranch Cases Params [shen.f-error F])
+          Body (hoist-labels PreBody Params)
+          Continuations (reverse (value *continuations*))
           _ (set *continuations* [])
        [defun F Params [scm.begin | (append Continuations [Body])]])
   X -> X)
 
 (define free-variables-h
-  [let Var Value Body] Scope Acc -> (free-variables-h Body (remove Var Scope) (free-variables-h Value Scope Acc))
+  [let Var Value Body] Scope Acc -> (free-variables-h Body (remove Var Scope)
+                                      (free-variables-h Value Scope Acc))
   [lambda Var Body] Scope Acc -> (free-variables-h Body (remove Var Scope) Acc)
   [scm.goto-label Label | Args] Scope Acc -> (free-variables-h Args Scope Acc)
-  [X | Xs] Scope Acc -> (free-variables-h Xs Scope (free-variables-h X Scope Acc))
+  [X | Xs] Scope Acc -> (free-variables-h Xs Scope
+                          (free-variables-h X Scope Acc))
   Var Scope Acc -> (adjoin Var Acc)
       where (element? Var Scope)
   _ _ Acc -> Acc)
@@ -20,34 +25,38 @@
 (define free-variables
   Body Scope -> (reverse (free-variables-h Body Scope [])))
 
-(set *continuations* [])
+(define hoist-labels
+  [let-label Label LabelBody Body] Scope
+  -> (let Vars (free-variables LabelBody Scope)
+          NewLabelBody (hoist-labels LabelBody Scope)
+          NewBody (subst [scm.goto-label Label | Vars] [scm.goto-label Label] Body)
+          Continuation [scm.define [Label | Vars] NewLabelBody]
+          _ (set *continuations* [Continuation | (value *continuations*)])
+       (hoist-labels NewBody Scope))
+  [if Test Then Else] Scope  -> [if Test (hoist-labels Then Scope) Else]
+  [let Var Val Body] Scope -> [let Var Val (hoist-labels Body [Var | Scope])]
+  Body _ -> Body)
 
 (define generate-label
-  -> (gensym (concat (hd (value *compiling-function*)) $label)))
+  -> (let FName (hd (value *compiling-function*))
+       (if (= *toplevel* FName)
+           (gensym $label)
+           (gensym (concat FName $label)))))
 
-(define push-continuation
-  Vars Cont -> (let Label (generate-label)
-                    _ (set *continuations* [[Label Vars Cont] | (value *continuations*)])
-                 Label))
-
-(define bind-continuations
-  [] -> []
-  [[Label Vars Body] | Rest] -> [[scm.define [Label | Vars] Body]
-                                 | (bind-continuations Rest)])
-
-(define make-label
-  Vars [scm.goto-label Continuation | Vars] -> [scm.goto-label Continuation | Vars]
-  Vars Body -> (let Label (push-continuation Vars Body)
-                 [scm.goto-label Label | Vars]))
+(define with-labelled-else
+  [scm.goto-label Label] F -> (F [scm.goto-label Label])
+  Body F -> (let Label (generate-label)
+              [let-label Label Body
+                (F [scm.goto-label Label])]))
 
 (define rebranch-h
   Test Scope TrueBranch FalseBranch Else
   -> (let NewElse (rebranch FalseBranch Scope Else)
-          FreeVars (free-variables NewElse Scope)
-          GotoElse (make-label FreeVars NewElse)
-       [if Test
-           (optimize-selectors Test (rebranch TrueBranch Scope GotoElse))
-           GotoElse]))
+       (with-labelled-else NewElse
+         (/. GotoElse
+          [if Test
+              (optimize-selectors Test (rebranch TrueBranch Scope GotoElse))
+              GotoElse]))))
 
 (define rebranch
   [] _ Else -> Else

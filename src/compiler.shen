@@ -328,11 +328,11 @@ but not otherwise.
               Result))
 
 (define kl->scheme
-  [defun Name Args [cond | Cases]]-> (kl->scheme
+  [defun Name Args [cond | Cases]] -> (kl->scheme
                                        (compiling-function Name
                                         (freeze
-                                        (factorize-defun
-                                          [defun Name Args [cond | Cases]]))))
+                                         (factorize-defun
+                                           [defun Name Args [cond | Cases]]))))
   [defun Name Args Body] -> (compiling-function Name
                               (freeze [define [(prefix-op Name) | Args]
                                         (compile-expression Body Args)]))
