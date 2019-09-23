@@ -116,6 +116,7 @@ updates all the label invocations accordingly.
            (gensym (concat FName $label)))))
 
 (define with-labelled-else
+  Atom F -> (F Atom) where (not (cons? Atom))
   [scm.goto-label Label] F -> (F [scm.goto-label Label])
   Body F -> (let Label (generate-label)
               [let-label Label Body
