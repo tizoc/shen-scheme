@@ -27,9 +27,9 @@
 \* Used to keep track of the function being compiled for error messages *\
 (set *compiling-function* [*toplevel*])
 
-(define merge-begins
-  [begin Exp1 [begin | Exps]] -> [begin Exp1 | Exps]
-  X -> X)
+(define merge-nested-repeats
+  Op [Op Exp1 [Op | Exps]] -> [Op Exp1 | Exps]
+  _ X -> X)
 
 (define compile-expression
   [] _ -> [quote []]
@@ -39,14 +39,16 @@
   [if Test Then Else] Scope -> (emit-if Test Then Else Scope)
   [lambda Var Body] Scope -> [lambda [Var]
                                (compile-expression Body [Var | Scope])]
-  [and E1 E2] Scope -> [and
-                        (compile-expression (force-boolean E1) Scope)
-                        (compile-expression (force-boolean E2) Scope)]
-  [or E1 E2] Scope -> [or
-                       (compile-expression (force-boolean E1) Scope)
-                       (compile-expression (force-boolean E2) Scope)]
+  [and E1 E2] Scope -> (merge-nested-repeats and
+                         [and
+                          (compile-expression (force-boolean E1) Scope)
+                          (compile-expression (force-boolean E2) Scope)])
+  [or E1 E2] Scope -> (merge-nested-repeats or
+                        [or
+                         (compile-expression (force-boolean E1) Scope)
+                         (compile-expression (force-boolean E2) Scope)])
   [trap-error Exp Handler] Scope -> (emit-trap-error Exp Handler Scope)
-  [do E1 E2] Scope -> (merge-begins
+  [do E1 E2] Scope -> (merge-nested-repeats begin
                         [begin (compile-expression E1 Scope)
                                (compile-expression E2 Scope)])
   [freeze Exp] Scope -> [lambda [] (compile-expression Exp Scope)]
