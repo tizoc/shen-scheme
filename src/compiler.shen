@@ -344,12 +344,17 @@ but not otherwise.
 
 (set *factorize-patterns* true)
 
+(define remove-root-begin
+  [define F [begin | Body]] -> [define F | Body]
+  X -> X)
+
 (define kl->scheme
-  [defun Name Args [cond | Cases]] -> (kl->scheme
-                                       (compiling-function Name
-                                        (freeze
-                                         (factorize-defun
-                                           [defun Name Args [cond | Cases]]))))
+  [defun Name Args [cond | Cases]] -> (remove-root-begin
+                                       (kl->scheme
+                                        (compiling-function Name
+                                         (freeze
+                                          (factorize-defun
+                                            [defun Name Args [cond | Cases]])))))
       where (value *factorize-patterns*)
   [defun Name Args Body] -> (compiling-function Name
                               (freeze [define [(prefix-op Name) | Args]
