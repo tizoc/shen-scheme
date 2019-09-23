@@ -1,3 +1,13 @@
+Unreleased:
+
+	* Added flag to allow disabling of pattern factorization.
+
+	* Improve pattern factorization by only hoisting labels that get jumped to from more than one place.
+
+	* Improve pattern factorization by generating fewer `ifs` in cases where the conditions can be merged into a single `if` + `and`.
+
+	* Compile chains of `cons` calls that result in a properly formed list into a single `list` call.
+
 0.19:
 
 	* Updated for Shen 21.2.
