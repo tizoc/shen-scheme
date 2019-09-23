@@ -1,7 +1,7 @@
 \* Copyright (c) 2012-2019 Bruno Deferrari.  All rights reserved.    *\
 \* BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause *\
 
-(package _scm [scm.goto-label scm.begin scm.define $label hdstr *toplevel*]
+(package _scm [scm.goto-label scm.begin scm.define $label *toplevel*]
 
 \*
 
@@ -166,7 +166,7 @@ updates all the label invocations accordingly.
 (define exp-var
   [SelF Exp] -> (concat/ (exp-var Exp) SelF)
       where (element? SelF [hd tl hdv tlv fst snd tlstr])
-  [pos 0 Exp] -> (concat/ (exp-var Exp) hdstr)
+  [hdstr Exp] -> (concat/ (exp-var Exp) hdstr)
   Var -> Var)
 
 (define optimize-selectors
@@ -175,7 +175,7 @@ updates all the label invocations accordingly.
 (define test->selectors
   [cons? X] -> [[hd X] [tl X]]
   [tuple? X] -> [[fst X] [snd X]]
-  [string? X] -> [[pos 0 X] [tlstr X]]
+  [string? X] -> [[hdstr X] [tlstr X]]
   [vector? X] -> [[hdv X] [tlv X]]
   _ -> [])
 
