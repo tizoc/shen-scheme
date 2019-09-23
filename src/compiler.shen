@@ -16,7 +16,8 @@
          (set *yields-boolean1*
                [not
                 string? vector? number? cons? absvector? element? symbol?
-                tuple? variable? boolean? empty? shen.pvar?])
+                tuple? variable? boolean? empty? shen.pvar?
+                shen.+string? shen.+vector?])
          (set *kl-prefix* (intern "kl:"))))
 
 (define unbound-symbol?
