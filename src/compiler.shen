@@ -6,7 +6,7 @@
                      string-append integer->char char->integer
                      string-ref string-length substring list
                      eq? equal? scm. scm.import import *toplevel*
-                     letrec scm.letrec scm.with-input-from-string scm.read
+                     letrec let* scm.letrec scm.with-input-from-string scm.read
                      scm.define scm.goto-label scm.begin
                      scm.value/or scm.get/or scm.<-vector/or scm.<-address/or]
 
@@ -31,10 +31,16 @@
   Op [Op Exp1 [Op | Exps]] -> [Op Exp1 | Exps]
   _ X -> X)
 
+(define merge-nested-lets
+  [let [Binding] [let* Bindings Body]] -> [let* [Binding | Bindings] Body]
+  [let [Binding1] [let [Binding2] Body]] -> [let* [Binding1 Binding2] Body]
+  X -> X)
+
 (define compile-expression
   [] _ -> [quote []]
   Sym Scope -> (emit-symbol Sym) where (unbound-symbol? Sym Scope)
-  [let Var Value Body] Scope -> (emit-let Var Value Body Scope)
+  [let Var Value Body] Scope -> (merge-nested-lets
+                                 (emit-let Var Value Body Scope))
   [cond | Clauses] Scope -> (emit-cond Clauses Scope)
   [if Test Then Else] Scope -> (emit-if Test Then Else Scope)
   [lambda Var Body] Scope -> [lambda [Var]
