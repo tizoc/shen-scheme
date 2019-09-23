@@ -27,6 +27,10 @@
 \* Used to keep track of the function being compiled for error messages *\
 (set *compiling-function* [*toplevel*])
 
+(define merge-begins
+  [begin Exp1 [begin | Exps]] -> [begin Exp1 | Exps]
+  X -> X)
+
 (define compile-expression
   [] _ -> [quote []]
   Sym Scope -> (emit-symbol Sym) where (unbound-symbol? Sym Scope)
@@ -42,8 +46,9 @@
                        (compile-expression (force-boolean E1) Scope)
                        (compile-expression (force-boolean E2) Scope)]
   [trap-error Exp Handler] Scope -> (emit-trap-error Exp Handler Scope)
-  [do E1 E2] Scope -> [begin (compile-expression E1 Scope)
-                             (compile-expression E2 Scope)]
+  [do E1 E2] Scope -> (merge-begins
+                        [begin (compile-expression E1 Scope)
+                               (compile-expression E2 Scope)])
   [freeze Exp] Scope -> [lambda [] (compile-expression Exp Scope)]
   [thaw Exp] Scope -> [(compile-expression Exp Scope)]
   [= A B] Scope -> (emit-equality-check A B Scope)
@@ -274,7 +279,6 @@ but not otherwise.
   Obj _ -> Obj)
 
 (define listify-conses
-
   [cons Exp [quote []]] -> [list Exp]
   [cons Exp [list | List]] -> [list Exp | List]
   Exp -> Exp)
