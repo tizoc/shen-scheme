@@ -1,4 +1,4 @@
-Unreleased:
+0.20:
 
 	* Added flag to allow disabling of pattern factorization.
 
