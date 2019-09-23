@@ -4,7 +4,7 @@
 (package _scm [begin quote string->symbol null? car cdr pair? else
                      vector-ref vector-set! make-vector string non-rational-/
                      string-append integer->char char->integer
-                     string-ref string-length substring
+                     string-ref string-length substring list
                      eq? equal? scm. scm.import import *toplevel*
                      letrec scm.letrec scm.with-input-from-string scm.read
                      scm.define scm.goto-label scm.begin
@@ -271,13 +271,20 @@ but not otherwise.
   Obj F -> (F Obj) where (not (= Obj (fail)))
   Obj _ -> Obj)
 
+(define listify-conses
+
+  [cons Exp [quote []]] -> [list Exp]
+  [cons Exp [list | List]] -> [list Exp | List]
+  Exp -> Exp)
+
 (define emit-static-application
   Op 2 Params Scope <- (not-fail
                         (binary-op-mapping Op)
                         (/. MappedOp
                             (let Args (map (/. P (compile-expression P Scope))
                                            Params)
-                              [MappedOp | Args])))
+                              (listify-conses
+                               [MappedOp | Args]))))
   Op 1 Params Scope <- (not-fail
                         (unary-op-mapping Op)
                         (/. MappedOp
