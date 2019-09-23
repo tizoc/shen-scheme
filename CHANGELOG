@@ -8,6 +8,8 @@ Unreleased:
 
 	* Compile chains of `cons` calls that result in a properly formed list into a single `list` call.
 
+	* Multiple aesthetic changes to the Scheme code the compiler generates.
+
 0.19:
 
 	* Updated for Shen 21.2.
