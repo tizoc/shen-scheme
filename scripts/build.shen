@@ -101,6 +101,7 @@
   false -> "#f"
   Comma -> "|,|" where (= Comma ,)
   Sym -> (symbol->string Sym) where (symbol? Sym)
+  [quote Exp] -> (@s "'" (sexp->string Exp))
   [Sexp | Sexps] -> (@s "(" (concat-strings (map (/. X (sexp->string X))
                                                  [Sexp | Sexps]))
                         ")")
