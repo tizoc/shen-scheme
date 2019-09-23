@@ -131,12 +131,12 @@ updates all the label invocations accordingly.
 (define rebranch-h
   Test Scope TrueBranch FalseBranch Else
   -> (let NewElse (rebranch FalseBranch Scope Else)
-       (merge-same-else-ifs
-        (with-labelled-else NewElse
-          (/. GotoElse
-           [if Test
-               (optimize-selectors Test (rebranch TrueBranch Scope GotoElse))
-               GotoElse])))))
+       (with-labelled-else NewElse
+        (/. GotoElse
+         (merge-same-else-ifs
+          [if Test
+              (optimize-selectors Test (rebranch TrueBranch Scope GotoElse))
+              GotoElse])))))
 
 (define rebranch
   [] _ Else -> Else
