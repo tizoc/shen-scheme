@@ -40,11 +40,12 @@
        "t-star"
        "init"
        "extension-features"
+       "extension-launcher"
        ])
 
 (set *shen-scheme-files*
       ["overrides"
-       "extensions"
+       "shen-scheme-extensions"
        "compiler"
        "factorize-patterns"
        ])
@@ -185,7 +186,7 @@
   -> (do (compile-shen-file "src/compiler.shen" "kl/compiler.kl")
          (compile-shen-file "src/factorize-patterns.shen" "kl/factorize-patterns.kl")
          (compile-shen-file "src/overrides.shen" "kl/overrides.kl")
-         (compile-shen-file "src/extensions.shen" "kl/extensions.kl")
+         (compile-shen-file "src/shen-scheme-extensions.shen" "kl/shen-scheme-extensions.kl")
          (for-each (/. F (compile-kl-file
                           (shen-scheme-license)
                           (@s "kl/" F ".kl")
@@ -208,7 +209,7 @@
 (include c#34;src/primitives.scmc#34;)
 
 (include c#34;compiled/overrides.scmc#34;)
-(include c#34;compiled/extensions.scmc#34;)
+(include c#34;compiled/shen-scheme-extensions.scmc#34;)
 
 (include c#34;compiled/compiler.scmc#34;)
 (include c#34;compiled/factorize-patterns.scmc#34;)
@@ -229,6 +230,7 @@
 (include c#34;compiled/t-star.scmc#34;)
 (include c#34;compiled/init.scmc#34;)
 (include c#34;compiled/extension-features.scmc#34;)
+(include c#34;compiled/extension-launcher.scmc#34;)
 
 (define initialize-shen
   (let ((initialized #f))
