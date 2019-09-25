@@ -98,7 +98,7 @@ $(bootfile): $(psboot) $(csboot) shen-scheme.scm src/* $(compiled_dir)/*.scm
 fetch-kernel:
 	curl -LO 'https://github.com/Shen-Language/shen-sources/releases/download/shen-$(shenversion)/ShenOSKernel-$(shenversion).tar.gz'
 	tar xzf ShenOSKernel-$(shenversion).tar.gz
-	cp ShenOSKernel-$(shenversion)/klambda/*.kl kl
+	cp ShenOSKernel-$(shenversion)/klambda/*.kl $(klsources_dir)/
 
 .PHONY: fetch-prebuilt
 fetch-prebuilt:

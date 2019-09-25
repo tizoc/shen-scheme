@@ -38,6 +38,8 @@
        "declarations"
        "types"
        "t-star"
+       "init"
+       "extension-features"
        ])
 
 (set *shen-scheme-files*
@@ -126,7 +128,10 @@
    kernel that is not a function definition has to be
    kept until the end *\
 
-(set *init-code* [])
+(set *init-code* [
+  [shen.initialise]
+  [shen.x.features.initialise [cons (intern "shen/scheme") []]]
+])
 
 (define store-init-code
   Code -> (set *init-code*
@@ -167,7 +172,7 @@
                (close Out)))
 
 (define compile-init-code
-  -> (let Out (open "compiled/shen-init.scm" out)
+  -> (let Out (open "compiled/shen-scheme-init.scm" out)
           Cmds (value *init-code*)
           Scm (map (function _scm.kl->scheme) Cmds)
           ScmS (map (function sexp->string) Scm)
@@ -222,6 +227,8 @@
 (include c#34;compiled/declarations.scmc#34;)
 (include c#34;compiled/types.scmc#34;)
 (include c#34;compiled/t-star.scmc#34;)
+(include c#34;compiled/init.scmc#34;)
+(include c#34;compiled/extension-features.scmc#34;)
 
 (define initialize-shen
   (let ((initialized #f))
@@ -230,7 +237,7 @@
           (begin
             (define-top-level-value 'get-shen-scheme-home-path (foreign-procedure c#34;get_shen_scheme_home_pathc#34; () string))
             (include c#34;src/init.scmc#34;)
-            (include c#34;compiled/shen-init.scmc#34;)
+            (include c#34;compiled/shen-scheme-init.scmc#34;)
             (set! initialized #t))))))
 ")
 
