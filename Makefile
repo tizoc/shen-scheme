@@ -112,11 +112,11 @@ precompile:
 
 .PHONY: test-shen
 test-shen: $(exe) $(bootfile)
-	./$(exe) --script scripts/run-shen-tests.shen
+	./$(exe) script scripts/run-shen-tests.shen
 
 .PHONY: test-compiler
 test-compiler: $(exe) $(bootfile)
-	./$(exe) --script scripts/run-compiler-tests.shen
+	./$(exe) script scripts/run-compiler-tests.shen
 
 .PHONY: test
 test: test-shen test-compiler
