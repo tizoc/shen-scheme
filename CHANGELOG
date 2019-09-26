@@ -1,3 +1,11 @@
+0.21:
+
+	* Updated for Shen 22.0.
+
+	* Arguments to the shen-scheme binary have changed, and the launcher extension provided by the latest Shen kernel release is used, pass the `--help` argument to the executable to see the new format.
+
+	* Integrated new `features` extension provided by the latest Shen kernel release.
+
 0.20:
 
 	* Added flag to allow disabling of pattern factorization.
