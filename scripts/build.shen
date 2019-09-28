@@ -14,6 +14,7 @@
 
 *\
 
+(load "kl/extension-factorise-defun.kl")
 (load "src/factorize-patterns.shen")
 (load "src/compiler.shen")
 
@@ -41,6 +42,7 @@
        "init"
        "extension-features"
        "extension-launcher"
+       "extension-factorise-defun"
        ])
 
 (set *shen-scheme-files*
@@ -231,6 +233,7 @@
 (include c#34;compiled/init.scmc#34;)
 (include c#34;compiled/extension-features.scmc#34;)
 (include c#34;compiled/extension-launcher.scmc#34;)
+(include c#34;compiled/extension-factorise-defun.scmc#34;)
 
 (define initialize-shen
   (let ((initialized #f))

@@ -84,7 +84,6 @@
   [scm.lambda Vars Body] Scope -> [lambda Vars (compile-expression Body (append Vars Scope))]
   [scm.define [Name | Vars] Body] Scope -> [define [Name | Vars] (compile-expression Body (append Vars Scope))]
   [scm.begin | Exprs] Scope -> [begin | (map (/. Exp (compile-expression Exp Scope)) Exprs)]
-  [scm.goto-label F | Args] _ -> [F | Args]
   [scm. Code] _ -> (if (string? Code)
                        (scm.with-input-from-string Code (freeze (scm.read)))
                        (error "scm. excepts a string, not ~A" Code))
