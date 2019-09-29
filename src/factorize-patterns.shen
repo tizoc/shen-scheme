@@ -24,13 +24,17 @@ Jumps to labels become direct function calls.
 
 (define factorize-defun
   [defun F Params [cond | Cases]]
-  -> (let LabelledBody (shen.x.factorise-defun.factorise-cond
-                        [cond | Cases] [shen.f-error F] Params)
-          Body+Continuations (hoist-labels LabelledBody [])
+  -> (let FactorizedDefun (shen.x.factorise-defun.factorise-defun
+                           [defun F Params [cond | Cases]])
+       (hoist-defun-labels FactorizedDefun))
+  X -> X)
+
+(define hoist-defun-labels
+  [defun F Params LabelledBody]
+  -> (let Body+Continuations (hoist-labels LabelledBody [])
           Body (fst Body+Continuations)
           Continuations (snd Body+Continuations)
-       [defun F Params [scm.begin | (append Continuations [Body])]])
-  X -> X)
+       [defun F Params [scm.begin | (append Continuations [Body])]]))
 
 (define hoist-labels
   [%%let-label [Label | Vars] LabelBody Body] Acc
