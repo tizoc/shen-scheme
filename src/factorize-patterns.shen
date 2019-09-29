@@ -1,7 +1,7 @@
 \\ Copyright (c) 2012-2019 Bruno Deferrari.  All rights reserved.
 \\ BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause
 
-(package _scm [%%goto-label %%let-label scm.begin scm.define scm.]
+(package _scm [%%goto-label %%let-label %%return scm.begin scm.define scm.]
 
 \*
 
@@ -56,6 +56,8 @@ Jumps to labels become direct function calls.
   -> (let NewBody+NewAcc (hoist-labels Body Acc)
        (@p [let Var Val (fst NewBody+NewAcc)]
            (snd NewBody+NewAcc)))
+
+  [%%return Body] Acc -> (hoist-labels Body Acc)
 
   Body Acc -> (@p Body (reverse Acc)))
 
