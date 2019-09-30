@@ -1,3 +1,9 @@
+0.22
+
+	* Updated for Shen 22.1
+
+	* Replace factorisation implementation with extension from kernel.
+
 0.21:
 
 	* Updated for Shen 22.0.
