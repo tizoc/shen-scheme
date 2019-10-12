@@ -1,4 +1,4 @@
-[![Shen Version](https://img.shields.io/badge/shen-22.1-blue.svg)](https://github.com/Shen-Language)
+[![Shen Version](https://img.shields.io/badge/shen-22.2-blue.svg)](https://github.com/Shen-Language)
 [![Build Status](https://travis-ci.com/tizoc/shen-scheme.svg?branch=master)](https://travis-ci.com/tizoc/shen-scheme)
 
 Shen/Scheme, a Scheme port of the Shen language
