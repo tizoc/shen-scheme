@@ -1,10 +1,12 @@
 Unreleased
 
-	* Updated for Shen 22.2
+	* Updated for Shen 22.2.
+
+	* Faster equality check against literal numbers.
 
 0.22
 
-	* Updated for Shen 22.1
+	* Updated for Shen 22.1.
 
 	* Replace factorisation implementation with extension from kernel.
 
