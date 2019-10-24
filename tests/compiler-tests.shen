@@ -74,15 +74,15 @@
 
 (assert-equal
  (_scm.kl->scheme [lambda X [= X 1]])
- [lambda [X] [(_scm.prefix-op =) X 1]])
+ [lambda [X] [eqv? X 1]])
 
 (assert-equal
  (_scm.compile-expression [and [some-func X] [= 1 2]] [X])
- [and [(_scm.prefix-op _scm.assert-boolean) [(_scm.prefix-op some-func) X]] [(_scm.prefix-op =) 1 2]])
+ [and [(_scm.prefix-op _scm.assert-boolean) [(_scm.prefix-op some-func) X]] [eqv? 1 2]])
 
 (assert-equal
  (_scm.compile-expression [or [some-func X] [= 1 2]] [X])
- [or [(_scm.prefix-op _scm.assert-boolean) [(_scm.prefix-op some-func) X]] [(_scm.prefix-op =) 1 2]])
+ [or [(_scm.prefix-op _scm.assert-boolean) [(_scm.prefix-op some-func) X]] [eqv? 1 2]])
 
 (assert-equal
  (_scm.kl->scheme [trap-error [+ 1 2] [lambda E 0]])
