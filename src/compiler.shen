@@ -5,7 +5,7 @@
                      vector-ref vector-set! make-vector string non-rational-/
                      string-append integer->char char->integer
                      string-ref string-length substring list
-                     eq? equal? scm. scm.import import *toplevel*
+                     eq? eqv? equal? scm. scm.import import *toplevel*
                      letrec let* scm.letrec scm.with-input-from-string scm.read
                      scm.define scm.goto-label scm.begin
                      scm.value/or scm.get/or scm.<-vector/or scm.<-address/or]
@@ -193,7 +193,9 @@ but not otherwise.
                 (unbound-symbol? V2 Scope)
                 (= [fail] V1)
                 (= [fail] V2))
-  \* TODO: optimize integers with `eq?` too *\
+  V1 V2 Scope -> [eqv? (compile-expression V1 Scope)
+                       (compile-expression V2 Scope)]
+      where (or (number? V1) (number? V2))
   V1 V2 Scope -> [equal? (compile-expression V1 Scope)
                          (compile-expression V2 Scope)]
       where (or (string? V1) (string? V2))
