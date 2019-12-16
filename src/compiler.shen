@@ -133,6 +133,8 @@
                                  (emit-letrec-bindings Rest Scope)])
 
 (define emit-if
+  true Then _ Scope  -> (compile-expression Then Scope)
+  false _ Else Scope -> (compile-expression Else Scope)
   Test Then Else Scope
   -> [if (compile-expression (force-boolean Test) Scope)
          (compile-expression Then Scope)
