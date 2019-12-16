@@ -18,6 +18,7 @@
 (load "src/factorize-patterns.shen")
 (load "src/compiler.shen")
 
+(shen.x.factorise-defun.initialise)
 (_scm.initialize-compiler)
 (set _scm.*compiling-shen-sources* true)
 
@@ -43,6 +44,7 @@
        "extension-features"
        "extension-launcher"
        "extension-factorise-defun"
+       "extension-programmable-pattern-matching"
        ])
 
 (set *shen-scheme-files*
@@ -134,6 +136,8 @@
 (set *init-code* [
   [shen.initialise]
   [shen.x.features.initialise [cons (intern "shen/scheme") []]]
+  [shen.x.factorise-defun.initialise]
+  [shen.x.programmable-pattern-matching.initialise]
 ])
 
 (define store-init-code
@@ -234,6 +238,7 @@
 (include c#34;compiled/extension-features.scmc#34;)
 (include c#34;compiled/extension-launcher.scmc#34;)
 (include c#34;compiled/extension-factorise-defun.scmc#34;)
+(include c#34;compiled/extension-programmable-pattern-matching.scmc#34;)
 
 (define initialize-shen
   (let ((initialized #f))
