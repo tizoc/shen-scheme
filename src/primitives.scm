@@ -85,10 +85,25 @@
 ;; Eval
 ;;
 
+;; If name contains the `kl:` prefix, remove it.
+;; If it doesn't add an `scm.` prefix.
+;; This is used to show the correct name on the REPL
+;; when the result of evaluating a `defun` is printed.
+(define (adjust-name name)
+  (let ((len (string-length name)))
+    (if (and (> len 3)
+             (string=? "kl:" (substring name 0 3)))
+        (substring name 3 len)
+        (string-append "scm." name))))
+
+
+;; (define (f ...) ...)
+;; (define f ...)
 (define (function-name expr)
-  (let* ((qualified-name (symbol->string (caadr expr)))
-         (name (substring qualified-name 3 (string-length qualified-name))))
-    (string->symbol name)))
+  (let ((name (if (pair? (cadr expr))
+                  (caadr expr)
+                  (cadr expr))))
+    (string->symbol (adjust-name (symbol->string name)))))
 
 (define (kl:eval-kl expr)
   (let* ((scm-expr (kl:_scm.kl->scheme expr))

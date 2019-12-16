@@ -83,6 +83,7 @@
   [scm.letrec | Rest] Scope -> (emit-letrec Rest Scope)
   [scm.lambda Vars Body] Scope -> [lambda Vars (compile-expression Body (append Vars Scope))]
   [scm.define [Name | Vars] Body] Scope -> [define [Name | Vars] (compile-expression Body (append Vars Scope))]
+  [scm.define Name Expr] Scope -> [define Name (compile-expression Expr Scope)] where (symbol? Name)
   [scm. Code] _ -> (scm.with-input-from-string Code (freeze (scm.read))) where (string? Code)
   [scm. Form] _ -> (emit-scm-form Form)
   [Op | Args] Scope -> (emit-application Op Args Scope)
