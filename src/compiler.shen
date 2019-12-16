@@ -83,9 +83,8 @@
   [scm.letrec | Rest] Scope -> (emit-letrec Rest Scope)
   [scm.lambda Vars Body] Scope -> [lambda Vars (compile-expression Body (append Vars Scope))]
   [scm.define [Name | Vars] Body] Scope -> [define [Name | Vars] (compile-expression Body (append Vars Scope))]
-  [scm. Code] _ -> (if (string? Code)
-                       (scm.with-input-from-string Code (freeze (scm.read)))
-                       (error "scm. excepts a string, not ~A" Code))
+  [scm. Code] _ -> (scm.with-input-from-string Code (freeze (scm.read))) where (string? Code)
+  [scm. Form] _ -> (emit-scm-form Form)
   [Op | Args] Scope -> (emit-application Op Args Scope)
   X _ -> X                      \* literal *\
   )
@@ -110,6 +109,15 @@
   Var Value Body Scope
   -> [let [[Var (compile-expression Value Scope)]]
        (compile-expression Body [Var | Scope])])
+
+(define emit-scm-form
+  Form -> (without-scm-prefixes Form))
+
+(define without-scm-prefixes
+  [] -> []
+  [H | T] -> [(without-scm-prefixes H) | (without-scm-prefixes T)]
+  Sym -> (remove-scm-prefix Sym) where (scm-prefixed? Sym)
+  Other -> Other)
 
 (define valid-letrec-bindings?
   [] -> true
