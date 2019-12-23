@@ -287,6 +287,7 @@ but not otherwise.
 
 (define remove-scm-prefix
   Sym -> (remove-scm-prefix (str Sym)) where (symbol? Sym)
+  "scm." -> scm.
   (@s "scm." Rest) -> (intern Rest))
 
 (define prefix-op
