@@ -49,9 +49,14 @@
   (shen-global-set! var val)
   val)
 
+(define (get-failure-error var)
+  (raise-error 'value "variable has no value" var))
+
+(define (get-failure-default _var)
+  *hash-table-default*)
+
 (define (kl:value var)
-  (shen-global-get var
-                   (lambda () (raise-error 'value "variable has no value" var))))
+  (shen-global-get var get-failure-error))
 
 ;; Error Handling
 ;;
@@ -152,7 +157,10 @@
   (make-hashtable equal-hash equal? size))
 
 (define (value/or var default)
-  (shen-global-get var default))
+  (let ((result (shen-global-get var get-failure-default)))
+    (if (eq? result *hash-table-default*)
+        (default)
+        result)))
 
 (define (get/or var prop dict default)
   (let* ((entry (hashtable-ref dict var '()))
