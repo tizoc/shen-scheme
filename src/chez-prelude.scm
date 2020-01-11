@@ -6,17 +6,17 @@
     ((_ location message obj ...)
      (error location message obj ...))))
 
-(define *shen-globals* (make-eq-hashtable))
+(define *shen-globals* (make-hashtable symbol-hash eq?))
 
 (define (shen-global-set! var value)
-  (hashtable-set! *shen-globals* var value))
+  (symbol-hashtable-set! *shen-globals* var value))
 
 (define *hash-table-default* (string-append "_" "-"))
 
 (define (shen-global-get var default)
-  (let ((res (hashtable-ref *shen-globals* var *hash-table-default*)))
+  (let ((res (symbol-hashtable-ref *shen-globals* var *hash-table-default*)))
     (if (eq? res *hash-table-default*)
-        (default)
+        (default var)
         res)))
 
 (define (kl-var-clean sym)
