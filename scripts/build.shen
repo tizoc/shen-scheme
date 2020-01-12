@@ -14,6 +14,11 @@
 
 *\
 
+\\ Required for compiling newer versions with 0.18
+(set shen.x.factorise-defun.*selector-handlers* [])
+(set shen.x.factorise-defun.*selector-handlers-reg* [])
+(scm. "(define kl:global/*property-vector* (make-parameter (kl:value '*property-vector*)))")
+
 (load "kl/extension-factorise-defun.kl")
 (load "src/factorize-patterns.shen")
 (load "src/compiler.shen")
@@ -208,8 +213,32 @@
          (compile-shen-as As Filename)
          done))
 
+(define globals-definitions
+  [] -> "c#10;"
+  [Name | Rest] -> (@s "(define " (str (_scm.prefix-global Name))
+                       " (make-parameter #f))c#10;"
+                       (globals-definitions Rest)))
+
+(define globals-register
+  [] -> ""
+  [Name | Rest] -> (@s "  (shen-global-parameter-set! '" (str Name)
+                       " kl:global/" (str Name) ")c#10;"
+                       (globals-register Rest)))
+
 (define loader-body
-  -> "(import (chezscheme))
+  -> (@s
+"(import (chezscheme))
+
+"
+
+(globals-definitions (value _scm.*static-globals*))
+
+"(define (register-globals)
+"
+
+(globals-register (value _scm.*static-globals*))
+
+")
 
 (include c#34;src/chez-prelude.scmc#34;)
 (include c#34;src/primitives.scmc#34;)
@@ -249,7 +278,7 @@
             (include c#34;src/init.scmc#34;)
             (include c#34;compiled/shen-scheme-init.scmc#34;)
             (set! initialized #t))))))
-")
+"))
 
 (define write-string-to-file
   Body File -> (let Out (open File out)

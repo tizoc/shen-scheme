@@ -18,7 +18,16 @@
                 string? vector? number? cons? absvector? element? symbol?
                 tuple? variable? boolean? empty? shen.pvar?
                 shen.+string? shen.+vector?])
-         (set *kl-prefix* (intern "kl:"))))
+         (set *kl-prefix* (intern "kl:"))
+         (set *static-globals* [
+           shen.*catch* shen.*infs*
+           shen.*maxcomplexity* shen.*occurs*
+           shen.*process-counter*
+           shen.*prologvectors* shen.*varcounter*
+           *stinput* *stoutput* *sterror*
+           *property-vector* *macros*
+         ])
+         (set *global-prefix* (intern "kl:global/"))))
 
 (define unbound-symbol?
   Sym Scope -> (not (element? Sym Scope)) where (or (symbol? Sym) (= Sym ,))
@@ -36,9 +45,19 @@
   [let [Binding1] [let [Binding2] Body]] -> [let* [Binding1 Binding2] Body]
   X -> X)
 
+(define static-global?
+  Var -> (trap-error (element? Var (value *static-globals*))
+                     (/. E false)))
+
 (define compile-expression
   [] _ -> [quote []]
   Sym Scope -> (emit-symbol Sym) where (unbound-symbol? Sym Scope)
+  [set Var Value] Scope -> [let [[tmp (compile-expression Value Scope)]]
+                              [(prefix-global Var) tmp]
+                              tmp]
+      where (static-global? Var)
+  [value Var] _ -> [(prefix-global Var)]
+      where (static-global? Var)
   [let Var Value Body] Scope -> (merge-nested-lets
                                  (emit-let Var Value Body Scope))
   [cond | Clauses] Scope -> (emit-cond Clauses Scope)
@@ -294,6 +313,9 @@ but not otherwise.
   Sym -> (remove-scm-prefix Sym) where (scm-prefixed? Sym)
   Sym -> (concat (value *kl-prefix*) Sym) where (symbol? Sym)
   NotSym -> NotSym)
+
+(define prefix-global
+  Sym -> (concat (value *global-prefix*) Sym))
 
 (define not-fail
   Obj F -> (F Obj) where (not (= Obj (fail)))

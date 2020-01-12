@@ -8,8 +8,14 @@
 
 (define *shen-globals* (make-hashtable symbol-hash eq?))
 
+(define (shen-global-parameter-set! var parameter)
+  (symbol-hashtable-set! *shen-globals* var parameter))
+
 (define (shen-global-set! var value)
-  (symbol-hashtable-set! *shen-globals* var value))
+  (let ((cell (symbol-hashtable-cell *shen-globals* var #f)))
+    (if (cdr cell)
+        ((cdr cell) value)
+        (set-cdr! cell (make-parameter value)))))
 
 (define *hash-table-default* (string-append "_" "-"))
 
@@ -17,7 +23,7 @@
   (let ((res (symbol-hashtable-ref *shen-globals* var *hash-table-default*)))
     (if (eq? res *hash-table-default*)
         (default var)
-        res)))
+        (res))))
 
 (define (kl-var-clean sym)
   (if (symbol? sym)
