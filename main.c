@@ -72,6 +72,14 @@ static const char *get_shen_scheme_home_path() {
   return shen_scheme_home_path;
 }
 
+static ptr buf_to_bytevector(const void *buf, size_t len) {
+  ptr bv = Smake_bytevector(len, 0);
+
+  memcpy(Sbytevector_data(bv), buf, len);
+
+  return bv;
+}
+
 int main(int argc, char *argv[]) {
   int status;
 
@@ -87,6 +95,8 @@ int main(int argc, char *argv[]) {
   Sregister_boot_file(shen_scheme_bootfile_path);
   Sbuild_heap(NULL, NULL);
   Sforeign_symbol("get_shen_scheme_home_path", (void*)get_shen_scheme_home_path);
+  Sforeign_symbol("scm_make_utf8_string", (void*)Sstring_utf8);
+  Sforeign_symbol("scm_make_bytevector", (void*)buf_to_bytevector);
   status = Sscheme_start(argc + 1, (const char**)argv - 1);
   Sscheme_deinit();
 
