@@ -23,7 +23,9 @@
 (load "src/factorize-patterns.shen")
 (load "src/compiler.shen")
 
-(shen.x.factorise-defun.initialise)
+(trap-error
+  (shen.x.factorise-defun.initialise)
+  (/. _ ignore))
 (_scm.initialize-compiler)
 (set _scm.*compiling-shen-sources* true)
 
