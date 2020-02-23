@@ -1,6 +1,6 @@
 Unreleased
 
-	* Updated for Shen 22.2.
+	* Updated for Shen 22.3.
 
 	* Faster equality check against literal numbers.
 
