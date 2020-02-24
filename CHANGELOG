@@ -2,7 +2,18 @@ Unreleased
 
 	* Updated for Shen 22.3.
 
+	* Enabled `programmable-pattern-matching` extension.
+
+	* `if` branches with a known test result are optimized away.
+
+	* Added non-string version of special `scm.` form.
+
 	* Faster equality check against literal numbers.
+
+	* Faster globals.
+
+	* Various other optimizations.
+
 
 0.22
 
