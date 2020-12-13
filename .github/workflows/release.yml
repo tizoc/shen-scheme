@@ -58,7 +58,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ RELEASE_VERSION }}
+          release_name: Release ${{ env.RELEASE_VERSION }}
           draft: true
           prerelease: false
       - name: Upload Release Asset (binary for ${{ matrix.OSNAME }})
@@ -67,8 +67,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./_dist/shen-scheme-${{ RELEASE_VERSION }}-${{ matrix.OSNAME }}-bin.${{ matrix.BUNDLE_EXT }}
-          asset_name: shen-scheme-${{ RELEASE_VERSION }}-${{ matrix.OSNAME }}-bin.${{ matrix.BUNDLE_EXT }}
+          asset_path: ./_dist/shen-scheme-${{ env.RELEASE_VERSION }}-${{ matrix.OSNAME }}-bin.${{ matrix.BUNDLE_EXT }}
+          asset_name: shen-scheme-${{ env.RELEASE_VERSION }}-${{ matrix.OSNAME }}-bin.${{ matrix.BUNDLE_EXT }}
           asset_content_type: ${{ matrix.ASSET_CONTENT_TYPE }}
       - name: Upload Release Asset (sources)
         if: runner.os == 'linux'
@@ -77,6 +77,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./_dist/shen-scheme-${{ RELEASE_VERSION }}-src.${{ matrix.BUNDLE_EXT }}
-          asset_name: shen-scheme-${{ RELEASE_VERSION }}-src.${{ matrix.BUNDLE_EXT }}
+          asset_path: ./_dist/shen-scheme-${{ env.RELEASE_VERSION }}-src.${{ matrix.BUNDLE_EXT }}
+          asset_name: shen-scheme-${{ env.RELEASE_VERSION }}-src.${{ matrix.BUNDLE_EXT }}
           asset_content_type: ${{ matrix.ASSET_CONTENT_TYPE }}
