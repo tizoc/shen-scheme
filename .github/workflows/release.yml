@@ -4,22 +4,27 @@ on:
     - 'v*.*.*'
     - 'v*.*'
 
-name: Upload Release Asset
+name: Make release
 
 jobs:
   build:
-    name: Upload Release Asset (Linux)
+    name: Upload Release Asset (${{ matrix.OSNAME }})
     runs-on: ${{ matrix.os }}-latest
     strategy:
       matrix:
-        os: [macos, ubuntu, windows]
         include:
           - os: macos
-            env: BUNDLE_EXT=tar.gz OSNAME=macos
+            BUNDLE_EXT: tar.gz
+            ASSET_CONTENT_TYPE: application/gzip
+            OSNAME: macos
           - os: ubuntu
-            env: BUNDLE_EXT=tar.gz OSNAME=linux
+            BUNDLE_EXT: tar.gz
+            ASSET_CONTENT_TYPE: application/gzip
+            OSNAME: linux
           - os: windows
-            env: BUNDLE_EXT=zip OSNAME=windows
+            BUNDLE_EXT: zip
+            ASSET_CONTENT_TYPE: application/zip
+            OSNAME: windows
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -54,14 +59,15 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: true
           prerelease: false
-      - name: Upload Release Asset (binary for ${{ OSNAME}})
+      - name: Upload Release Asset (binary for ${{ matrix.OSNAME }})
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./_dist/shen-scheme-${{ github.ref }}-${{ OSNAME }}-bin.${{ BUNDLE_EXT }}
-          asset_name: shen-scheme-${{ github.ref }}-${{ OSNAME }}-bin.${{ BUNDLE_EXT }}
+          asset_path: ./_dist/shen-scheme-${{ github.ref }}-${{ matrix.OSNAME }}-bin.${{ matrix.BUNDLE_EXT }}
+          asset_name: shen-scheme-${{ github.ref }}-${{ matrix.OSNAME }}-bin.${{ matrix.BUNDLE_EXT }}
+          asset_content_type: ${{ matrix.ASSET_CONTENT_TYPE }}
       - name: Upload Release Asset (sources)
         if: runner.os == 'linux'
         uses: actions/upload-release-asset@v1
@@ -69,5 +75,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./_dist/shen-scheme-${{ github.ref }}-src.${{ BUNDLE_EXT }}
-          asset_name: shen-scheme-${{ github.ref }}-src.${{ BUNDLE_EXT }}
+          asset_path: ./_dist/shen-scheme-${{ github.ref }}-src.${{ matrix.BUNDLE_EXT }}
+          asset_name: shen-scheme-${{ github.ref }}-src.${{ matrix.BUNDLE_EXT }}
+          asset_content_type: ${{ matrix.ASSET_CONTENT_TYPE }}
