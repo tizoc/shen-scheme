@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated for Shen 22.3.
+- Updated Chez dependency to 9.5.4.
 - `if` branches with a known test result are optimized away.
 - Faster equality check against literal numbers.
 - Faster globals.
