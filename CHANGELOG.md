@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23] - 2020-12-13
+
 ### Added
 
 - Enabled `programmable-pattern-matching` extension.
@@ -112,7 +114,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/0.22...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.23...HEAD
+[0.23]: https://github.com/tizoc/shen-scheme/compare/0.22...v0.23
 [0.22]: https://github.com/tizoc/shen-scheme/compare/0.21...0.22
 [0.21]: https://github.com/tizoc/shen-scheme/compare/0.20...0.21
 [0.20]: https://github.com/tizoc/shen-scheme/compare/0.19...0.20
