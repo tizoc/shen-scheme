@@ -1,11 +1,14 @@
 ifeq ($(OS), Windows_NT)
 	os = windows
+	v18os = windows
 	m ?= ta6nt
 else ifeq ($(shell uname -s), Darwin)
-	os = osx
+	os = macOS
+	v18os = osx
 	m ?= ta6osx
 else
 	os = linux
+	v18os = linux
 	m ?= ta6le
 endif
 
@@ -103,12 +106,12 @@ fetch-kernel:
 .PHONY: fetch-prebuilt
 fetch-prebuilt:
 	mkdir -p $(build_dir)
-	curl -LO 'https://github.com/tizoc/shen-scheme/releases/download/0.18/shen-scheme-0.18-$(os)-bin$(archiveext)'
-	$(uncompress) shen-scheme-0.18-$(os)-bin$(archiveext) $(uncompressToFlag)$(build_dir)
+	curl -LO 'https://github.com/tizoc/shen-scheme/releases/download/0.18/shen-scheme-0.18-$(v18os)-bin$(archiveext)'
+	$(uncompress) shen-scheme-0.18-$(v18os)-bin$(archiveext) $(uncompressToFlag)$(build_dir)
 
 .PHONY: precompile
 precompile:
-	$(build_dir)$(S)shen-scheme-0.18-$(os)-bin$(S)bin$(S)shen-scheme$(binext) --script scripts/do-build.shen > /dev/null
+	$(build_dir)$(S)shen-scheme-0.18-$(v18os)-bin$(S)bin$(S)shen-scheme$(binext) --script scripts/do-build.shen > /dev/null
 
 .PHONY: test-shen
 test-shen: $(exe) $(bootfile)
@@ -139,7 +142,6 @@ source-release:
 	cp -R compiled/ "_dist/$(archive_name)/compiled"
 	cp shen-scheme.scm "_dist/$(archive_name)/shen-scheme.scm"
 	rm -f "_dist/$(archive_name)/".git*
-	rm -f "_dist/$(archive_name)/".travis.yml
 	rm "_dist/$(archive_name)/"*/.gitignore
 	cd _dist; tar cvzf "$(archive_name).tar.gz" "$(archive_name)/";	rm -rf "$(archive_name)/"
 	echo "Generated tarball for tag $(git_tag) as _dist/$(archive_name).tar.gz"

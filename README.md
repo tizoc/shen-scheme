@@ -1,5 +1,5 @@
 [![Shen Version](https://img.shields.io/badge/shen-22.3-blue.svg)](https://github.com/Shen-Language)
-[![Build Status](https://travis-ci.com/tizoc/shen-scheme.svg?branch=master)](https://travis-ci.com/tizoc/shen-scheme)
+[![build](https://github.com/tizoc/shen-scheme/workflows/build/badge.svg)](https://github.com/tizoc/shen-scheme/actions?query=workflow%3Abuild)
 
 Shen/Scheme, a Scheme port of the Shen language
 ====================================================

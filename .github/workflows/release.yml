@@ -1,0 +1,73 @@
+on:
+  push:
+    tags:
+    - 'v*.*.*'
+    - 'v*.*'
+
+name: Upload Release Asset
+
+jobs:
+  build:
+    name: Upload Release Asset (Linux)
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      matrix:
+        os: [macos, ubuntu, windows]
+        include:
+          - os: macos
+            env: BUNDLE_EXT=tar.gz OSNAME=macos
+          - os: ubuntu
+            env: BUNDLE_EXT=tar.gz OSNAME=linux
+          - os: windows
+            env: BUNDLE_EXT=zip OSNAME=windows
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Chez cache
+        id: shen-scheme-chez-cache
+        uses: actions/cache@v2
+        with:
+          path: _build/chez
+          key: shen-scheme-chez-cache-${{ matrix.os }}
+      - name: Install deps (Ubuntu)
+        run: sudo apt-get install -y uuid-dev
+        if: runner.os == 'linux'
+      - name: Build and test
+        run: |
+          make fetch-kernel
+          make fetch-prebuilt
+          make precompile
+          make
+          make test
+      - name: Create binary release for ${{ matrix.os }}
+        run: make binary-release
+      - name: Create source release
+        if: runner.os == 'linux'
+        run: make source-release
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: true
+          prerelease: false
+      - name: Upload Release Asset (binary for ${{ OSNAME}})
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./_dist/shen-scheme-${{ github.ref }}-${{ OSNAME }}-bin.${{ BUNDLE_EXT }}
+          asset_name: shen-scheme-${{ github.ref }}-${{ OSNAME }}-bin.${{ BUNDLE_EXT }}
+      - name: Upload Release Asset (sources)
+        if: runner.os == 'linux'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./_dist/shen-scheme-${{ github.ref }}-src.${{ BUNDLE_EXT }}
+          asset_name: shen-scheme-${{ github.ref }}-src.${{ BUNDLE_EXT }}

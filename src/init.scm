@@ -3,7 +3,6 @@
 
 (kl:set '*language* "Scheme")
 (kl:set '*implementation* "chez-scheme")
-(kl:set '*port* "0.22")
 (kl:set '*release* (call-with-values scheme-version-number (lambda (major minor patch) (format "~s.~s.~s" major minor patch))))
 (kl:set '*porters* "Bruno Deferrari")
 (kl:set '*home-directory* (current-directory))
