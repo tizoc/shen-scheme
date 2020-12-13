@@ -277,6 +277,7 @@
       (if (not initialized)
           (begin
             (define-top-level-value 'get-shen-scheme-home-path (foreign-procedure c#34;get_shen_scheme_home_pathc#34; () string))
+            (include c#34;src/version.scmc#34;)
             (include c#34;src/init.scmc#34;)
             (include c#34;compiled/shen-scheme-init.scmc#34;)
             (set! initialized #t))))))
