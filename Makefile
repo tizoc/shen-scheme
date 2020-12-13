@@ -141,7 +141,7 @@ source-release:
 	git archive --format=tar --prefix="$(archive_name)/" $(git_tag) | (cd _dist && tar xf -)
 	cp -R compiled/ "_dist/$(archive_name)/compiled"
 	cp shen-scheme.scm "_dist/$(archive_name)/shen-scheme.scm"
-	rm -f "_dist/$(archive_name)/".git*
+	rm -rf "_dist/$(archive_name)/".git*
 	rm "_dist/$(archive_name)/"*/.gitignore
 	cd _dist; tar cvzf "$(archive_name).tar.gz" "$(archive_name)/";	rm -rf "$(archive_name)/"
 	echo "Generated tarball for tag $(git_tag) as _dist/$(archive_name).tar.gz"
