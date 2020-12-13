@@ -19,7 +19,7 @@ jobs:
        git config user.name "GitHub Actions"
        git config user.email noreply@github.com
     - name: Update version in sources
-      run: printf '(kl:set \'*port* "${{ github.event.inputs.versionName }})"\n' > src/version.scm
+      run: printf "(kl:set '*port* \"${{ github.event.inputs.versionName }}\")\n" > src/version.scm
     - name: Update Changelog
       uses: thomaseizinger/keep-a-changelog-new-release@v1
       with:
