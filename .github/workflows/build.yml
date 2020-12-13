@@ -9,17 +9,10 @@ on:
 jobs:
   build:
     name: Build and test
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
-        include:
-          - os: macos-latest
-            env: BUNDLE_EXT=tar.gz
-          - os: ubuntu-latest
-            env: BUNDLE_EXT=tar.gz
-          - os: windows-latest
-            env: BUNDLE_EXT=zip
+        os: [macos, ubuntu, windows]
 
     steps:
       - uses: actions/checkout@v2

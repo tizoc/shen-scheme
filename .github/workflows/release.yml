@@ -9,16 +9,16 @@ name: Upload Release Asset
 jobs:
   build:
     name: Upload Release Asset (Linux)
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [macos, ubuntu, windows]
         include:
-          - os: macos-latest
+          - os: macos
             env: BUNDLE_EXT=tar.gz OSNAME=macos
-          - os: ubuntu-latest
+          - os: ubuntu
             env: BUNDLE_EXT=tar.gz OSNAME=linux
-          - os: windows-latest
+          - os: windows
             env: BUNDLE_EXT=zip OSNAME=windows
     steps:
       - name: Checkout code
