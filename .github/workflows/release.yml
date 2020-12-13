@@ -7,9 +7,31 @@ on:
 name: Make release
 
 jobs:
+  create_release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version_tag: ${{ steps.version_tag.outputs.version_tag }}
+    steps:
+      - name: Set release version in env
+        id: version_tag
+        run: echo ::set-output name=version_tag::${GITHUB_REF#refs/*/}
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ steps.version_tag.outputs.version_tag }}
+          draft: true
+          prerelease: false
+
   build:
     name: Upload Release Asset (${{ matrix.OSNAME }})
     runs-on: ${{ matrix.os }}-latest
+    needs: create_release
     strategy:
       matrix:
         include:
@@ -28,8 +50,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Set release version in env
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Chez cache
         id: shen-scheme-chez-cache
         uses: actions/cache@v2
@@ -46,29 +66,19 @@ jobs:
           make precompile
           make
           make test
-      - name: Create binary release for ${{ matrix.os }}
+      - name: Create binary release for ${{ matrix.OSNAME }}
         run: make binary-release
       - name: Create source release
         if: runner.os == 'linux'
         run: make source-release
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ env.RELEASE_VERSION }}
-          draft: true
-          prerelease: false
       - name: Upload Release Asset (binary for ${{ matrix.OSNAME }})
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./_dist/shen-scheme-${{ env.RELEASE_VERSION }}-${{ matrix.OSNAME }}-bin.${{ matrix.BUNDLE_EXT }}
-          asset_name: shen-scheme-${{ env.RELEASE_VERSION }}-${{ matrix.OSNAME }}-bin.${{ matrix.BUNDLE_EXT }}
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ./_dist/shen-scheme-${{ needs.create_release.outputs.version_tag }}-${{ matrix.OSNAME }}-bin.${{ matrix.BUNDLE_EXT }}
+          asset_name: shen-scheme-${{ needs.create_release.outputs.version_tag }}-${{ matrix.OSNAME }}-bin.${{ matrix.BUNDLE_EXT }}
           asset_content_type: ${{ matrix.ASSET_CONTENT_TYPE }}
       - name: Upload Release Asset (sources)
         if: runner.os == 'linux'
@@ -76,7 +86,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./_dist/shen-scheme-${{ env.RELEASE_VERSION }}-src.${{ matrix.BUNDLE_EXT }}
-          asset_name: shen-scheme-${{ env.RELEASE_VERSION }}-src.${{ matrix.BUNDLE_EXT }}
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ./_dist/shen-scheme-${{ needs.create_release.outputs.version_tag }}-src.${{ matrix.BUNDLE_EXT }}
+          asset_name: shen-scheme-${{ needs.create_release.outputs.version_tag }}-src.${{ matrix.BUNDLE_EXT }}
           asset_content_type: ${{ matrix.ASSET_CONTENT_TYPE }}
