@@ -16,7 +16,7 @@ jobs:
           - os: macos
             BUNDLE_EXT: tar.gz
             ASSET_CONTENT_TYPE: application/gzip
-            OSNAME: macos
+            OSNAME: macOS
           - os: ubuntu
             BUNDLE_EXT: tar.gz
             ASSET_CONTENT_TYPE: application/gzip
@@ -28,6 +28,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Set release version in env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Chez cache
         id: shen-scheme-chez-cache
         uses: actions/cache@v2
@@ -56,7 +58,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          release_name: Release ${{ RELEASE_VERSION }}
           draft: true
           prerelease: false
       - name: Upload Release Asset (binary for ${{ matrix.OSNAME }})
@@ -65,8 +67,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./_dist/shen-scheme-${{ github.ref }}-${{ matrix.OSNAME }}-bin.${{ matrix.BUNDLE_EXT }}
-          asset_name: shen-scheme-${{ github.ref }}-${{ matrix.OSNAME }}-bin.${{ matrix.BUNDLE_EXT }}
+          asset_path: ./_dist/shen-scheme-${{ RELEASE_VERSION }}-${{ matrix.OSNAME }}-bin.${{ matrix.BUNDLE_EXT }}
+          asset_name: shen-scheme-${{ RELEASE_VERSION }}-${{ matrix.OSNAME }}-bin.${{ matrix.BUNDLE_EXT }}
           asset_content_type: ${{ matrix.ASSET_CONTENT_TYPE }}
       - name: Upload Release Asset (sources)
         if: runner.os == 'linux'
@@ -75,6 +77,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./_dist/shen-scheme-${{ github.ref }}-src.${{ matrix.BUNDLE_EXT }}
-          asset_name: shen-scheme-${{ github.ref }}-src.${{ matrix.BUNDLE_EXT }}
+          asset_path: ./_dist/shen-scheme-${{ RELEASE_VERSION }}-src.${{ matrix.BUNDLE_EXT }}
+          asset_name: shen-scheme-${{ RELEASE_VERSION }}-src.${{ matrix.BUNDLE_EXT }}
           asset_content_type: ${{ matrix.ASSET_CONTENT_TYPE }}
