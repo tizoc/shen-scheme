@@ -81,8 +81,8 @@ Running
 -------
 
 `shen-scheme` will start the Shen REPL.
-`shen-scheme --script <some shen file>` will run a script.
-`shen-scheme --eval <shen expression>` will evaluate an expression.
+`shen-scheme script <some shen file>` will run a script.
+`shen-scheme eval <shen expression>` will evaluate an expression.
 
 Home and Boot file search path
 ------------------------------
