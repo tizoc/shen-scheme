@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24] - 2021-03-07
+
+### Changed
+
+- Updated for Shen 22.4.
+
 ## [0.23] - 2020-12-13
 
 ### Added
@@ -115,7 +121,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.23...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.24...HEAD
+[0.24]: https://github.com/tizoc/shen-scheme/compare/0.23...v0.24
 [0.23]: https://github.com/tizoc/shen-scheme/compare/0.22...v0.23
 [0.22]: https://github.com/tizoc/shen-scheme/compare/0.21...0.22
 [0.21]: https://github.com/tizoc/shen-scheme/compare/0.20...0.21
