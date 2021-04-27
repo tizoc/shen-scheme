@@ -139,7 +139,7 @@ install: $(exe) $(bootfile)
 source-release:
 	mkdir -p _dist
 	git archive --format=tar --prefix="$(archive_name)/" $(git_tag) | (cd _dist && tar xf -)
-	cp -R compiled/ "_dist/$(archive_name)/compiled"
+	cp compiled/*.scm "_dist/$(archive_name)/compiled/"
 	cp shen-scheme.scm "_dist/$(archive_name)/shen-scheme.scm"
 	rm -rf "_dist/$(archive_name)/".git*
 	rm "_dist/$(archive_name)/"*/.gitignore
