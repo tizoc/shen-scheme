@@ -14,4 +14,14 @@
 (kl:global/*stinput* (standard-input-port))
 (kl:global/*stoutput* (standard-output-port))
 
+(kl:global/shen.*platform-native-call-check*
+  (lambda (fname)
+    (and (symbol? fname)
+         (let ((fname (symbol->string fname)))
+           (and (> (string-length fname) 4)
+                (char=? #\. (string-ref fname 3))
+                (char=? #\s (string-ref fname 0))
+                (char=? #\c (string-ref fname 1))
+                (char=? #\m (string-ref fname 2)))))))
+
 (kl:_scm.initialize-compiler)

@@ -17,15 +17,17 @@
 \\ Required for compiling newer versions with 0.18
 (set shen.x.factorise-defun.*selector-handlers* [])
 (set shen.x.factorise-defun.*selector-handlers-reg* [])
-(scm. "(define kl:global/*property-vector* (make-parameter (kl:value '*property-vector*)))")
+(trap-error
+  (scm. "(define-top-level-value kl:global/*property-vector* (make-parameter (kl:value '*property-vector*)))")
+  (/. X ignore))
 
-(load "kl/extension-factorise-defun.kl")
-(load "src/factorize-patterns.shen")
+\\(load "kl/extension-factorise-defun.kl")
+\\(load "src/factorize-patterns.shen")
 (load "src/compiler.shen")
 
 (trap-error
   (shen.x.factorise-defun.initialise)
-  (/. _ ignore))
+  (/. X ignore))
 (_scm.initialize-compiler)
 (set _scm.*compiling-shen-sources* true)
 
@@ -50,8 +52,8 @@
        "init"
        "extension-features"
        "extension-launcher"
-       "extension-factorise-defun"
-       "extension-programmable-pattern-matching"
+       \\"extension-factorise-defun"
+       \\"extension-programmable-pattern-matching"
        ])
 
 (set *shen-scheme-files*
@@ -65,7 +67,7 @@
 (defcc shen.<name>
   X := (if (symbol? X)
            X
-           (error "~A is not a legitimate function name.~%" X)))
+           (error "~A is not a legitimate function name.~%" X));)
 
 (define prefix-fn
   F -> (_scm.prefix-op F))
@@ -143,8 +145,8 @@
 (set *init-code* [
   [shen.initialise]
   [shen.x.features.initialise [cons (intern "shen/scheme") []]]
-  [shen.x.factorise-defun.initialise]
-  [shen.x.programmable-pattern-matching.initialise]
+  \\[shen.x.factorise-defun.initialise]
+  \\[shen.x.programmable-pattern-matching.initialise]
 ])
 
 (define store-init-code
@@ -156,7 +158,7 @@
 
 (define compile-kl-file
   Prelude From To
-  -> (let _ (output "Compiling ~R...~%" From)
+  -> (let O (output "Compiling ~R...~%" From)
           Out (open To out)
           Kl (read-file From)
           Defuns (filter (/. X (and (defun? X)
@@ -168,20 +170,19 @@
                                         Kl))
           Scm (map (function compile-defun) Defuns)
           ScmS (map (function sexp->string) Scm)
-          _ (pr Prelude Out)
-          _ (for-each (/. S (pr (make-string "~A~%~%" S) Out) ) ScmS)
+          P (pr Prelude Out)
+          F (for-each (/. S (pr (make-string "~A~%~%" S) Out) ) ScmS)
        (close Out)))
 
 (define make-kl-code
-  [define F | Rules] -> (shen.elim-def [define F | Rules])
-  [defcc F | Rules] -> (shen.elim-def [defcc F | Rules])
+  [define F | Rules] -> (shen.shendef->kldef F Rules)
   Code -> Code)
 
 (define compile-shen-file
   From To -> (let Out (open To out)
                   Shen (read-file From)
                   Kl (map (function make-kl-code) Shen)
-                  _ (for-each (/. S (pr (make-string "~R~%~%" S) Out) )
+                  F (for-each (/. S (pr (make-string "~R~%~%" S) Out) )
                               Kl)
                (close Out)))
 
@@ -190,14 +191,14 @@
           Cmds (value *init-code*)
           Scm (map (function _scm.kl->scheme) Cmds)
           ScmS (map (function sexp->string) Scm)
-          _ (pr (shen-license) Out)
-          _ (for-each (/. S (pr (make-string "~A~%~%" S) Out) ) ScmS)
+          P (pr (shen-license) Out)
+          F (for-each (/. S (pr (make-string "~A~%~%" S) Out) ) ScmS)
        (close Out)))
 
 (define build
   As Filename
   -> (do (compile-shen-file "src/compiler.shen" "kl/compiler.kl")
-         (compile-shen-file "src/factorize-patterns.shen" "kl/factorize-patterns.kl")
+         \\(compile-shen-file "src/factorize-patterns.shen" "kl/factorize-patterns.kl")
          (compile-shen-file "src/overrides.shen" "kl/overrides.kl")
          (compile-shen-file "src/shen-scheme-extensions.shen" "kl/shen-scheme-extensions.kl")
          (for-each (/. F (compile-kl-file
@@ -268,8 +269,8 @@
 (include c#34;compiled/init.scmc#34;)
 (include c#34;compiled/extension-features.scmc#34;)
 (include c#34;compiled/extension-launcher.scmc#34;)
-(include c#34;compiled/extension-factorise-defun.scmc#34;)
-(include c#34;compiled/extension-programmable-pattern-matching.scmc#34;)
+;; (include c#34;compiled/extension-factorise-defun.scmc#34;)
+;; (include c#34;compiled/extension-programmable-pattern-matching.scmc#34;)
 
 (define initialize-shen
   (let ((initialized #f))
@@ -285,7 +286,7 @@
 
 (define write-string-to-file
   Body File -> (let Out (open File out)
-                    _ (pr Body Out)
+                    P (pr Body Out)
                  (close Out)))
 
 (define compile-shen-as

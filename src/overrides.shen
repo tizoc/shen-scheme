@@ -20,10 +20,10 @@
 
 (define pr
   String Sink -> (trap-error
-                  (let _ (if (scm.textual-port? Sink)
+                  (let P (if (scm.textual-port? Sink)
                              (scm.put-string Sink String)
                              (scm.put-bytevector Sink (scm.string->utf8 String)))
-                       _ (scm.and (scm.should-flush? Sink)
+                       F (scm.and (scm.should-flush? Sink)
                                   (scm.flush-output-port Sink))
                     String)
                   (/. E String)))
@@ -119,6 +119,9 @@
                 (_scm.scm-prefixed? F))))
 
 )
+
+(define shen.char-stinput? S -> false)
+(define shen.char-stoutput? S -> false)
 
 \* To print location of errors *\
 

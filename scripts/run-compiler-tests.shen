@@ -31,6 +31,8 @@
   [assert-equal Exp Result] ->
     [assert-equal (make-string "~R" (eval-cons Exp)) Exp Result])
 
-(set *hush* true)
+(define quiet-load
+  File -> (let Contents (read-file File)
+            (map (/. X (eval X)) Contents)))
 
-(load "tests/compiler-tests.shen")
+(quiet-load "tests/compiler-tests.shen")

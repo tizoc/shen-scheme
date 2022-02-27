@@ -88,14 +88,6 @@
  (_scm.kl->scheme [trap-error [+ 1 2] [lambda E 0]])
  [guard [E [else 0]] [+ 1 2]])
 
-(define default D E -> D)
-
-(assert-equal
- (_scm.kl->scheme [trap-error [+ 1 2] [default 0]])
- [let [[?handler [[lambda [X] [lambda [Y] [(_scm.prefix-op default) X Y]]] 0]]]
-   [guard [?exn [else [?handler ?exn]]]
-    [+ 1 2]]])
-
 (assert-equal
  (_scm.kl->scheme [do 1 2])
  [begin 1 2])
@@ -128,30 +120,12 @@
  (_scm.compile-expression [F 1 2 3] [F])
  [[[F 1] 2] 3])
 
-(assert-equal
- (_scm.kl->scheme [+ 1])
- [[lambda [Y] [lambda [Z] [+ Y Z]]] 1])
-
-(define takes-3-args
-  X Y Z -> X)
 
 (define takes-0-args -> 0)
 
 (assert-equal
- (_scm.compile-expression [takes-3-args A B] [A B])
- [[[lambda [X] [lambda [Y] [lambda [Z] [(_scm.prefix-op takes-3-args) X Y Z]]]] A] B])
-
-(assert-equal
- (_scm.compile-expression [takes-3-args X Y Z symbol W] [X Y Z W])
- [[[(_scm.prefix-op takes-3-args) X Y Z] [quote symbol]] W])
-
-(assert-equal
  (_scm.kl->scheme [takes-0-args])
  [(_scm.prefix-op takes-0-args)])
-
-(assert-equal
- (_scm.kl->scheme [takes-0-args 1])
- [[(_scm.prefix-op takes-0-args)] 1])
 
 (assert-equal
  (_scm.kl->scheme [takes-?-args])
@@ -162,6 +136,8 @@
  [(_scm.prefix-op takes-?-args) 1 2 3])
 
 (set _scm.*compiling-shen-sources* true)
+
+(define default D E -> D)
 
 (assert-equal
  (_scm.kl->scheme [trap-error [value varname] [lambda E default]])
