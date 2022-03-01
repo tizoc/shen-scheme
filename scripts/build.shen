@@ -60,7 +60,7 @@
       ["overrides"
        "shen-scheme-extensions"
        "compiler"
-       "factorize-patterns"
+       \\"factorize-patterns"
        ])
 
 \* Required to avoid errors when processing functions with system names *\
@@ -250,7 +250,7 @@
 (include c#34;compiled/shen-scheme-extensions.scmc#34;)
 
 (include c#34;compiled/compiler.scmc#34;)
-(include c#34;compiled/factorize-patterns.scmc#34;)
+;(include c#34;compiled/factorize-patterns.scmc#34;)
 (include c#34;compiled/toplevel.scmc#34;)
 (include c#34;compiled/core.scmc#34;)
 (include c#34;compiled/sys.scmc#34;)
