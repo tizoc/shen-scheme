@@ -112,9 +112,12 @@
 
 (define (kl:eval-kl expr)
   (let* ((scm-expr (kl:_scm.kl->scheme expr))
-         (result (eval scm-expr)))
+         (result (if (pair? scm-expr)
+                     (eval scm-expr)
+                     scm-expr)))
+    ;; TODO: cleanup, both are the same
     (if (and (pair? scm-expr) (eq? (car scm-expr) 'define))
-        (function-name scm-expr)
+        scm-expr
         result)))
 
 ;; Streams and I/O

@@ -5,7 +5,7 @@
                      vector-ref vector-set! make-vector string non-rational-/
                      string-append integer->char char->integer
                      string-ref string-length substring list kl
-                     eq? eqv? equal? scm. scm.import import *toplevel*
+                     eq? eqv? equal? scm. scm.import import *sterror* *toplevel*
                      letrec let* scm.letrec scm.with-input-from-string scm.read
                      scm.define scm.goto-label scm.begin
                      scm.value/or scm.get/or scm.<-vector/or scm.<-address/or]
@@ -20,12 +20,21 @@
                 shen.+string? shen.+vector?])
          (set *kl-prefix* (intern "kl:"))
          (set *static-globals* [
-           shen.*catch* shen.*infs*
-           shen.*maxcomplexity* shen.*occurs*
-           shen.*process-counter*
-           shen.*prologvectors* shen.*varcounter*
+           shen.*infs* shen.*call* shen.*occurs*
+           shen.*special* shen.*extraspecial*
+           shen.*platform-native-call-check*
+           shen.*demodulation-function*
+           shen.*gensym*
            *stinput* *stoutput* *sterror*
            *property-vector* *macros*
+           _scm.*kl-prefix*
+           _scm.*global-prefix*
+           _scm.*yields-boolean1*
+           _scm.*yields-boolean2*
+           \\ TODO
+           \\*maximum-print-sequence-size*
+           \\_scm.*static-globals*
+           \\_scm.*compiling-shen-sources*
          ])
          (set *global-prefix* (intern "kl:global/"))))
 
@@ -261,31 +270,6 @@ but not otherwise.
 (define emit-application
   Op Params Scope -> (emit-application* Op (arity Op) Params Scope))
 
-(define partial-application?
-  Op Arity Params -> (not (or (= Arity -1)
-                              (= Arity (length Params)))))
-
-(define take
-  _ 0 -> []
-  [X | Xs] N -> [X | (take Xs (- N 1))])
-
-(define drop
-  Xs 0 -> Xs
-  [X | Xs] N -> (drop Xs (- N 1)))
-
-\* TODO: optimize cases where the args are static values *\
-(define emit-partial-application
-  Op Arity Params Scope
-  -> (let Args (map (/. P (compile-expression P Scope)) Params)
-       (nest-call (nest-lambda Op Arity Scope) Args))
-    where (> Arity (length Params))
-  Op Arity Params Scope
-  -> (let App (compile-expression [Op | (take Params Arity)] Scope)
-          Rest (map (/. X (compile-expression X Scope)) (drop Params Arity))
-       (nest-call App Rest))
-    where (< Arity (length Params))
-  _ _ _ _ -> (error "emit-partial-application called with non-partial application"))
-
 (define dynamic-application?
   Op Scope -> (or (cons? Op) (element? Op Scope)))
 
@@ -347,9 +331,6 @@ but not otherwise.
 (define emit-application*
   Op Arity Params Scope
   -> (cases
-      \* Known function without all arguments *\
-      (partial-application? Op Arity Params)
-      (emit-partial-application Op Arity Params Scope)
       \* Variables or results of expressions *\
       (dynamic-application? Op Scope)
       (emit-dynamic-application Op Params Scope)
@@ -361,40 +342,13 @@ but not otherwise.
   Op [] -> Op
   Op [Arg | Args] -> (nest-call [Op Arg] Args))
 
-(define nest-lambda
-  Callable Arity Scope
-  -> (compile-expression Callable Scope)
-     where (<= Arity 0)
-
-  Callable Arity Scope
-  -> (let ArgName (gensym (protect Y))
-       [lambda [ArgName]
-         (nest-lambda (merge-args Callable ArgName)
-                      (- Arity 1)
-                      [ArgName | Scope])]))
-
-(define merge-args
-  Op Arg -> (append Op [Arg]) where (cons? Op)
-  Op Arg -> [Op Arg])
-
 (define compiling-function
-  Name F -> (let _ (set *compiling-function* [Name | (value *compiling-function*)])
+  Name F -> (let S (set *compiling-function* [Name | (value *compiling-function*)])
                  Result (thaw F)
-                 _ (set *compiling-function* (tl (value *compiling-function*)))
+                 S (set *compiling-function* (tl (value *compiling-function*)))
               Result))
 
-(set *factorize-patterns* true)
-
-(define remove-root-begin
-  [define F [begin | Body]] -> [define F | Body]
-  X -> X)
-
 (define kl->scheme
-  [defun Name Args [cond | Cases]] -> (remove-root-begin
-                                       (kl->scheme
-                                        (factorize-defun
-                                          [defun Name Args [cond | Cases]])))
-      where (value *factorize-patterns*)
   [defun Name Args Body] -> (compiling-function Name
                               (freeze [define [(prefix-op Name) | Args]
                                         (compile-expression Body Args)]))
