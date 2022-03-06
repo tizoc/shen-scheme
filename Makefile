@@ -37,7 +37,7 @@ ifeq ($(os), linux)
 endif
 
 shenversion ?= 31.0-rc1
-csversion ?= 9.5.4
+csversion ?= 9.5.6
 build_dir ?= _build
 chez_build_dir ?= $(build_dir)$(S)chez
 csdir ?= $(chez_build_dir)$(S)csv$(csversion)
@@ -57,6 +57,8 @@ prefix ?= /usr/local
 home_path ?= \"$(prefix)/lib/shen-scheme\"
 bootfile = $(build_dir)/lib/shen-scheme/shen.boot
 
+precompiled_dir = $(build_dir)$(S)shen-scheme-v0.25-rc1-src
+
 git_tag ?= $(shell git tag -l --contains HEAD 2> /dev/null)
 ifeq ("$(git_tag)","")
 	git_tag = $(shell git rev-parse --short HEAD 2> /dev/null)
@@ -73,6 +75,8 @@ $(csdir):
 	echo "Downloading and uncompressing Chez..."
 	mkdir -p $(chez_build_dir)
 	cd $(chez_build_dir); curl -LO 'https://github.com/cisco/ChezScheme/releases/download/v$(csversion)/csv$(csversion).tar.gz'; tar xzf csv$(csversion).tar.gz; rm csv$(csversion).tar.gz
+	# Workaround to make the build work with Visual Studio > 2017
+	curl -L -o "$(csdir)$(S)c$(S)vs.bat" 'https://raw.githubusercontent.com/cisco/ChezScheme/bf4f42105325f03778c07139f502294ebf8a0b50/c/vs.bat'
 
 $(cskernel): $(csdir)
 	echo "Building Chez..."
@@ -81,7 +85,7 @@ $(cskernel): $(csdir)
 $(exe): $(cskernel) main$(objext)
 	mkdir -p $(build_dir)/bin
 ifeq ($(os), windows)
-	cmd.exe /C '$(csdir)$(S)c$(S)vs.bat amd64 && link.exe /out:$(exe) /machine:X64 /incremental:no /release /nologo main$(objext) $(csbootpath)$(S)csv954mt.lib /DEFAULTLIB:rpcrt4.lib /DEFAULTLIB:User32.lib /DEFAULTLIB:Advapi32.lib /DEFAULTLIB:Ole32.lib'
+	cmd.exe /C '$(csdir)$(S)c$(S)vs.bat amd64 && link.exe /out:$(exe) /machine:X64 /incremental:no /release /nologo main$(objext) $(csbootpath)$(S)csv956mt.lib /DEFAULTLIB:rpcrt4.lib /DEFAULTLIB:User32.lib /DEFAULTLIB:Advapi32.lib /DEFAULTLIB:Ole32.lib'
 else
 	$(CC) -o $@ $^ $(linkerflags)
 endif
@@ -109,9 +113,26 @@ fetch-prebuilt:
 	curl -LO 'https://github.com/tizoc/shen-scheme/releases/download/0.18/shen-scheme-0.18-$(v18os)-bin$(archiveext)'
 	$(uncompress) shen-scheme-0.18-$(v18os)-bin$(archiveext) $(uncompressToFlag)$(build_dir)
 
+# .PHONY: precompile
+# precompile:
+# 	$(build_dir)$(S)shen-scheme-0.18-$(v18os)-bin$(S)bin$(S)shen-scheme$(binext) --script scripts/do-build.shen > /dev/null
+
+$(precompiled_dir):
+	mkdir -p $(build_dir)
+	curl -LO 'https://github.com/tizoc/shen-scheme/releases/download/v0.25-rc1/shen-scheme-v0.25-rc1-src.tar.gz'
+	tar xzf shen-scheme-v0.25-rc1-src.tar.gz -C $(build_dir)
+	rm -f $(precompiled_dir)$(S)Makefile
+	cp Makefile $(precompiled_dir)$(S)Makefile
+
 .PHONY: precompile
 precompile:
-	$(build_dir)$(S)shen-scheme-0.18-$(v18os)-bin$(S)bin$(S)shen-scheme$(binext) --script scripts/do-build.shen > /dev/null
+	$(precompiled_dir)$(S)_build$(S)bin$(S)shen-scheme$(binext) script scripts/do-build.shen > /dev/null
+
+.PHONY: build-precompiled
+build-precompiled: $(precompiled_dir) $(cskernel)
+	mkdir -p $(precompiled_dir)$(S)_build
+	cp -a $(chez_build_dir) $(precompiled_dir)$(S)$(chez_build_dir)
+	cd $(precompiled_dir); make csversion=$(csversion)
 
 .PHONY: test-shen
 test-shen: $(exe) $(bootfile)
@@ -139,7 +160,7 @@ install: $(exe) $(bootfile)
 source-release:
 	mkdir -p _dist
 	git archive --format=tar --prefix="$(archive_name)/" $(git_tag) | (cd _dist && tar xf -)
-	cp compiled/*.scm "_dist/$(archive_name)/compiled/"
+	cp $(compiled_dir)/*.scm "_dist/$(archive_name)/compiled/"
 	cp shen-scheme.scm "_dist/$(archive_name)/shen-scheme.scm"
 	rm -rf "_dist/$(archive_name)/".git*
 	rm "_dist/$(archive_name)/"*/.gitignore
