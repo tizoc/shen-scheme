@@ -57,6 +57,8 @@ prefix ?= /usr/local
 home_path ?= \"$(prefix)/lib/shen-scheme\"
 bootfile = $(build_dir)/lib/shen-scheme/shen.boot
 
+precompiled_dir = $(build_dir)$(S)shen-scheme-v0.25-rc1-src
+
 git_tag ?= $(shell git tag -l --contains HEAD 2> /dev/null)
 ifeq ("$(git_tag)","")
 	git_tag = $(shell git rev-parse --short HEAD 2> /dev/null)
@@ -109,9 +111,24 @@ fetch-prebuilt:
 	curl -LO 'https://github.com/tizoc/shen-scheme/releases/download/0.18/shen-scheme-0.18-$(v18os)-bin$(archiveext)'
 	$(uncompress) shen-scheme-0.18-$(v18os)-bin$(archiveext) $(uncompressToFlag)$(build_dir)
 
+# .PHONY: precompile
+# precompile:
+# 	$(build_dir)$(S)shen-scheme-0.18-$(v18os)-bin$(S)bin$(S)shen-scheme$(binext) --script scripts/do-build.shen > /dev/null
+
+$(precompiled_dir):
+	mkdir -p $(build_dir)
+	curl -LO 'https://github.com/tizoc/shen-scheme/releases/download/v0.25-rc1/shen-scheme-v0.25-rc1-src.tar.gz'
+	tar xzf shen-scheme-v0.25-rc1-src.tar.gz -C $(build_dir)
+
 .PHONY: precompile
 precompile:
-	$(build_dir)$(S)shen-scheme-0.18-$(v18os)-bin$(S)bin$(S)shen-scheme$(binext) --script scripts/do-build.shen > /dev/null
+	$(precompiled_dir)$(S)_build$(S)bin$(S)shen-scheme$(binext) script scripts/do-build.shen > /dev/null
+
+.PHONY: build-precompiled
+build-precompiled: $(precompiled_dir) $(cskernel)
+	mkdir -p $(precompiled_dir)$(S)_build
+	cp -a $(chez_build_dir) $(precompiled_dir)$(S)$(chez_build_dir)
+	cd $(precompiled_dir); make csversion=$(csversion)
 
 .PHONY: test-shen
 test-shen: $(exe) $(bootfile)
@@ -139,7 +156,7 @@ install: $(exe) $(bootfile)
 source-release:
 	mkdir -p _dist
 	git archive --format=tar --prefix="$(archive_name)/" $(git_tag) | (cd _dist && tar xf -)
-	cp compiled/*.scm "_dist/$(archive_name)/compiled/"
+	cp $(compiled_dir)/*.scm "_dist/$(archive_name)/compiled/"
 	cp shen-scheme.scm "_dist/$(archive_name)/shen-scheme.scm"
 	rm -rf "_dist/$(archive_name)/".git*
 	rm "_dist/$(archive_name)/"*/.gitignore
