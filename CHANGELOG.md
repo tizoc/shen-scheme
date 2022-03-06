@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.25] - 2022-03-06
 
+### Changed
+
 - Updated for new S-series kernel (version S31)
 
 ## [0.24] - 2021-03-07

@@ -1,14 +1,11 @@
 ifeq ($(OS), Windows_NT)
 	os = windows
-	v18os = windows
 	m ?= ta6nt
 else ifeq ($(shell uname -s), Darwin)
 	os = macOS
-	v18os = osx
 	m ?= ta6osx
 else
 	os = linux
-	v18os = linux
 	m ?= ta6le
 endif
 
@@ -57,7 +54,7 @@ prefix ?= /usr/local
 home_path ?= \"$(prefix)/lib/shen-scheme\"
 bootfile = $(build_dir)/lib/shen-scheme/shen.boot
 
-precompiled_dir = $(build_dir)$(S)shen-scheme-v0.25-rc1-src
+precompiled_dir = $(build_dir)$(S)shen-scheme-v0.25-src
 
 git_tag ?= $(shell git tag -l --contains HEAD 2> /dev/null)
 ifeq ("$(git_tag)","")
@@ -110,17 +107,17 @@ fetch-kernel:
 .PHONY: fetch-prebuilt
 fetch-prebuilt:
 	mkdir -p $(build_dir)
-	curl -LO 'https://github.com/tizoc/shen-scheme/releases/download/0.18/shen-scheme-0.18-$(v18os)-bin$(archiveext)'
-	$(uncompress) shen-scheme-0.18-$(v18os)-bin$(archiveext) $(uncompressToFlag)$(build_dir)
+	curl -LO 'https://github.com/tizoc/shen-scheme/releases/download/v0.25/shen-scheme-v0.25-$(os)-bin$(archiveext)'
+	$(uncompress) shen-scheme-v0.25-$(os)-bin$(archiveext) $(uncompressToFlag)$(build_dir)
 
-# .PHONY: precompile
-# precompile:
-# 	$(build_dir)$(S)shen-scheme-0.18-$(v18os)-bin$(S)bin$(S)shen-scheme$(binext) --script scripts/do-build.shen > /dev/null
+.PHONY: precompile-with-prebuilt
+precompile-with-prebuilt:
+	$(build_dir)$(S)shen-scheme-v0.25-$(os)-bin$(S)bin$(S)shen-scheme$(binext) script scripts/do-build.shen > /dev/null
 
 $(precompiled_dir):
 	mkdir -p $(build_dir)
-	curl -LO 'https://github.com/tizoc/shen-scheme/releases/download/v0.25-rc1/shen-scheme-v0.25-rc1-src.tar.gz'
-	tar xzf shen-scheme-v0.25-rc1-src.tar.gz -C $(build_dir)
+	curl -LO 'https://github.com/tizoc/shen-scheme/releases/download/v0.25/shen-scheme-v0.25-src.tar.gz'
+	tar xzf shen-scheme-v0.25-src.tar.gz -C $(build_dir)
 	rm -f $(precompiled_dir)$(S)Makefile
 	cp Makefile $(precompiled_dir)$(S)Makefile
 
