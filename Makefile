@@ -75,6 +75,8 @@ $(csdir):
 	echo "Downloading and uncompressing Chez..."
 	mkdir -p $(chez_build_dir)
 	cd $(chez_build_dir); curl -LO 'https://github.com/cisco/ChezScheme/releases/download/v$(csversion)/csv$(csversion).tar.gz'; tar xzf csv$(csversion).tar.gz; rm csv$(csversion).tar.gz
+	# Workaround to make the build work with Visual Studio > 2017
+	curl -L -o "$(csdir)$(S)c$(S)vs.bat" 'https://raw.githubusercontent.com/cisco/ChezScheme/bf4f42105325f03778c07139f502294ebf8a0b50/c/vs.bat'
 
 $(cskernel): $(csdir)
 	echo "Building Chez..."
