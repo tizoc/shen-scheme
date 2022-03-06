@@ -37,7 +37,7 @@ ifeq ($(os), linux)
 endif
 
 shenversion ?= 31.0-rc1
-csversion ?= 9.5.4
+csversion ?= 9.5.6
 build_dir ?= _build
 chez_build_dir ?= $(build_dir)$(S)chez
 csdir ?= $(chez_build_dir)$(S)csv$(csversion)
@@ -83,7 +83,7 @@ $(cskernel): $(csdir)
 $(exe): $(cskernel) main$(objext)
 	mkdir -p $(build_dir)/bin
 ifeq ($(os), windows)
-	cmd.exe /C '$(csdir)$(S)c$(S)vs.bat amd64 && link.exe /out:$(exe) /machine:X64 /incremental:no /release /nologo main$(objext) $(csbootpath)$(S)csv954mt.lib /DEFAULTLIB:rpcrt4.lib /DEFAULTLIB:User32.lib /DEFAULTLIB:Advapi32.lib /DEFAULTLIB:Ole32.lib'
+	cmd.exe /C '$(csdir)$(S)c$(S)vs.bat amd64 && link.exe /out:$(exe) /machine:X64 /incremental:no /release /nologo main$(objext) $(csbootpath)$(S)csv956mt.lib /DEFAULTLIB:rpcrt4.lib /DEFAULTLIB:User32.lib /DEFAULTLIB:Advapi32.lib /DEFAULTLIB:Ole32.lib'
 else
 	$(CC) -o $@ $^ $(linkerflags)
 endif
@@ -119,6 +119,8 @@ $(precompiled_dir):
 	mkdir -p $(build_dir)
 	curl -LO 'https://github.com/tizoc/shen-scheme/releases/download/v0.25-rc1/shen-scheme-v0.25-rc1-src.tar.gz'
 	tar xzf shen-scheme-v0.25-rc1-src.tar.gz -C $(build_dir)
+	rm -f $(precompiled_dir)$(S)Makefile
+	cp Makefile $(precompiled_dir)$(S)Makefile
 
 .PHONY: precompile
 precompile:
