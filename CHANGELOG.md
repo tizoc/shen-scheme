@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.25.1] - 2022-03-06
+
+### Changed
+
+- Updated kernel to S32
+
 ## [0.25] - 2022-03-06
 
 ### Changed
