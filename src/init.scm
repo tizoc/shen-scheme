@@ -18,7 +18,7 @@
   (lambda (fname)
     (and (symbol? fname)
          (let ((fname (symbol->string fname)))
-           (and (> (string-length fname) 4)
+           (and (>= (string-length fname) 4)
                 (char=? #\. (string-ref fname 3))
                 (char=? #\s (string-ref fname 0))
                 (char=? #\c (string-ref fname 1))
