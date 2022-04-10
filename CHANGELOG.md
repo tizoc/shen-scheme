@@ -133,9 +133,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.25...HEAD
-[0.25]: https://github.com/tizoc/shen-scheme/compare/0.24...v0.25
-[0.24]: https://github.com/tizoc/shen-scheme/compare/0.23...v0.24
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.25.1...HEAD
+[0.25.1]: https://github.com/tizoc/shen-scheme/compare/v0.25...v0.25.1
+[0.25]: https://github.com/tizoc/shen-scheme/compare/v0.24...v0.25
+[0.24]: https://github.com/tizoc/shen-scheme/compare/v0.23...v0.24
 [0.23]: https://github.com/tizoc/shen-scheme/compare/0.22...v0.23
 [0.22]: https://github.com/tizoc/shen-scheme/compare/0.21...0.22
 [0.21]: https://github.com/tizoc/shen-scheme/compare/0.20...0.21
