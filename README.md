@@ -1,4 +1,4 @@
-[![Shen Version](https://img.shields.io/badge/shen-32.1-blue.svg)](https://github.com/Shen-Language)
+[![Shen Version](https://img.shields.io/badge/shen-32.3-blue.svg)](https://github.com/Shen-Language)
 [![build](https://github.com/tizoc/shen-scheme/workflows/build/badge.svg)](https://github.com/tizoc/shen-scheme/actions?query=workflow%3Abuild)
 
 Shen/Scheme, a Scheme port of the Shen language
@@ -151,5 +151,5 @@ Example:
 License
 -------
 
-- Shen, Copyright © 2010-2015 Mark Tarver - [License](http://www.shenlanguage.org/license.pdf).
-- shen-scheme, Copyright © 2012-2021 Bruno Deferrari under [BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause).
+- Shen, Copyright © 2010-2022 Mark Tarver - [License](http://www.shenlanguage.org/license.pdf).
+- shen-scheme, Copyright © 2012-2023 Bruno Deferrari under [BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause).
