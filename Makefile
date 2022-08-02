@@ -51,7 +51,7 @@ klsources_dir ?= kl
 compiled_dir ?= compiled
 exe ?= $(build_dir)/bin/shen-scheme$(binext)
 prefix ?= /usr/local
-home_path ?= \"$(prefix)/lib/shen-scheme\"
+home_path ?= "$(prefix)/lib/shen-scheme"
 bootfile = $(build_dir)/lib/shen-scheme/shen.boot
 
 precompiled_dir = $(build_dir)$(S)shen-scheme-v0.25-src
