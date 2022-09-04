@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.25.4] - 2022-09-04
+
+### Fixed
+
+- `eval-kl` now correctly returns the name of the defined function when evaluating `defun` expressions.
+- The exception raised by `abort` and `shen.string-match` is now recognized as an interactive error in the REPL and no exception message is displayed.
+
 ## [0.25.3] - 2022-07-31
 
 ### Changed
@@ -145,7 +152,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.25.3...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.25.4...HEAD
+[0.25.4]: https://github.com/tizoc/shen-scheme/compare/v0.25.3...v0.25.4
 [0.25.3]: https://github.com/tizoc/shen-scheme/compare/v0.25.2...v0.25.3
 [0.25.2]: https://github.com/tizoc/shen-scheme/compare/v0.25.1...v0.25.2
 [0.25.1]: https://github.com/tizoc/shen-scheme/compare/v0.25...v0.25.1
