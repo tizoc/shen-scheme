@@ -136,6 +136,7 @@
 
 (define interactive-error?
   E abort _ -> true
+  E shen.string-match _ -> true
   E shen.toplineread_loop "line read aborted" -> true
   E shen.f_error "aborted" -> true
   E shen.typecheck-and-evaluate "type error" -> true
