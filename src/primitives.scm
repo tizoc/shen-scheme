@@ -115,9 +115,8 @@
          (result (if (pair? scm-expr)
                      (eval scm-expr)
                      scm-expr)))
-    ;; TODO: cleanup, both are the same
     (if (and (pair? scm-expr) (eq? (car scm-expr) 'define))
-        scm-expr
+        (function-name scm-expr)
         result)))
 
 ;; Streams and I/O
