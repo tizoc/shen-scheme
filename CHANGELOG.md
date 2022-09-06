@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.25.5] - 2022-09-06
+
+### Fixed
+
+- `pr` override now respects `*hush*`'s value.
+
 ## [0.25.4] - 2022-09-04
 
 ### Fixed
@@ -152,7 +158,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.25.4...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.25.5...HEAD
+[0.25.5]: https://github.com/tizoc/shen-scheme/compare/v0.25.4...v0.25.5
 [0.25.4]: https://github.com/tizoc/shen-scheme/compare/v0.25.3...v0.25.4
 [0.25.3]: https://github.com/tizoc/shen-scheme/compare/v0.25.2...v0.25.3
 [0.25.2]: https://github.com/tizoc/shen-scheme/compare/v0.25.1...v0.25.2
