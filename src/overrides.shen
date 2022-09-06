@@ -21,9 +21,10 @@
 (define pr
   String Sink -> (trap-error
                   (let P (if (scm.textual-port? Sink)
-                             (scm.put-string Sink String)
-                             (scm.put-bytevector Sink (scm.string->utf8 String)))
-                       F (scm.and (scm.should-flush? Sink)
+                             (scm.or (value *hush*) (scm.put-string Sink String))
+                             (scm.or (value *hush*) (scm.put-bytevector Sink (scm.string->utf8 String))))
+                       F (scm.and (not (value *hush*))
+                                  (scm.should-flush? Sink)
                                   (scm.flush-output-port Sink))
                     String)
                   (/. E String)))
