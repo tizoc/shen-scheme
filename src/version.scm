@@ -1,2 +1,2 @@
-(kl:set '*port* "0.25.5")
+(kl:set '*port* "0.26")
 

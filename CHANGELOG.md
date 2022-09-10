@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26] - 2022-09-10
+
+### Changed
+
+- Updated kernel to S33.1
+- Origin of raised exceptions is not shown anymore my default. This can be changed by setting `shen.*show-exceptions*` to `true`.
+
 ## [0.25.5] - 2022-09-06
 
 ### Fixed
@@ -158,7 +165,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.25.5...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.26...HEAD
+[0.26]: https://github.com/tizoc/shen-scheme/compare/v0.25.5...v0.26
 [0.25.5]: https://github.com/tizoc/shen-scheme/compare/v0.25.4...v0.25.5
 [0.25.4]: https://github.com/tizoc/shen-scheme/compare/v0.25.3...v0.25.4
 [0.25.3]: https://github.com/tizoc/shen-scheme/compare/v0.25.2...v0.25.3
