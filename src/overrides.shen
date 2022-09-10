@@ -135,7 +135,11 @@
             (output "~A" Msg)
             (output "Exception in ~A: ~A" Loc Msg))))
 
+(define show-exceptions?
+  -> (trap-error (value *show-exceptions*) (/. E false)))
+
 (define interactive-error?
+  _ _ _ -> true where (not (show-exceptions?))
   E abort _ -> true
   E shen.string-match _ -> true
   E shen.toplineread_loop "line read aborted" -> true
