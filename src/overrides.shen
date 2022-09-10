@@ -141,6 +141,7 @@
   E shen.toplineread_loop "line read aborted" -> true
   E shen.f_error "aborted" -> true
   E shen.typecheck-and-evaluate "type error" -> true
+  E shen.unwind-types _ -> true
   _ _ _ -> false)
 
 )
