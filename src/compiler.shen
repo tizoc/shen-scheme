@@ -112,7 +112,7 @@
   [scm.lambda Vars Body] Scope -> [lambda Vars (compile-expression Body (append Vars Scope))]
   [scm.define [Name | Vars] Body] Scope -> [define [Name | Vars] (compile-expression Body (append Vars Scope))]
   [scm.define Name Expr] Scope -> [define Name (compile-expression Expr Scope)] where (symbol? Name)
-  [scm. Code] _ -> (scm.with-input-from-string Code (freeze (scm.read))) where (string? Code)
+  [scm. Code] _ -> ((foreign scm.with-input-from-string) Code (freeze ((foreign scm.read)))) where (string? Code)
   [scm. Form] _ -> (emit-scm-form Form)
   [scm. kl : Name] _ -> (intern (cn "kl:" (str Name))) where (symbol? Name)
   [Op | Args] Scope -> (emit-application Op Args Scope)

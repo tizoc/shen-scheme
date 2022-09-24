@@ -18,7 +18,7 @@
 (set shen.x.factorise-defun.*selector-handlers* [])
 (set shen.x.factorise-defun.*selector-handlers-reg* [])
 (trap-error
-  (scm. "(define-top-level-value kl:global/*property-vector* (make-parameter (kl:value '*property-vector*)))")
+  ((foreign scm.) "(define-top-level-value kl:global/*property-vector* (make-parameter (kl:value '*property-vector*)))")
   (/. X ignore))
 
 \\(load "kl/extension-factorise-defun.kl")

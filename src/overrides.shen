@@ -3,123 +3,113 @@
 
 (define cd
   "" -> (cd (value shen.*initial-home-directory*))
-  Dir -> (let NewDir (scm.current-directory Dir)
-           (set *home-directory* (scm.current-directory))))
+  Dir -> (let NewDir ((foreign scm.current-directory) Dir)
+           (set *home-directory* ((foreign scm.current-directory)))))
 
 (define hash
-  Val Bound -> (scm.fxmod (scm.equal-hash Val) Bound))
+  Val Bound -> ((foreign scm.fxmod) ((foreign scm.equal-hash) Val) Bound))
 
 (define not
-  Val -> (scm.not Val))
+  Val -> ((foreign scm.not) Val))
 
 (define boolean?
-  Val -> (scm.boolean? Val))
+  Val -> ((foreign scm.boolean?) Val))
 
 (define integer?
-  Val -> (scm.integer? Val))
+  Val -> ((foreign scm.integer?) Val))
 
 (define pr
   String Sink -> (trap-error
-                  (let P (if (scm.textual-port? Sink)
-                             (scm.or (value *hush*) (scm.put-string Sink String))
-                             (scm.or (value *hush*) (scm.put-bytevector Sink (scm.string->utf8 String))))
-                       F (scm.and (not (value *hush*))
-                                  (scm.should-flush? Sink)
-                                  (scm.flush-output-port Sink))
+                  (let P (if ((foreign scm.textual-port?) Sink)
+                             ((foreign scm.or) (value *hush*) ((foreign scm.put-string) Sink String))
+                             ((foreign scm.or) (value *hush*) ((foreign scm.put-bytevector) Sink ((foreign scm.string->utf8) String))))
+                       F ((foreign scm.and)
+                            (not (value *hush*))
+                            ((foreign scm.should-flush?) Sink)
+                            ((foreign scm.flush-output-port) Sink))
                     String)
                   (/. E String)))
 
 (define variable?
-  Val -> (scm.and
-          (scm.symbol? Val)
-          (scm.char-upper-case? (scm.string-ref (scm.symbol->string Val) 0))))
+  Val -> ((foreign scm.and)
+          ((foreign scm.symbol?) Val)
+          ((foreign scm.char-upper-case?) ((foreign scm.string-ref) ((foreign scm.symbol->string) Val) 0))))
 
 (define shen.analyse-symbol?
-  S -> (scm.analyse-symbol? S))
+  S -> ((foreign scm.analyse-symbol?) S))
 
 (define symbol?
-  Val -> (and (scm.symbol? Val)
+  Val -> (and ((foreign scm.symbol?) Val)
               (shen.analyse-symbol? (str Val))))
 
 (define shen.pvar?
-  V -> (scm.and
+  V -> ((foreign scm.and)
         (absvector? V)
-        (scm.and
-         (scm.fx>? (scm.vector-length V) 0)
-         (= (scm.vector-ref V 0) shen.pvar))))
+        ((foreign scm.and)
+         ((foreign scm.fx>?) ((foreign scm.vector-length) V) 0)
+         (= ((foreign scm.vector-ref) V 0) shen.pvar))))
 
 (define shen.numbyte?
-  N -> (scm.and (scm.fx>=? N 48) (scm.fx<=? N 57)))
+  N -> ((foreign scm.and) ((foreign scm.fx>=?) N 48) ((foreign scm.fx<=?) N 57)))
 
 (define shen.byte->digit
-  N -> (scm.fx- N 48))
+  N -> ((foreign scm.fx-) N 48))
 
 (define shen.dict
-  Size -> (scm.make-equal-hashtable Size))
+  Size -> ((foreign scm.make-equal-hashtable) Size))
 
 (define shen.dict?
-  X -> (scm.hashtable? X))
+  X -> ((foreign scm.hashtable?) X))
 
 (define shen.dict-count
-  Dict -> (scm.hashtable-size Dict))
+  Dict -> ((foreign scm.hashtable-size) Dict))
 
 (define shen.dict->
-  Dict K V -> (do (scm.hashtable-set! Dict K V)
+  Dict K V -> (do ((foreign scm.hashtable-set!) Dict K V)
                   V))
 
 (define shen.<-dict
-  Dict K -> (let Res (scm.hashtable-ref Dict K $%value-not-found%$)
-              (if (scm.eq? Res $%value-not-found%$)
+  Dict K -> (let Res ((foreign scm.hashtable-ref) Dict K $%value-not-found%$)
+              (if ((foreign scm.eq?) Res $%value-not-found%$)
                   (error "value ~A not found in dict~%" K)
                   Res)))
 
 (define shen.dict-rm
-  Dict K -> (do (scm.hashtable-delete! Dict K)
+  Dict K -> (do ((foreign scm.hashtable-delete!) Dict K)
                 K))
 
 \* hashtable-fold defined in prelude.scm *\
 (define shen.dict-fold
-  Dict F Init -> (scm.hashtable-fold Dict F Init))
+  Dict F Init -> ((foreign scm.hashtable-fold) Dict F Init))
 
 (define shen.dict-keys
-  Dict -> (scm.hashtable-keys Dict))
+  Dict -> ((foreign scm.hashtable-keys) Dict))
 
 (define shen.dict-values
-  Dict -> (scm.hashtable-values Dict))
+  Dict -> ((foreign scm.hashtable-values) Dict))
 
 \* read-file-as-* defined in prelude.scm *\
 
 (define read-file-as-bytelist
-  Filename -> (scm.read-file-as-bytelist Filename))
+  Filename -> ((foreign scm.read-file-as-bytelist) Filename))
 
 (define shen.read-file-as-charlist
-  Filename -> (scm.read-file-as-bytelist Filename))
+  Filename -> ((foreign scm.read-file-as-bytelist) Filename))
 
 (define read-file-as-string
-  Filename -> (scm.read-file-as-string Filename))
+  Filename -> ((foreign scm.read-file-as-string) Filename))
 
 \* tuples *\
 
 (define @p
-  X Y -> (scm.vector shen.tuple X Y))
+  X Y -> ((foreign scm.vector) shen.tuple X Y))
 
 \* vectors *\
 
 (define vector
-  N -> (let Vector (scm.make-vector (+ N 1) (fail))
+  N -> (let Vector ((foreign scm.make-vector) (+ N 1) (fail))
             ZeroStamp (address-> Vector 0 N)
           Vector))
-
-\* consider scm. prefixed names sysfuncs *\
-
-(package shen [scm.symbol? _scm.scm-prefixed?]
-
-(define sysfunc?
-  F -> (and (scm.symbol? F)
-            (or (element? F (get (intern "shen") external-symbols))
-                (_scm.scm-prefixed? F))))
-
-)
 
 (define shen.char-stinput? S -> false)
 (define shen.char-stoutput? S -> false)
@@ -130,7 +120,7 @@
 
 (define toplevel-display-exception
   E -> (let Msg (error-to-string E)
-            Loc (scm.error-location E)
+            Loc ((foreign scm.error-location) E)
         (if (interactive-error? E Loc Msg)
             (output "~A" Msg)
             (output "Exception in ~A: ~A" Loc Msg))))
