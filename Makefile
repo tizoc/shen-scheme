@@ -54,7 +54,7 @@ prefix ?= /usr/local
 home_path ?= "$(prefix)/lib/shen-scheme"
 bootfile = $(build_dir)/lib/shen-scheme/shen.boot
 
-precompiled_dir = $(build_dir)$(S)shen-scheme-v0.25-src
+precompiled_dir = $(build_dir)$(S)shen-scheme-v0.26-src
 
 git_tag ?= $(shell git tag -l --contains HEAD 2> /dev/null)
 ifeq ("$(git_tag)","")
@@ -107,17 +107,17 @@ fetch-kernel:
 .PHONY: fetch-prebuilt
 fetch-prebuilt:
 	mkdir -p $(build_dir)
-	curl -LO 'https://github.com/tizoc/shen-scheme/releases/download/v0.25/shen-scheme-v0.25-$(os)-bin$(archiveext)'
-	$(uncompress) shen-scheme-v0.25-$(os)-bin$(archiveext) $(uncompressToFlag)$(build_dir)
+	curl -LO 'https://github.com/tizoc/shen-scheme/releases/download/v0.26/shen-scheme-v0.26-$(os)-bin$(archiveext)'
+	$(uncompress) shen-scheme-v0.26-$(os)-bin$(archiveext) $(uncompressToFlag)$(build_dir)
 
 .PHONY: precompile-with-prebuilt
 precompile-with-prebuilt:
-	$(build_dir)$(S)shen-scheme-v0.25-$(os)-bin$(S)bin$(S)shen-scheme$(binext) script scripts/do-build.shen > /dev/null
+	$(build_dir)$(S)shen-scheme-v0.26-$(os)-bin$(S)bin$(S)shen-scheme$(binext) script scripts/do-build.shen > /dev/null
 
 $(precompiled_dir):
 	mkdir -p $(build_dir)
-	curl -LO 'https://github.com/tizoc/shen-scheme/releases/download/v0.25/shen-scheme-v0.25-src.tar.gz'
-	tar xzf shen-scheme-v0.25-src.tar.gz -C $(build_dir)
+	curl -LO 'https://github.com/tizoc/shen-scheme/releases/download/v0.26/shen-scheme-v0.26-src.tar.gz'
+	tar xzf shen-scheme-v0.26-src.tar.gz -C $(build_dir)
 	rm -f $(precompiled_dir)$(S)Makefile
 	cp Makefile $(precompiled_dir)$(S)Makefile
 
