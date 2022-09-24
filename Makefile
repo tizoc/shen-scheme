@@ -123,7 +123,7 @@ $(precompiled_dir):
 
 .PHONY: precompile
 precompile:
-	$(precompiled_dir)$(S)_build$(S)bin$(S)shen-scheme$(binext) script scripts/do-build.shen > /dev/null
+	$(SHEN) script scripts/do-build.shen > /dev/null
 
 .PHONY: build-precompiled
 build-precompiled: $(precompiled_dir) $(cskernel)
