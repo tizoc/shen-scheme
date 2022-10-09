@@ -28,7 +28,7 @@ jobs:
       - name: Build and test
         run: |
           make fetch-kernel
-          make build-precompiled
-          make precompile
+          make fetch-prebuilt
+          make precompile-with-prebuilt
           make
           make test
