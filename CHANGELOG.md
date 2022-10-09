@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.27] - 2022-10-09
+
+### Changed
+
+- Updated kernel to S33.1.1.
+- Improved compilation of factorized `defuns` that generates code as efficient as the pre-S-kernel version.
+
+### Removed
+
+- Special treatment of `scm.` prefixed functions was removed. The new `foreign` form must now be used.
+
 ## [0.26] - 2022-09-10
 
 ### Changed
@@ -165,7 +176,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.26...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.27...HEAD
+[0.27]: https://github.com/tizoc/shen-scheme/compare/v0.26...v0.27
 [0.26]: https://github.com/tizoc/shen-scheme/compare/v0.25.5...v0.26
 [0.25.5]: https://github.com/tizoc/shen-scheme/compare/v0.25.4...v0.25.5
 [0.25.4]: https://github.com/tizoc/shen-scheme/compare/v0.25.3...v0.25.4
