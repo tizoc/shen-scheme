@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.28] - 2022-11-27
+
+- Updated kernel to S34.1.
+
 ## [0.27.1] - 2022-10-09
 
 ### Changed
@@ -183,7 +187,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.27.1...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.28...HEAD
+[0.28]: https://github.com/tizoc/shen-scheme/compare/v0.27.1...v0.28
 [0.27.1]: https://github.com/tizoc/shen-scheme/compare/v0.27...v0.27.1
 [0.27]: https://github.com/tizoc/shen-scheme/compare/v0.26...v0.27
 [0.26]: https://github.com/tizoc/shen-scheme/compare/v0.25.5...v0.26
