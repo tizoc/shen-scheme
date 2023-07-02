@@ -133,8 +133,8 @@
 
 (define (kl:close stream)
   (cond
-   ((input-port? stream) (close-input-port stream))
-   ((output-port? stream) (close-output-port stream))
+   ((input-port? stream) (close-input-port stream) '())
+   ((output-port? stream) (close-output-port stream) '())
    (else (raise-error 'close "invalid stream" stream))))
 
 (define (kl:write-byte byte o)
