@@ -7,23 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.33] - 2023-08-19
+
+- Updated kernel to S34.5.
+
 ## [0.32] - 2023-07-02
+
+### Fixed
 
 - Fix `close` so that it returns an empty list as declared by the Shen kernel.
 
 ## [0.31] - 2023-07-02
 
+### Changed
+
 - Updated kernel to S34.4.
 
 ## [0.30] - 2023-04-02
+
+### Changed
 
 - Updated kernel to S34.3.
 
 ## [0.29] - 2022-12-10
 
+### Changed
+
 - Updated kernel to S34.2.
 
 ## [0.28] - 2022-11-27
+
+### Changed
 
 - Updated kernel to S34.1.
 
@@ -203,7 +217,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.32...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.33...HEAD
+[0.33]: https://github.com/tizoc/shen-scheme/compare/v0.32...v0.33
 [0.32]: https://github.com/tizoc/shen-scheme/compare/v0.31...v0.32
 [0.31]: https://github.com/tizoc/shen-scheme/compare/v0.30...v0.31
 [0.30]: https://github.com/tizoc/shen-scheme/compare/v0.29...v0.30
