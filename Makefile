@@ -34,7 +34,7 @@ ifeq ($(os), linux)
 endif
 
 shenversion ?= 36.0
-csversion ?= 9.5.8
+csversion ?= 9.6.4
 build_dir ?= _build
 chez_build_dir ?= $(build_dir)$(S)chez
 csdir ?= $(chez_build_dir)$(S)csv$(csversion)
@@ -82,7 +82,7 @@ $(cskernel): $(csdir)
 $(exe): $(cskernel) main$(objext)
 	mkdir -p $(build_dir)/bin
 ifeq ($(os), windows)
-	cmd.exe /C '$(csdir)$(S)c$(S)vs.bat amd64 && link.exe /out:$(exe) /machine:X64 /incremental:no /release /nologo main$(objext) $(csbootpath)$(S)csv958mt.lib /DEFAULTLIB:rpcrt4.lib /DEFAULTLIB:User32.lib /DEFAULTLIB:Advapi32.lib /DEFAULTLIB:Ole32.lib'
+	cmd.exe /C '$(csdir)$(S)c$(S)vs.bat amd64 && link.exe /out:$(exe) /machine:X64 /incremental:no /release /nologo main$(objext) $(csbootpath)$(S)csv964mt.lib /DEFAULTLIB:rpcrt4.lib /DEFAULTLIB:User32.lib /DEFAULTLIB:Advapi32.lib /DEFAULTLIB:Ole32.lib'
 else
 	$(CC) -o $@ $^ $(linkerflags)
 endif
