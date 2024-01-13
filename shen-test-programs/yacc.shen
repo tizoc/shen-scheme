@@ -31,6 +31,7 @@ likes; chases;)
 [<ds>] [<es>] := (append <ds> <es>);) 
 
 (defcc <ds>
+  {(list symbol) ==> (list symbol)}
   d <ds>; 
   d;) 
 
