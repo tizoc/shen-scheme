@@ -32,6 +32,8 @@ jobs:
     name: Upload Release Asset (${{ matrix.OSNAME }})
     runs-on: ${{ matrix.os }}-latest
     needs: create_release
+    env:
+      CHEZ_SCHEME_VERSION: '9.6.4'
     strategy:
       matrix:
         include:
@@ -55,7 +57,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: _build/chez
-          key: shen-scheme-chez-cache-${{ matrix.os }}
+          key: shen-scheme-chez-cache-${{ matrix.os }}-${{ env.CHEZ_SCHEME_VERSION }}
       - name: Install deps (Ubuntu)
         run: sudo apt-get install -y uuid-dev
         if: runner.os == 'linux'
@@ -64,7 +66,7 @@ jobs:
           make fetch-kernel
           make fetch-prebuilt
           make precompile-with-prebuilt
-          make
+          make csversion=$CHEZ_SCHEME_VERSION
           make test
       - name: Create binary release for ${{ matrix.OSNAME }}
         run: make binary-release

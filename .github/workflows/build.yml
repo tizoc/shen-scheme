@@ -10,6 +10,8 @@ jobs:
   build:
     name: Build and test
     runs-on: ${{ matrix.os }}-latest
+    env:
+      CHEZ_SCHEME_VERSION: '9.6.4'
     strategy:
       matrix:
         os: [macos, ubuntu, windows]
@@ -21,14 +23,15 @@ jobs:
         uses: actions/cache@v2
         with:
           path: _build/chez
-          key: ${{ matrix.os }}
+          key: ${{ matrix.os }}-chez-${{ env.CHEZ_SCHEME_VERSION }}
       - name: Install deps (Ubuntu)
         run: sudo apt-get install -y uuid-dev
         if: runner.os == 'linux'
       - name: Build and test
         run: |
+          echo "Using Chez Scheme version $CHEZ_SCHEME_VERSION"
           make fetch-kernel
           make fetch-prebuilt
           make precompile-with-prebuilt
-          make
+          make csversion=$CHEZ_SCHEME_VERSION
           make test
