@@ -33,7 +33,7 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     needs: create_release
     env:
-      CHEZ_SCHEME_VERSION: '9.6.4'
+      CHEZ_SCHEME_VERSION: '10.0.0'
     strategy:
       matrix:
         include:
