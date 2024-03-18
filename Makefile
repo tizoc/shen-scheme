@@ -95,7 +95,7 @@ $(csdir):
 $(cskernel): $(csdir)
 	echo "Building Chez..."
 ifeq ($(os), windows)
-	cd $(csdir) && cmd.exe /C build.bat ta6nt
+	cd $(csdir) && cmd.exe /C 'build.bat ta6nt'
 else
 	cd $(csdir) && ./configure --threads && make
 endif
