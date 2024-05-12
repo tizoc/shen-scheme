@@ -3,7 +3,12 @@ ifeq ($(OS), Windows_NT)
 	m ?= ta6nt
 else ifeq ($(shell uname -s), Darwin)
 	os = macOS
-	m ?= ta6osx
+	uname_m := $(shell uname -m)
+	ifeq ($(uname_m), arm64)
+		m ?= tarm64osx
+	else
+		m ?= ta6osx
+	endif
 else
 	os = linux
 	m ?= ta6le
@@ -12,18 +17,28 @@ endif
 ifeq ($(os), windows)
 	S = \\\\
 	objext = .obj
+	arext = .lib
 	binext = .exe
 	archiveext = .zip
-	cskernelname = mainmd
+	cskernelname = csv1000mt
+	lz4dirname = lz4mts$(S)lib
+	lz4libname = liblz4
+	zlibdirname = zlibmts
+	zliblibname = zlib
 	compress = 7z a -tzip
 	uncompress = 7z x
 	uncompressToFlag = -o
 else
 	S = /
 	objext = .o
+	arext = .a
 	binext =
 	archiveext = .tar.gz
-	cskernelname = kernel
+	cskernelname = libkernel
+	lz4dirname = lz4$(S)lib
+	lz4libname = liblz4
+	zlibdirname = zlib
+	zliblibname = libz
 	compress = tar cvzf
 	uncompress = tar xzf
 	uncompressToFlag = -C
@@ -34,7 +49,7 @@ ifeq ($(os), linux)
 endif
 
 shenversion ?= 36.0
-csversion ?= 9.6.4
+csversion ?= 10.0.0
 build_dir ?= _build
 chez_build_dir ?= $(build_dir)$(S)chez
 csdir ?= $(chez_build_dir)$(S)csv$(csversion)
@@ -43,8 +58,12 @@ cscopyright = $(csdir)$(S)NOTICE
 csbootpath = $(csdir)$(S)$(m)$(S)boot$(S)$(m)
 psboot = .$(S)$(csbootpath)$(S)petite.boot
 csboot = .$(S)$(csbootpath)$(S)scheme.boot
-cskernelname ?= kernel
-cskernel = $(csbootpath)$(S)$(cskernelname)$(objext)
+cskernelname ?= libkernel
+cskernel = $(csbootpath)$(S)$(cskernelname)$(arext)
+zlibdir = $(csdir)$(S)$(m)$(S)$(zlibdirname)
+zlib = $(zlibdir)$(S)$(zliblibname)$(arext)
+lz4dir = $(csdir)$(S)$(m)$(S)$(lz4dirname)
+lz4 = $(lz4dir)$(S)$(lz4libname)$(arext)
 csbinpath = $(csdir)$(S)$(m)$(S)bin$(S)$(m)
 scmexe = $(csbinpath)$(S)scheme
 klsources_dir ?= kl
@@ -72,24 +91,33 @@ $(csdir):
 	echo "Downloading and uncompressing Chez..."
 	mkdir -p $(chez_build_dir)
 	cd $(chez_build_dir); curl -LO 'https://github.com/cisco/ChezScheme/releases/download/v$(csversion)/csv$(csversion).tar.gz'; tar xzf csv$(csversion).tar.gz; rm csv$(csversion).tar.gz
-	# Workaround to make the build work with Visual Studio > 2017
-	curl -L -o "$(csdir)$(S)c$(S)vs.bat" 'https://raw.githubusercontent.com/cisco/ChezScheme/bf4f42105325f03778c07139f502294ebf8a0b50/c/vs.bat'
 
 $(cskernel): $(csdir)
 	echo "Building Chez..."
+ifeq ($(os), windows)
+	cmd.exe /C 'cd $(csdir) && build.bat ta6nt'
+else
 	cd $(csdir) && ./configure --threads && make
+endif
 
-$(exe): $(cskernel) main$(objext)
+.PHONY: chez_kernel
+chez_kernel: $(cskernel)
+
+$(zlib): $(cskernel)
+
+$(lz4): $(cskernel)
+
+$(exe): $(zlib) $(lz4) $(cskernel) main$(objext)
 	mkdir -p $(build_dir)/bin
 ifeq ($(os), windows)
-	cmd.exe /C '$(csdir)$(S)c$(S)vs.bat amd64 && link.exe /out:$(exe) /machine:X64 /incremental:no /release /nologo main$(objext) $(csbootpath)$(S)csv964mt.lib /DEFAULTLIB:rpcrt4.lib /DEFAULTLIB:User32.lib /DEFAULTLIB:Advapi32.lib /DEFAULTLIB:Ole32.lib'
+	cmd.exe /C '$(csdir)$(S)c$(S)vs.bat amd64 && link.exe /out:$(exe) /machine:X64 /incremental:no /release /nologo $(zlib) $(lz4) $(cskernel) main$(objext) /DEFAULTLIB:rpcrt4.lib /DEFAULTLIB:User32.lib /DEFAULTLIB:Advapi32.lib /DEFAULTLIB:Ole32.lib'
 else
-	$(CC) -o $@ $^ $(linkerflags)
+	$(CC) -o $@ main.o -L$(csbootpath) -lkernel -L$(zlibdir) -L$(lz4dir) -llz4 -lz $(linkerflags)
 endif
 
 %$(objext): %.c
 ifeq ($(os), windows)
-	cmd.exe /C '$(csdir)$(S)c$(S)vs.bat amd64 && cl.exe /c /nologo /W3 /D_CRT_SECURE_NO_WARNINGS /I$(csbootpath) /I.$(S)lib /MT /Fo$@ $<'
+	cmd.exe /C '$(csdir)$(S)c$(S)vs.bat amd64 && cl.exe /c /nologo /W3 /D_CRT_SECURE_NO_WARNINGS /I.$(S)$(csbootpath) /I.$(S)lib /MT /Fo$@ $<'
 else
 	$(CC) -c -o $@ $< -I$(csbootpath) -I./lib -Wall -Wextra -pedantic $(CFLAGS)
 endif
