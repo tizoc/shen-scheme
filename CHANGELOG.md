@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.35] - 2024-05-12
+
+### Changed
+
+- Updated kernel to S38.2.
+- Bumped default Chez versino to 10.0.0.
+
 ## [0.34] - 2024-01-14
 
 ### Changed
@@ -226,7 +233,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.34...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.35...HEAD
+[0.35]: https://github.com/tizoc/shen-scheme/compare/v0.34...v0.35
 [0.34]: https://github.com/tizoc/shen-scheme/compare/v0.33...v0.34
 [0.33]: https://github.com/tizoc/shen-scheme/compare/v0.32...v0.33
 [0.32]: https://github.com/tizoc/shen-scheme/compare/v0.31...v0.32
