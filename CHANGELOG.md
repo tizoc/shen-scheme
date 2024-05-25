@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.37] - 2024-05-25
+
 ### Added
 
 - Support for aarch64 and riscv64 architectures on Linux.
@@ -243,7 +245,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.36...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.37...HEAD
+[0.37]: https://github.com/tizoc/shen-scheme/compare/v0.36...v0.37
 [0.36]: https://github.com/tizoc/shen-scheme/compare/v0.35...v0.36
 [0.35]: https://github.com/tizoc/shen-scheme/compare/v0.34...v0.35
 [0.34]: https://github.com/tizoc/shen-scheme/compare/v0.33...v0.34
