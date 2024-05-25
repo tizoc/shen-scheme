@@ -11,7 +11,14 @@ else ifeq ($(shell uname -s), Darwin)
 	endif
 else
 	os = linux
-	m ?= ta6le
+	uname_m := $(shell uname -m)
+	ifeq ($(uname_m), aarch64)
+		m ?= tarm64le
+	else ifeq ($(uname_m), riscv64)
+		m ?= trv64le
+	else
+		m ?= ta6le
+	endif
 endif
 
 ifeq ($(os), windows)
@@ -81,7 +88,11 @@ ifeq ("$(git_tag)","")
 endif
 archive_name = shen-scheme-$(git_tag)-src
 
-CFLAGS += -m64
+ifneq ($(uname_m), aarch64)
+ifneq ($(uname_m), riscv64)
+	CFLAGS += -m64
+endif
+endif
 
 .DEFAULT: all
 .PHONY: all
