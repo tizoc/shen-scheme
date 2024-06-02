@@ -22,7 +22,6 @@
          (set *static-globals* [
            shen.*infs* shen.*call* shen.*occurs*
            shen.*special* shen.*extraspecial*
-           shen.*platform-native-call-check*
            shen.*demodulation-function*
            shen.*gensym*
            *stinput* *stoutput* *sterror*

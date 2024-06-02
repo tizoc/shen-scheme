@@ -1,11 +1,6 @@
 \* Copyright (c) 2012-2021 Bruno Deferrari.  All rights reserved. *\
 \* BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause *\
 
-(define cd
-  "" -> (cd (value shen.*initial-home-directory*))
-  Dir -> (let NewDir ((foreign scm.current-directory) Dir)
-           (set *home-directory* ((foreign scm.current-directory)))))
-
 (define hash
   Val Bound -> ((foreign scm.fxmod) ((foreign scm.equal-hash) Val) Bound))
 
@@ -91,13 +86,10 @@
 \* read-file-as-* defined in prelude.scm *\
 
 (define read-file-as-bytelist
-  Filename -> ((foreign scm.read-file-as-bytelist) Filename))
-
-(define shen.read-file-as-charlist
-  Filename -> ((foreign scm.read-file-as-bytelist) Filename))
+  Filename -> ((foreign scm.read-file-as-bytelist) ((foreign scm.string-append) (value *home-directory*) Filename)))
 
 (define read-file-as-string
-  Filename -> ((foreign scm.read-file-as-string) Filename))
+  Filename -> ((foreign scm.read-file-as-string) ((foreign scm.string-append) (value *home-directory*) Filename)))
 
 \* tuples *\
 

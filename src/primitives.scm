@@ -122,8 +122,11 @@
 ;; Streams and I/O
 ;;
 
+(define (with-home-directory filename)
+  (string-append (kl:value '*home-directory*) filename))
+
 (define (kl:open filename direction)
-  (let ((full-path (full-path-for-file filename)))
+  (let ((full-path (full-path-for-file (with-home-directory filename))))
     (case direction
       ((in) (if (file-exists? full-path)
                 (open-binary-input-file full-path)
