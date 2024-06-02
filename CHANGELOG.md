@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.38] - 2024-06-02
+
+### Changed
+
+- The `cd` function is not overriden anymore. Now it behaves the same as in the official SBCL port. It doesn't use the underlying Chez `current-directory` function anymore, which means that FFI code should not depend on the current directory as seen by `cd` anymore.
+
 ## [0.37] - 2024-05-25
 
 ### Added
@@ -245,7 +251,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.37...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.38...HEAD
+[0.38]: https://github.com/tizoc/shen-scheme/compare/v0.37...v0.38
 [0.37]: https://github.com/tizoc/shen-scheme/compare/v0.36...v0.37
 [0.36]: https://github.com/tizoc/shen-scheme/compare/v0.35...v0.36
 [0.35]: https://github.com/tizoc/shen-scheme/compare/v0.34...v0.35
