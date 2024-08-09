@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Set release version in env
         id: version_tag
-        run: echo ::set-output name=version_tag::${GITHUB_REF#refs/*/}
+        run: echo "version_tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -29,26 +29,40 @@ jobs:
           prerelease: false
 
   build:
-    name: Upload Release Asset (${{ matrix.OSNAME }})
-    runs-on: ${{ matrix.os }}-latest
     needs: create_release
     env:
       CHEZ_SCHEME_VERSION: '10.0.0'
     strategy:
       matrix:
-        include:
+        config:
           - os: macos
+            arch: x64
+            # macos-12 for x64 builds
+            # https://github.com/actions/runner-images?tab=readme-ov-file#available-images
+            runs_on: macos-12
+            BUNDLE_EXT: tar.gz
+            ASSET_CONTENT_TYPE: application/gzip
+            OSNAME: macOS
+          - os: macos
+            arch: arm64
+            runs_on: macos-latest
             BUNDLE_EXT: tar.gz
             ASSET_CONTENT_TYPE: application/gzip
             OSNAME: macOS
           - os: ubuntu
+            arch: x64
+            runs_on: ubuntu-latest
             BUNDLE_EXT: tar.gz
             ASSET_CONTENT_TYPE: application/gzip
             OSNAME: linux
           - os: windows
+            arch: x64
+            runs_on: windows-latest
             BUNDLE_EXT: zip
             ASSET_CONTENT_TYPE: application/zip
             OSNAME: windows
+    name: Upload Release Asset (${{ matrix.config.OSNAME }} ${{ matrix.config.arch}})
+    runs-on: ${{ matrix.config.runs_on }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -57,7 +71,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: _build/chez
-          key: shen-scheme-chez-cache-${{ matrix.os }}-${{ env.CHEZ_SCHEME_VERSION }}
+          key: shen-scheme-chez-cache-${{ matrix.config.os }}-${{ matrix.config.arch }}-${{ env.CHEZ_SCHEME_VERSION }}
       - name: Install deps (Ubuntu)
         run: sudo apt-get install -y uuid-dev
         if: runner.os == 'linux'
@@ -68,20 +82,20 @@ jobs:
           make precompile-with-prebuilt
           make csversion=$CHEZ_SCHEME_VERSION
           make test
-      - name: Create binary release for ${{ matrix.OSNAME }}
+      - name: Create binary release for ${{ matrix.config.OSNAME }} ${{ matrix.config.arch }}
         run: make binary-release
       - name: Create source release
         if: runner.os == 'linux'
         run: make source-release
-      - name: Upload Release Asset (binary for ${{ matrix.OSNAME }})
+      - name: Upload Release Asset (binary for ${{ matrix.config.OSNAME }} ${{ matrix.config.arch }})
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: ./_dist/shen-scheme-${{ needs.create_release.outputs.version_tag }}-${{ matrix.OSNAME }}-bin.${{ matrix.BUNDLE_EXT }}
-          asset_name: shen-scheme-${{ needs.create_release.outputs.version_tag }}-${{ matrix.OSNAME }}-bin.${{ matrix.BUNDLE_EXT }}
-          asset_content_type: ${{ matrix.ASSET_CONTENT_TYPE }}
+          asset_path: ./_dist/shen-scheme-${{ needs.create_release.outputs.version_tag }}-${{ matrix.config.OSNAME }}-bin.${{ matrix.config.BUNDLE_EXT }}
+          asset_name: shen-scheme-${{ needs.create_release.outputs.version_tag }}-${{ matrix.config.OSNAME }}-${{ matrix.config.arch }}-bin.${{ matrix.config.BUNDLE_EXT }}
+          asset_content_type: ${{ matrix.config.ASSET_CONTENT_TYPE }}
       - name: Upload Release Asset (sources)
         if: runner.os == 'linux'
         uses: actions/upload-release-asset@v1
@@ -89,6 +103,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: ./_dist/shen-scheme-${{ needs.create_release.outputs.version_tag }}-src.${{ matrix.BUNDLE_EXT }}
-          asset_name: shen-scheme-${{ needs.create_release.outputs.version_tag }}-src.${{ matrix.BUNDLE_EXT }}
-          asset_content_type: ${{ matrix.ASSET_CONTENT_TYPE }}
+          asset_path: ./_dist/shen-scheme-${{ needs.create_release.outputs.version_tag }}-src.${{ matrix.config.BUNDLE_EXT }}
+          asset_name: shen-scheme-${{ needs.create_release.outputs.version_tag }}-src.${{ matrix.config.BUNDLE_EXT }}
+          asset_content_type: ${{ matrix.config.ASSET_CONTENT_TYPE }}
