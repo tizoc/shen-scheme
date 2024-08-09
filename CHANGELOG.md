@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Binary releases for macOS on x64. Now two binaries for both x64 and arm64 are uploaded for macOS.
+
 ## [0.38] - 2024-06-02
 
 ### Changed
