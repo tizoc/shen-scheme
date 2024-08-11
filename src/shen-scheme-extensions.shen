@@ -17,3 +17,11 @@
 
 (define shen-scheme.find-library
   Name -> ((foreign scm.string-append) ((foreign scm.get-shen-scheme-home-path)) "/libraries/" Name))
+
+(define thread
+  Lazy -> ((foreign scm.fork-thread) Lazy))
+
+(update-lambda-table shen-scheme.handle-launcher-result 1)
+(update-lambda-table shen-scheme.run-shen 1)
+(update-lambda-table shen-scheme.find-library 1)
+(update-lambda-table thread 1)
