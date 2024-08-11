@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.39] - 2024-08-11
+
+### Changed
+
+- - Updated kernel to S39.
+
 ### Fixed
 
 - Binary releases for macOS on x64. Now two binaries for both x64 and arm64 are uploaded for macOS.
@@ -255,7 +261,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.38...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.39...HEAD
+[0.39]: https://github.com/tizoc/shen-scheme/compare/v0.38...v0.39
 [0.38]: https://github.com/tizoc/shen-scheme/compare/v0.37...v0.38
 [0.37]: https://github.com/tizoc/shen-scheme/compare/v0.36...v0.37
 [0.36]: https://github.com/tizoc/shen-scheme/compare/v0.35...v0.36
