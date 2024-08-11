@@ -1,5 +1,5 @@
-[![Shen Version](https://img.shields.io/badge/shen-22.0-blue.svg)](https://github.com/Shen-Language)
-[![Build Status](https://travis-ci.com/tizoc/shen-scheme.svg?branch=master)](https://travis-ci.com/tizoc/shen-scheme)
+[![Shen Version](https://img.shields.io/badge/shen-38.3-blue.svg)](https://github.com/Shen-Language)
+[![build](https://github.com/tizoc/shen-scheme/workflows/build/badge.svg)](https://github.com/tizoc/shen-scheme/actions?query=workflow%3Abuild)
 
 Shen/Scheme, a Scheme port of the Shen language
 ====================================================
@@ -81,8 +81,8 @@ Running
 -------
 
 `shen-scheme` will start the Shen REPL.
-`shen-scheme --script <some shen file>` will run a script.
-`shen-scheme --eval <shen expression>` will evaluate an expression.
+`shen-scheme script <some shen file>` will run a script.
+`shen-scheme eval <shen expression>` will evaluate an expression.
 
 Home and Boot file search path
 ------------------------------
@@ -96,12 +96,12 @@ By default, the boot file will be loaded from `<shen-scheme-home>/shen.boot`, bu
 Native Calls
 ------------
 
-Scheme functions live under the `scm` namespace (`scm.` prefix). For example: `(scm.write [1 2 3 4])` invokes Scheme's `write` function with a list as an argument.
+Scheme functions live under the `scm` namespace (`scm.` prefix), and the names need to be wrapped with the `foreign` form in calls. For example: `((foreign scm.write) [1 2 3 4])` invokes Scheme's `write` function with a list as an argument.
 
 Because Scheme functions can have variable numbers of arguments and the code passed to `scm.` is not preprocessed, any imported function that is intended to support partial application has to be wrapped with a `defun`:
 
 ```
-(0-) (defun my-for-each (F L) (scm.for-each F L))
+(0-) (defun my-for-each (F L) ((foreign scm.for-each) F L))
 my-for-each
 
 (1-) (my-for-each (/. X (do (print (+ X X)) (nl))) [1 2 3 4 5])
@@ -124,14 +124,14 @@ Scheme code can be compiled as-is with the `scm.` special form that takes a stri
 Example:
 
 ```
-(0-) (scm. "(+ 1 2)")
+(0-) ((foreign scm.) "(+ 1 2)")
 3
 
-(1-) (scm. "(begin (display c#34;testc#34;) (newline))")
+(1-) ((foreign scm.) "(begin (display c#34;testc#34;) (newline))")
 test
 #<void>
 
-(2-) (scm. "(list #t #f (quote symbol) 'symbol)")
+(2-) ((foreign scm.) "(list #t #f (quote symbol) 'symbol)")
 [true false symbol symbol]
 ```
 
@@ -142,14 +142,14 @@ Importing bindings from Scheme modules
 
 Example:
 
-    (1-) (scm.import (rename (rnrs) (+ add-numbers)))
+    (1-) ((foreign scm.import) (rename (rnrs) (+ add-numbers)))
     #<void>
 
-    (2-) (scm.add-numbers 1 2 3 4)
+    (2-) ((foreign scm.add-numbers) 1 2 3 4)
     10
 
 License
 -------
 
-- Shen, Copyright © 2010-2015 Mark Tarver - [License](http://www.shenlanguage.org/license.pdf).
-- shen-scheme, Copyright © 2012-2019 Bruno Deferrari under [BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause).
+- Shen, Copyright © 2010-2022 Mark Tarver - [License](http://www.shenlanguage.org/license.pdf).
+- shen-scheme, Copyright © 2012-2023 Bruno Deferrari under [BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause).
