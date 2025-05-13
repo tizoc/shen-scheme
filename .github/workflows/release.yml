@@ -31,7 +31,7 @@ jobs:
   build:
     needs: create_release
     env:
-      CHEZ_SCHEME_VERSION: '10.0.0'
+      CHEZ_SCHEME_VERSION: '10.2.0'
     strategy:
       matrix:
         config:
@@ -68,7 +68,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Chez cache
         id: shen-scheme-chez-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: _build/chez
           key: shen-scheme-chez-cache-${{ matrix.config.os }}-${{ matrix.config.arch }}-${{ env.CHEZ_SCHEME_VERSION }}

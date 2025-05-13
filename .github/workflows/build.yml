@@ -11,7 +11,7 @@ jobs:
     name: Build and test
     runs-on: ${{ matrix.os }}-latest
     env:
-      CHEZ_SCHEME_VERSION: '10.0.0'
+      CHEZ_SCHEME_VERSION: '10.2.0'
     strategy:
       matrix:
         os: [macos, ubuntu, windows]
@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Chez cache
         id: shen-scheme-chez10-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: _build/chez
           key: ${{ matrix.os }}-chez-${{ env.CHEZ_SCHEME_VERSION }}

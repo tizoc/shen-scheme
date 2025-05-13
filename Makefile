@@ -27,7 +27,7 @@ ifeq ($(os), windows)
 	arext = .lib
 	binext = .exe
 	archiveext = .zip
-	cskernelname = csv1000mt
+	cskernelname = csv1020mt
 	lz4dirname = lz4mts$(S)lib
 	lz4libname = liblz4
 	zlibdirname = zlibmts
@@ -56,7 +56,7 @@ ifeq ($(os), linux)
 endif
 
 shenversion ?= 39.0
-csversion ?= 10.0.0
+csversion ?= 10.2.0
 build_dir ?= _build
 chez_build_dir ?= $(build_dir)$(S)chez
 csdir ?= $(chez_build_dir)$(S)csv$(csversion)
@@ -108,7 +108,7 @@ $(cskernel): $(csdir)
 ifeq ($(os), windows)
 	cmd.exe /C 'cd $(csdir) && build.bat ta6nt'
 else
-	cd $(csdir) && ./configure --threads && make
+	cd $(csdir) && ./configure --threads --disable-curses --disable-iconv --disable-x11 && make
 endif
 
 .PHONY: chez_kernel
