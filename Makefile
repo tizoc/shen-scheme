@@ -27,7 +27,7 @@ ifeq ($(os), windows)
 	arext = .lib
 	binext = .exe
 	archiveext = .zip
-	cskernelname = csv1000mt
+	cskernelname = csv1020mt
 	lz4dirname = lz4mts$(S)lib
 	lz4libname = liblz4
 	zlibdirname = zlibmts
