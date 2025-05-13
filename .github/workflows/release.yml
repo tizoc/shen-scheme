@@ -36,14 +36,6 @@ jobs:
       matrix:
         config:
           - os: macos
-            arch: x64
-            # macos-12 for x64 builds
-            # https://github.com/actions/runner-images?tab=readme-ov-file#available-images
-            runs_on: macos-12
-            BUNDLE_EXT: tar.gz
-            ASSET_CONTENT_TYPE: application/gzip
-            OSNAME: macOS
-          - os: macos
             arch: arm64
             runs_on: macos-latest
             BUNDLE_EXT: tar.gz
