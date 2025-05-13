@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.40] - 2025-05-13
+
+### Changed
+
+- Bumped default Chez version to 10.2.0.
+
 ## [0.39] - 2024-08-11
 
 ### Changed
@@ -261,7 +267,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.39...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.40...HEAD
+[0.40]: https://github.com/tizoc/shen-scheme/compare/v0.39...v0.40
 [0.39]: https://github.com/tizoc/shen-scheme/compare/v0.38...v0.39
 [0.38]: https://github.com/tizoc/shen-scheme/compare/v0.37...v0.38
 [0.37]: https://github.com/tizoc/shen-scheme/compare/v0.36...v0.37
