@@ -108,7 +108,7 @@ $(cskernel): $(csdir)
 ifeq ($(os), windows)
 	cmd.exe /C 'cd $(csdir) && build.bat ta6nt'
 else
-	cd $(csdir) && ./configure --threads && make
+	cd $(csdir) && ./configure --threads --disable-curses --disable-iconv --disable-x11 && make
 endif
 
 .PHONY: chez_kernel
