@@ -56,7 +56,7 @@ ifeq ($(os), linux)
 endif
 
 shenversion ?= 39.0
-csversion ?= 10.0.0
+csversion ?= 10.2.0
 build_dir ?= _build
 chez_build_dir ?= $(build_dir)$(S)chez
 csdir ?= $(chez_build_dir)$(S)csv$(csversion)

@@ -31,7 +31,7 @@ jobs:
   build:
     needs: create_release
     env:
-      CHEZ_SCHEME_VERSION: '10.0.0'
+      CHEZ_SCHEME_VERSION: '10.2.0'
     strategy:
       matrix:
         config:

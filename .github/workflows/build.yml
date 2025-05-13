@@ -11,7 +11,7 @@ jobs:
     name: Build and test
     runs-on: ${{ matrix.os }}-latest
     env:
-      CHEZ_SCHEME_VERSION: '10.0.0'
+      CHEZ_SCHEME_VERSION: '10.2.0'
     strategy:
       matrix:
         os: [macos, ubuntu, windows]
