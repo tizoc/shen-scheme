@@ -28,7 +28,7 @@
 static char shen_scheme_home_path[PATH_MAX];
 static char shen_scheme_bootfile_path[PATH_MAX];
 
-static void initialize_paths() {
+static void initialize_paths(void) {
   char *sshpath = getenv("SHEN_SCHEME_HOME");
   char *ssbfpath = getenv("SHEN_SCHEME_BOOT");
 #ifdef __APPLE__
@@ -68,7 +68,7 @@ static void initialize_paths() {
   }
 }
 
-static const char *get_shen_scheme_home_path() {
+static const char *get_shen_scheme_home_path(void) {
   return shen_scheme_home_path;
 }
 
@@ -102,15 +102,3 @@ int main(int argc, char *argv[]) {
 
   exit(status);
 }
-
-// These are to avoid the need for linking in ncurses
-
-void *setupterm;
-void *tputs;
-void *cur_term;
-
-// These are to avoid the need for linking in iconv
-
-void *iconv;
-void *iconv_close;
-void *iconv_open;
