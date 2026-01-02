@@ -27,7 +27,7 @@ ifeq ($(os), windows)
 	arext = .lib
 	binext = .exe
 	archiveext = .zip
-	cskernelname = csv1020mt
+	cskernelname = csv1030mt
 	lz4dirname = lz4mts$(S)lib
 	lz4libname = liblz4
 	zlibdirname = zlibmts
@@ -55,8 +55,8 @@ ifeq ($(os), linux)
 	linkerflags = -lm -ldl -lpthread -luuid
 endif
 
-shenversion ?= 39.0
-csversion ?= 10.2.0
+shenversion ?= 40.0
+csversion ?= 10.3.0
 build_dir ?= _build
 chez_build_dir ?= $(build_dir)$(S)chez
 csdir ?= $(chez_build_dir)$(S)csv$(csversion)
