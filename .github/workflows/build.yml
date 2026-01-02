@@ -11,7 +11,7 @@ jobs:
     name: Build and test
     runs-on: ${{ matrix.os }}-latest
     env:
-      CHEZ_SCHEME_VERSION: '10.2.0'
+      CHEZ_SCHEME_VERSION: '10.3.0'
     strategy:
       matrix:
         os: [macos, ubuntu, windows]
@@ -25,7 +25,9 @@ jobs:
           path: _build/chez
           key: ${{ matrix.os }}-chez-${{ env.CHEZ_SCHEME_VERSION }}
       - name: Install deps (Ubuntu)
-        run: sudo apt-get install -y uuid-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y uuid-dev
         if: runner.os == 'linux'
       - name: Build Chez
         run: make chez_kernel
