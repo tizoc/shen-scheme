@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated kernel to S40.
-- Bumped default Chez version to 10.2.0.
+- Bumped default Chez version to 10.3.0.
 
 ### Removed
 
