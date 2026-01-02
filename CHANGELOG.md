@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.41] - 2026-01-02
+
+### Changed
+
+- Updated kernel to S40.
+- Bumped default Chez version to 10.2.0.
+
 ### Removed
 
 - MacOS x64 releases.
@@ -271,7 +278,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.40...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.41...HEAD
+[0.41]: https://github.com/tizoc/shen-scheme/compare/v0.40...v0.41
 [0.40]: https://github.com/tizoc/shen-scheme/compare/v0.39...v0.40
 [0.39]: https://github.com/tizoc/shen-scheme/compare/v0.38...v0.39
 [0.38]: https://github.com/tizoc/shen-scheme/compare/v0.37...v0.38
