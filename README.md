@@ -52,6 +52,10 @@ Building
 
 ### Building from the source distribution
 
+> **IMPORTANT:** Download the release asset named `shen-scheme-<version>-src.tar.gz` from
+> the [Releases](https://github.com/tizoc/shen-scheme/releases) page. Do **not** use the
+> GitHub-generated "Source code" tarball/zip — it is missing the pre-generated `.scm` files.
+
 Running `make` should do the job. It will download and compile Chez under the `_build` directory, and then the `shen-scheme` binary and `shen.boot` boot files.
 
     make prefix=/opt/shen-scheme # optional prefix, defaults to /usr/local
