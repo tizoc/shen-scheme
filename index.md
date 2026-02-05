@@ -47,6 +47,12 @@ Already downloaded: /Users/bruno/Library/Caches/Homebrew/shen-scheme--chezscheme
   /usr/local/Cellar/shen-scheme/0.17: 7 files, 2.8MB, built in 1 minute 16 seconds
 ```
 
+Nix users can use a community-maintained package at https://github.com/hakujin/nix-shen-scheme. The maintainer also keeps the nixpkgs version of the SBCL port of Shen up to date. With Nix installed, you can drop into a working Shen/Scheme via:
+
+```
+$ nix run github:hakujin/nix-shen-scheme/master#shen-scheme
+```
+
 Building
 --------
 
