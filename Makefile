@@ -55,7 +55,7 @@ ifeq ($(os), linux)
 	linkerflags = -lm -ldl -lpthread -luuid
 endif
 
-shenversion ?= 40.1
+shenversion ?= 41.0
 csversion ?= 10.3.0
 build_dir ?= _build
 chez_build_dir ?= $(build_dir)$(S)chez
