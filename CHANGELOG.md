@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.44] - 2026-03-08
+
+### Changed
+
+- Now includes StLib
+
 ## [0.43] - 2026-03-01
 
 ### Changed
@@ -294,7 +300,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.43...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.44...HEAD
+[0.44]: https://github.com/tizoc/shen-scheme/compare/v0.43...v0.44
 [0.43]: https://github.com/tizoc/shen-scheme/compare/v0.42...v0.43
 [0.42]: https://github.com/tizoc/shen-scheme/compare/v0.41...v0.42
 [0.41]: https://github.com/tizoc/shen-scheme/compare/v0.40...v0.41
