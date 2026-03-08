@@ -17,6 +17,26 @@ jobs:
       - name: Set release version in env
         id: version_tag
         run: echo "version_tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Extract release notes from CHANGELOG
+        run: |
+          VERSION="${{ steps.version_tag.outputs.version_tag }}"
+          VERSION="${VERSION#v}"
+
+          awk -v version="$VERSION" '
+            $0 ~ "^## \\[" version "\\]" { in_section = 1; next }
+            in_section && /^## \[/ { exit }
+            in_section { print }
+          ' CHANGELOG.md > release-notes.md
+
+          if ! grep -q '[^[:space:]]' release-notes.md; then
+            {
+              printf 'Release %s\n' "$VERSION"
+              printf '\n'
+              printf 'See CHANGELOG.md for details.\n'
+            } > release-notes.md
+          fi
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -25,6 +45,7 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: ${{ steps.version_tag.outputs.version_tag }}
+          body_path: release-notes.md
           draft: true
           prerelease: false
 
