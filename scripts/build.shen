@@ -50,6 +50,7 @@
        "types"
        "t-star"
        "init"
+       "stlib"
        "extension-features"
        "extension-launcher"
        \\"extension-factorise-defun"
@@ -76,7 +77,7 @@
   _ [] -> true
   F [X | Rest] -> (do (F X) (for-each F Rest)))
 
-(define filter
+(define build.filter
   F Xs -> (filter-h F [] Xs))
 
 (define filter-h
@@ -117,6 +118,7 @@
   false -> "#f"
   Comma -> "|,|" where (= Comma ,)
   Sym -> (symbol->string Sym) where (symbol? Sym)
+  S -> (make-string "~R" (escape-string S)) where (string? S)
   [quote Exp] -> (@s "'" (sexp->string Exp))
   [Sexp | Sexps] -> (@s "(" (concat-strings (map (/. X (sexp->string X))
                                                  [Sexp | Sexps]))
@@ -127,7 +129,19 @@
   S -> "|{|" where (= { S)
   S -> "|}|" where (= } S)
   S -> "|;|" where (= ; S)
-  S -> (str S))
+  S -> (symbol->string-h (str S)))
+
+(define symbol->string-h
+  Str -> (@s "|" Str "|") where (element? "#" (explode Str))
+  Str -> Str)
+
+(define escape-string
+  S -> (escape-string-h (explode S)))
+
+(define escape-string-h
+  [] -> ""
+  ["\" | Cs] -> (@s "\\" (escape-string-h Cs))
+  [C | Cs] -> (@s C (escape-string-h Cs)))
 
 (define concat-strings
   [] -> ""
@@ -156,18 +170,24 @@
 (define compile-defun
   Defun -> (_scm.kl->scheme Defun))
 
+(define read-file-unprocessed
+  File -> (let Bytelist (read-file-as-bytelist File)
+               S-exprs  (trap-error (compile (/. X (shen.<s-exprs> X)) Bytelist)
+                                    (/. E (shen.reader-error (value shen.*residue*))))
+            S-exprs))
+
 (define compile-kl-file
   Prelude From To
   -> (let O (output "Compiling ~R...~%" From)
           Out (open To out)
-          Kl (read-file From)
-          Defuns (filter (/. X (and (defun? X)
-                                    (not (overidden? X))))
-                         Kl)
+          Kl (read-file-unprocessed From)
+          Defuns (build.filter
+                   (/. X (and (defun? X) (not (overidden? X))))
+                   Kl)
           Exports (map (function register-export) Defuns)
-          Init (store-init-code (filter (/. X (and (cons? X)
-                                                   (not (defun? X))))
-                                        Kl))
+          Init (store-init-code (build.filter
+                                  (/. X (and (cons? X) (not (defun? X))))
+                                  Kl))
           Scm (map (function compile-defun) Defuns)
           ScmS (map (function sexp->string) Scm)
           P (pr Prelude Out)
@@ -193,6 +213,7 @@
           ScmS (map (function sexp->string) Scm)
           P (pr (shen-license) Out)
           F (for-each (/. S (pr (make-string "~A~%~%" S) Out) ) ScmS)
+          StLib (pr (make-string "(kl:stlib.initialise)~%~%" S) Out)
        (close Out)))
 
 (define build
@@ -267,6 +288,7 @@
 (include c#34;compiled/types.scmc#34;)
 (include c#34;compiled/t-star.scmc#34;)
 (include c#34;compiled/init.scmc#34;)
+(include c#34;compiled/stlib.scmc#34;)
 (include c#34;compiled/extension-features.scmc#34;)
 (include c#34;compiled/extension-launcher.scmc#34;)
 ;; (include c#34;compiled/extension-factorise-defun.scmc#34;)
