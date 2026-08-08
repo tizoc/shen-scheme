@@ -106,6 +106,9 @@
 (define shen.char-stinput? S -> false)
 (define shen.char-stoutput? S -> false)
 
+(define shen.read-unit-string
+  _ -> (error "character input streams are not supported~%"))
+
 \* factorise *\
 
 \\ Branches are pushed into a stack instead of being evaluated

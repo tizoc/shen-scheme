@@ -6,11 +6,10 @@
     (load "build.shen")
     (build program "shen-scheme.scm")
 
-  The call to `build` will generate Scheme code files in "compiled/*.scm",
-  and a "shen-scheme.scm" file containing a program or R6RS library definition.
-  All initialization code will be contained in a `shen-initialize`
-  function that has to be called to initialize the Shen environment
-  before using it.
+  The call to `build` generates Scheme code files in "compiled/*.scm",
+  "shen-scheme-runtime.ss", and a file containing a program or public R6RS
+  library definition.  The public library exports `initialize-shen`, which
+  must be called before using the Shen environment.
 
 *\
 
@@ -21,8 +20,30 @@
   ((foreign scm.) "(define-top-level-value kl:global/*property-vector* (make-parameter (kl:value '*property-vector*)))")
   (/. X ignore))
 
+(define source-rules
+  [{ | Rest] -> (source-rules-after-signature Rest)
+  Rules -> Rules)
+
+(define source-rules-after-signature
+  [} | Rules] -> Rules
+  [_ | Rest] -> (source-rules-after-signature Rest))
+
+(define source-rule-arity
+  [Arrow | _] -> 0 where (= Arrow (intern "->"))
+  [Arrow | _] -> 0 where (= Arrow (intern "<-"))
+  [_ | Rest] -> (+ 1 (source-rule-arity Rest)))
+
+(define register-source-arities
+  [] -> []
+  [[define Name | Rules] | Rest]
+  -> (do (update-lambda-table Name
+                              (source-rule-arity (source-rules Rules)))
+         (register-source-arities Rest))
+  [_ | Rest] -> (register-source-arities Rest))
+
 \\(load "kl/extension-factorise-defun.kl")
 \\(load "src/factorize-patterns.shen")
+(register-source-arities (read-file "src/compiler.shen"))
 (load "src/compiler.shen")
 
 (trap-error
@@ -61,6 +82,11 @@
       ["overrides"
        "shen-scheme-extensions"
        "compiler"
+       "native-source"
+       "native-codegen"
+       "native-modules"
+       "native-app"
+       "native-compiler"
        \\"factorize-patterns"
        ])
 
@@ -151,6 +177,20 @@
   [defun | _] -> true
   _ -> false)
 
+(define defun-name
+  [defun Name | _] -> Name)
+
+(define defines-later?
+  _ [] -> false
+  Name [[defun Name | _] | _] -> true
+  Name [_ | Rest] -> (defines-later? Name Rest))
+
+(define keep-last-defuns
+  [] -> []
+  [Defun | Rest] -> (keep-last-defuns Rest)
+      where (defines-later? (defun-name Defun) Rest)
+  [Defun | Rest] -> [Defun | (keep-last-defuns Rest)])
+
 \* R6RS libraries require that all defines show up before
    any other code. That means that all code in the Shen
    kernel that is not a function definition has to be
@@ -184,11 +224,12 @@
           Defuns (build.filter
                    (/. X (and (defun? X) (not (overidden? X))))
                    Kl)
-          Exports (map (function register-export) Defuns)
+          LastDefuns (keep-last-defuns Defuns)
+          Exports (map (function register-export) LastDefuns)
           Init (store-init-code (build.filter
                                   (/. X (and (cons? X) (not (defun? X))))
                                   Kl))
-          Scm (map (function compile-defun) Defuns)
+          Scm (map (function compile-defun) LastDefuns)
           ScmS (map (function sexp->string) Scm)
           P (pr Prelude Out)
           F (for-each (/. S (pr (make-string "~A~%~%" S) Out) ) ScmS)
@@ -198,12 +239,29 @@
   [define F | Rules] -> (shen.shendef->kldef F Rules)
   Code -> Code)
 
+\* Port sources are translated without being loaded into the generated
+   runtime, so derive their arity-table initialization from the defuns. *\
+(define arity-registrations
+  [] -> []
+  [[defun Name Args _] | Rest]
+  -> [[update-lambda-table Name (length Args)]
+      | (arity-registrations Rest)]
+  [_ | Rest] -> (arity-registrations Rest))
+
+(define register-port-source-arities
+  [] -> []
+  [File | Rest]
+  -> (do (register-source-arities
+          (read-file (@s "src/" File ".shen")))
+         (register-port-source-arities Rest)))
+
 (define compile-shen-file
   From To -> (let Out (open To out)
                   Shen (read-file From)
                   Kl (map (function make-kl-code) Shen)
+                  Code (append Kl (arity-registrations Kl))
                   F (for-each (/. S (pr (make-string "~R~%~%" S) Out) )
-                              Kl)
+                              Code)
                (close Out)))
 
 (define compile-init-code
@@ -218,9 +276,16 @@
 
 (define build
   As Filename
-  -> (do (compile-shen-file "src/compiler.shen" "kl/compiler.kl")
+  -> (do (register-port-source-arities
+          (value *shen-scheme-files*))
+         (compile-shen-file "src/compiler.shen" "kl/compiler.kl")
          \\(compile-shen-file "src/factorize-patterns.shen" "kl/factorize-patterns.kl")
          (compile-shen-file "src/overrides.shen" "kl/overrides.kl")
+         (compile-shen-file "src/native-source.shen" "kl/native-source.kl")
+         (compile-shen-file "src/native-codegen.shen" "kl/native-codegen.kl")
+         (compile-shen-file "src/native-modules.shen" "kl/native-modules.kl")
+         (compile-shen-file "src/native-app.shen" "kl/native-app.kl")
+         (compile-shen-file "src/native-compiler.shen" "kl/native-compiler.kl")
          (compile-shen-file "src/shen-scheme-extensions.shen" "kl/shen-scheme-extensions.kl")
          (for-each (/. F (compile-kl-file
                           (shen-scheme-license)
@@ -249,9 +314,57 @@
                        " kl:global/" (str Name) ")c#10;"
                        (globals-register Rest)))
 
-(define loader-body
-  -> (@s
-"(import (chezscheme))
+(define runtime-primitive-exports
+  -> [register-globals
+      (prefix-fn _scm.assert-boolean)
+      (prefix-fn intern)
+      (prefix-fn str)
+      (prefix-fn set)
+      (prefix-fn value)
+      (prefix-fn error-to-string)
+      (prefix-fn =)
+      (prefix-fn eval-kl)
+      (prefix-fn open)
+      (prefix-fn close)
+      (prefix-fn write-byte)
+      (prefix-fn read-byte)
+      (prefix-fn get-time)
+      non-rational-/
+      value/or
+      get/or
+      <-address/or
+      <-vector/or
+      make-equal-hashtable
+      hashtable-fold
+      read-file-as-bytelist
+      read-file-as-string
+      shen-scheme-native-load-init?
+      error-location
+      analyse-symbol?])
+
+(define runtime-global-exports
+  -> (map (function _scm.prefix-global) (value _scm.*static-globals*)))
+
+(define runtime-exports
+  Names -> (append (runtime-primitive-exports)
+                   (runtime-global-exports)
+                   Names))
+
+(set *runtime-library-file* "shen-scheme-runtime.ss")
+
+(define runtime-library-definition
+  Names -> (@s
+";; Copyright (c) 2012-2021 Bruno Deferrari.  All rights reserved.
+;; BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause
+
+
+(library (shen-scheme runtime)
+  "
+
+(sexp->string [export | (runtime-exports Names)])
+
+"
+  (import (chezscheme))
 
 "
 
@@ -264,6 +377,14 @@
 
 ")
 
+(define get-shen-scheme-home-path
+  (let ((proc #f))
+    (lambda ()
+      (unless proc
+        (set! proc
+          (foreign-procedure c#34;get_shen_scheme_home_pathc#34; () string)))
+      (proc))))
+
 (include c#34;src/chez-prelude.scmc#34;)
 (include c#34;src/primitives.scmc#34;)
 
@@ -271,6 +392,11 @@
 (include c#34;compiled/shen-scheme-extensions.scmc#34;)
 
 (include c#34;compiled/compiler.scmc#34;)
+(include c#34;compiled/native-source.scmc#34;)
+(include c#34;compiled/native-codegen.scmc#34;)
+(include c#34;compiled/native-modules.scmc#34;)
+(include c#34;compiled/native-app.scmc#34;)
+(include c#34;compiled/native-compiler.scmc#34;)
 ;(include c#34;compiled/factorize-patterns.scmc#34;)
 (include c#34;compiled/toplevel.scmc#34;)
 (include c#34;compiled/core.scmc#34;)
@@ -294,17 +420,30 @@
 ;; (include c#34;compiled/extension-factorise-defun.scmc#34;)
 ;; (include c#34;compiled/extension-programmable-pattern-matching.scmc#34;)
 
+)
+"))
+
+(define loader-body
+  -> "
+(import (chezscheme))
+(import (shen-scheme runtime))
+
 (define initialize-shen
   (let ((initialized #f))
     (lambda ()
       (if (not initialized)
           (begin
-            (define-top-level-value 'get-shen-scheme-home-path (foreign-procedure c#34;get_shen_scheme_home_pathc#34; () string))
             (include c#34;src/version.scmc#34;)
             (include c#34;src/init.scmc#34;)
             (include c#34;compiled/shen-scheme-init.scmc#34;)
             (set! initialized #t))))))
-"))
+")
+
+(define library-compatibility-body
+  -> "
+(define kl:shen.quiet-load kl:shen.x.launcher.quiet-load)
+(define kl:shen.run-shen kl:shen-scheme.run-shen)
+")
 
 (define write-string-to-file
   Body File -> (let Out (open File out)
@@ -312,12 +451,20 @@
                  (close Out)))
 
 (define compile-shen-as
-  library Filename -> (write-string-to-file
-                       (library-definition (value *functions*))
-                       Filename)
-  program Filename -> (write-string-to-file
-                       (program-definition)
-                       Filename))
+  library Filename -> (do
+                       (write-string-to-file
+                        (runtime-library-definition (value *functions*))
+                        (value *runtime-library-file*))
+                       (write-string-to-file
+                        (library-definition (value *functions*))
+                        Filename))
+  program Filename -> (do
+                       (write-string-to-file
+                        (runtime-library-definition (value *functions*))
+                        (value *runtime-library-file*))
+                       (write-string-to-file
+                        (program-definition)
+                        Filename)))
 
 (define initialization-body
   -> "(suppress-greeting #t)
@@ -333,8 +480,6 @@
                   (shen-scheme-license)
                   (loader-body)
                   (initialization-body)))
-
-\* library-definition is unused for now *\
 
 (define library-definition
   Names -> (let Exports [export initialize-shen
@@ -354,10 +499,11 @@
                                 (prefix-fn shen.quiet-load)
                                 (prefix-fn shen.run-shen)
                                 | Names]
-             (make-string "~A~%(library (shen)~%  ~R~%  ~A)"
+             (make-string "~A~%(library (shen)~%  ~A~%  ~A~%~A)"
                           (shen-scheme-license)
-                          Exports
-                          (loader-body))))
+                          (sexp->string Exports)
+                          (loader-body)
+                          (library-compatibility-body))))
 
 (define shen-license
   -> ";; Copyright (c) 2015, Mark Tarver

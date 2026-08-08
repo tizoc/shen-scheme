@@ -1,0 +1,14 @@
+(shen.aot.module
+  (name realistic.bench.core)
+  (mode sealed)
+  (exports realistic-bench.member?
+           realistic-bench.add-unique
+           realistic-bench.union-vars
+           realistic-bench.remove-var
+           realistic-bench.list-length
+           realistic-bench.env-lookup
+           realistic-bench.initial-env
+           realistic-bench.make-program
+           realistic-bench.make-block
+           realistic-bench.make-expr)
+  (sources "benchmarks/realistic/core.shen"))

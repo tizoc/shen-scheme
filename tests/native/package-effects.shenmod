@@ -1,0 +1,6 @@
+(shen.aot.module
+  (name native.test.package-effects)
+  (mode sealed)
+  (exports)
+  (metadata)
+  (sources "tests/native/package-effects.shen"))

@@ -1,0 +1,6 @@
+(shen.aot.module
+  (name native-example.core)
+  (mode sealed)
+  (exports add-ten)
+  (metadata runtime compiletime)
+  (sources "examples/native/modules/native-example.core.shen"))
