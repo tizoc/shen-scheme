@@ -1,0 +1,7 @@
+(shen.aot.module
+  (name native-example.app)
+  (mode sealed)
+  (requires native-example.core)
+  (exports run-example module-events)
+  (metadata runtime compiletime)
+  (sources "examples/native/modules/native-example.app.shen"))

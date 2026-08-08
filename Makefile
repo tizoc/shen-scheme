@@ -254,6 +254,28 @@ test-native: $(exe) $(runtime_artifacts)
 	./$(exe) eval -q -e "(shen-scheme.load-compiled \"_build/native-tests/cli-app-profile-wpo.so\")" -e "(if (= (value *native-app-init-events*) [1 12]) ok (error \"native CLI WPO profile app initializer order failed\"))" -e "(if (= (native-app-main 31) 42) ok (error \"native CLI WPO profile app build failed\"))" -e "(if (= (native-app-length [1 2 3]) 3) ok (error \"native CLI WPO profile app runtime call failed\"))" -e "(if (= (native-app-absvector?) true) ok (error \"native CLI WPO profile app absvector failed\"))" -e "(if (= (native-app-list-equal?) true) ok (error \"native CLI WPO profile app generic equality failed\"))" -e "(if (= (native-app-sysfunc?) true) ok (error \"native CLI WPO profile app static global failed\"))"
 	./$(exe) load-compiled _build/native-tests/cli-simple.so
 
+.PHONY: test-native-examples
+test-native-examples: $(exe) $(runtime_artifacts)
+	mkdir -p _build/native-examples/modules
+	cp examples/native/modules/native-example.core.shenmod _build/native-examples/modules/
+	cp examples/native/modules/native-example.app.shenmod _build/native-examples/modules/
+	./$(exe) compile examples/native/single-file.shen -o _build/native-examples/single-file.so
+	./$(exe) eval -q -e "(shen-scheme.load-compiled \"_build/native-examples/single-file.so\")" -e "(if (= (answer 5) 26) ok (error \"native single-file example failed\"))"
+	./$(exe) compile examples/native/binding.shen -o _build/native-examples/compatible.so
+	./$(exe) eval -q -e "(shen-scheme.load-compiled \"_build/native-examples/compatible.so\")" -e "(load \"examples/native/binding-update.shen\")" -e "(if (= (call-helper 1) 101) ok (error \"native compatible example failed\"))"
+	./$(exe) compile examples/native/binding.shen --mode sealed -o _build/native-examples/sealed.so
+	./$(exe) eval -q -e "(shen-scheme.load-compiled \"_build/native-examples/sealed.so\")" -e "(load \"examples/native/binding-update.shen\")" -e "(if (= (call-helper 1) 2) ok (error \"native sealed example failed\"))"
+	./$(exe) compile examples/native/package-effects.shen -o _build/native-examples/package-effects.so
+	./$(exe) eval -q -e "(shen-scheme.load-compiled \"_build/native-examples/package-effects.so\")" -e "(if (= (effect-events) [\"inside-before-definition\" \"after-definition\"]) ok (error \"native package effects example failed\"))"
+	./$(exe) compile-module _build/native-examples/modules/native-example.core.shenmod -o _build/native-examples/modules/native-example.core.so
+	./$(exe) compile-module _build/native-examples/modules/native-example.app.shenmod --module-dir _build/native-examples/modules -o _build/native-examples/modules/native-example.app.so
+	./$(exe) eval -q -e "(shen-scheme.load-module \"_build/native-examples/modules/native-example.app.shenmod\" \"_build/native-examples/modules\")" -e "(if (= (run-example 32) 42) ok (error \"native module graph example failed\"))" -e "(if (= (module-events) [42]) ok (error \"native module initializer example failed\"))"
+	./$(exe) build-module-app _build/native-examples/modules/native-example.app.shenmod --module-dir _build/native-examples/modules -o _build/native-examples/app.so
+	./$(exe) eval -q -e "(shen-scheme.load-compiled \"_build/native-examples/app.so\")" -e "(if (= (run-example 32) 42) ok (error \"native module app example failed\"))" -e "(if (= (module-events) [42]) ok (error \"native module app initializer example failed\"))"
+	./$(exe) build-module-app _build/native-examples/modules/native-example.app.shenmod --module-dir _build/native-examples/modules -o _build/native-examples/app-wpo.so --wpo
+	./$(exe) eval -q -e "(shen-scheme.load-compiled \"_build/native-examples/app-wpo.so\")" -e "(if (= (run-example 32) 42) ok (error \"native WPO module app example failed\"))"
+	SHEN_SCHEME_RUNTIME=petite ./$(exe) eval -q -e "(shen-scheme.load-compiled \"_build/native-examples/single-file.so\")" -e "(if (= (answer 5) 26) ok (error \"native full-to-Petite example failed\"))"
+
 .PHONY: bench-native
 bench-native: $(exe) $(runtime_artifacts)
 	mkdir -p _build/native-bench
@@ -297,7 +319,7 @@ test-clean-parallel-build: chez_kernel
 	./$(exe) --version
 
 .PHONY: test
-test: test-shen test-compiler test-native
+test: test-shen test-compiler test-native test-native-examples
 
 .PHONY: test-external-runtime
 test-external-runtime: $(exe) $(runtime_artifacts)
@@ -346,6 +368,8 @@ source-release:
 binary-release: $(exe) $(runtime_artifacts)
 	mkdir -p "_dist/shen-scheme-$(git_tag)-$(os)-bin"
 	mkdir -p "_dist/shen-scheme-$(git_tag)-$(os)-bin/bin"
+	mkdir -p "_dist/shen-scheme-$(git_tag)-$(os)-bin/docs"
+	mkdir -p "_dist/shen-scheme-$(git_tag)-$(os)-bin/examples"
 	mkdir -p "_dist/shen-scheme-$(git_tag)-$(os)-bin/lib/shen-scheme/shen-scheme"
 	mkdir -p "_dist/shen-scheme-$(git_tag)-$(os)-bin/chez-legal"
 	cp $(exe) "_dist/shen-scheme-$(git_tag)-$(os)-bin/bin"
@@ -353,6 +377,8 @@ binary-release: $(exe) $(runtime_artifacts)
 	cp $(scheme_bootfile) "_dist/shen-scheme-$(git_tag)-$(os)-bin/lib/shen-scheme"
 	cp $(runtime_obj) "_dist/shen-scheme-$(git_tag)-$(os)-bin/lib/shen-scheme/shen-scheme"
 	cp README.md "_dist/shen-scheme-$(git_tag)-$(os)-bin/README.txt"
+	cp docs/native-compilation.md "_dist/shen-scheme-$(git_tag)-$(os)-bin/docs"
+	cp -R examples/native "_dist/shen-scheme-$(git_tag)-$(os)-bin/examples"
 	cp LICENSE "_dist/shen-scheme-$(git_tag)-$(os)-bin/LICENSE.txt"
 	cp $(cslicense) "_dist/shen-scheme-$(git_tag)-$(os)-bin/chez-legal/LICENSE.txt"
 	cp $(cscopyright) "_dist/shen-scheme-$(git_tag)-$(os)-bin/chez-legal/NOTICE.txt"

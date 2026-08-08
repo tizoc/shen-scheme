@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Native AOT compilation for Shen source files and declared modules, including
+  top-level `defprolog` and `package` forms and arbitrary top-level Shen
+  expression effects.
+- Compatible and sealed compilation modes, build profiles, dependency
+  resolution, standalone app builds, and whole-program optimization support.
+- Port-style and realistic benchmark suites comparing dynamic loading,
+  compatible and sealed native compilation, and native app builds.
+- Runnable native-compilation examples and a guide covering source files,
+  packages, modules, applications, deployment, and embedding.
+
+### Changed
+
+- Compiler arity registrations are generated from compiled definitions instead
+  of maintaining a parallel manual list.
+- Shen/Scheme now starts from the stock Chez boot files and loads a combined
+  runtime and launcher object instead of generating a custom `shen.boot`.
+  `SHEN_SCHEME_RUNTIME=petite` selects a compiler-free runtime that can still
+  load precompiled native artifacts.
+
+### Removed
+
+- The generated `shen.boot` artifact and the `SHEN_SCHEME_BOOT` override.
+  `SHEN_SCHEME_HOME` now selects a complete, internally consistent runtime
+  artifact set.
+
 ## [0.45] - 2026-04-19
 
 ### Changed
