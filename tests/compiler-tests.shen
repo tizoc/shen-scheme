@@ -7,6 +7,26 @@
  (_scm.force-boolean true)
  true)
 
+(set _scm.*native-mode* compatible)
+(set _scm.*native-local-map* [])
+
+(assert-equal
+ (trap-error
+  (_scm.with-native-context
+   sealed
+   [[native-context-test shen_native_context_test]]
+   (freeze (/ 1 0)))
+  (/. E failed))
+ failed)
+
+(assert-equal
+ (_scm.native-mode)
+ compatible)
+
+(assert-equal
+ (_scm.native-local-map)
+ [])
+
 (assert-equal
  (_scm.force-boolean false) false)
 
@@ -103,6 +123,36 @@
 (assert-equal
  (_scm.kl->scheme [blah 1 2])
  [(_scm.prefix-op blah) 1 2])
+
+(assert-equal
+ (_scm.with-native-context sealed [[foo local-foo] [bar local-bar]]
+   (freeze (_scm.kl->scheme [defun foo [X] [bar X]])))
+ [define [local-foo X] [local-bar X]])
+
+(assert-equal
+ (_scm.with-native-context sealed [[bar local-bar]]
+   (freeze (_scm.compile-expression [bar 1] [bar])))
+ [bar 1])
+
+(assert-equal
+ (_scm.with-native-context sealed [[bar local-bar]]
+   (freeze (_scm.compile-expression [fn bar] [])))
+ local-bar)
+
+(assert-equal
+ (_scm.with-native-context sealed [[+ local-plus]]
+   (freeze (_scm.compile-expression [+ X 1] [X])))
+ [+ X 1])
+
+(assert-equal
+ (_scm.with-native-context app [[foo local-foo] [bar local-bar]]
+   (freeze (_scm.kl->scheme [defun foo [X] [bar X]])))
+ [define [local-foo X] [local-bar X]])
+
+(assert-equal
+ (_scm.with-native-context app []
+   (freeze (_scm.compile-expression [length X] [X])))
+ [(_scm.prefix-op length) X])
 
 (assert-equal
  (_scm.kl->scheme 1)

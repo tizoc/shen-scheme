@@ -17,7 +17,8 @@
 
 (define assert-equal-h
   Exp X X -> (pr (make-string "[OK]    ~A = ~R ~%" Exp X))
-  Exp X Y -> (pr (make-string "[ERROR] ~A = ~R ~%  got ~R~%" Exp Y X)))
+  Exp X Y -> (simple-error
+              (make-string "[ERROR] ~A = ~R ~%  got ~R~%" Exp Y X)))
 
 (define assert-equal
   Exp X Y -> (assert-equal-h Exp X (subst-vars X Y)))
@@ -34,5 +35,17 @@
 (define quiet-load
   File -> (let Contents (read-file File)
             (map (/. X (eval X)) Contents)))
+
+(assert-equal "(arity _scm.kl->scheme)"
+              (arity _scm.kl->scheme)
+              1)
+
+(assert-equal "(arity shen-scheme.profile-help-text)"
+              (arity shen-scheme.profile-help-text)
+              0)
+
+(assert-equal "(arity shen-scheme.run-shen)"
+              (arity shen-scheme.run-shen)
+              1)
 
 (quiet-load "tests/compiler-tests.shen")

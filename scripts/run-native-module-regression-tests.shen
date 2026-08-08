@@ -1,0 +1,126 @@
+\* Copyright (c) 2012-2021 Bruno Deferrari.  All rights reserved.    *\
+\* BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause *\
+
+(define native-test.run-module-dependency-regressions
+  -> (let Dir "_build/native-tests"
+          BSource "_build/native-tests/module-precedence-b.shen"
+          ASource "_build/native-tests/module-precedence-a.shen"
+          MainSource "_build/native-tests/module-precedence-main.shen"
+          BDeclaration "_build/native-tests/native.test.precedence-b.shenmod"
+          ADeclaration "_build/native-tests/native.test.precedence-a.shenmod"
+          MainDeclaration "_build/native-tests/native.test.precedence-main.shenmod"
+          BObject "_build/native-tests/native.test.precedence-b.so"
+          AObject "_build/native-tests/native.test.precedence-a.so"
+          MainObject "_build/native-tests/native.test.precedence-main.so"
+          AppObject "_build/native-tests/module-precedence-app.so"
+          Assert (/. Label Expected Actual
+                    (native-test.assert-equal Label Expected Actual))
+       (do
+         (native-test.write-file
+          BSource
+          "(set *native-module-regression-effects*
+     (+ (value *native-module-regression-effects*) 1))
+
+(declare native-module-regression-shared
+         [number --> number --> number])
+
+(define native-module-regression-shared
+  X Y -> (+ X Y))
+
+(defmacro native-module-regression-call-shared-macro
+  [native-module-regression-call-shared X]
+  -> [native-module-regression-shared X 2])
+")
+         (native-test.write-file
+          ASource
+          "(define native-module-regression-shared
+  X -> (+ X 100))
+")
+         (native-test.write-file
+          MainSource
+          "(define native-module-regression-main
+  X -> (native-module-regression-call-shared X))
+")
+         (native-test.write-file
+          BDeclaration
+          (make-string "(shen.aot.module
+  (name native.test.precedence-b)
+  (mode sealed)
+  (exports native-module-regression-shared)
+  (sources ~S))
+"
+                       BSource))
+         (native-test.write-file
+          ADeclaration
+          (make-string "(shen.aot.module
+  (name native.test.precedence-a)
+  (mode sealed)
+  (requires native.test.precedence-b)
+  (exports native-module-regression-shared)
+  (sources ~S))
+"
+                       ASource))
+         (native-test.write-file
+          MainDeclaration
+          (make-string "(shen.aot.module
+  (name native.test.precedence-main)
+  (mode sealed)
+  (requires native.test.precedence-a native.test.precedence-b)
+  (exports native-module-regression-main)
+  (sources ~S))
+"
+                       MainSource))
+         (native-test.delete-file-if-exists BObject)
+         (native-test.delete-file-if-exists AObject)
+         (native-test.delete-file-if-exists MainObject)
+         (native-test.delete-file-if-exists AppObject)
+         (set *native-module-regression-effects* 0)
+         (load ASource)
+         (let InitialArity (arity native-module-regression-shared)
+              InitialSignature (assoc native-module-regression-shared
+                                      (value shen.*sigf*))
+           (do
+             (shen-scheme.compile-module/in-dir
+              ADeclaration AObject Dir)
+             (Assert "module compile needs no dependency object"
+                     false
+                     (shen-scheme.file-exists? BObject))
+             (Assert "module compile skips dependency initializer"
+                     0
+                     (value *native-module-regression-effects*))
+             (Assert "module compile leaves live dependency function"
+                     140
+                     (eval [native-module-regression-shared 40]))
+             (shen-scheme.compile-module BDeclaration BObject)
+             (shen-scheme.compile-module/in-dir
+              MainDeclaration MainObject Dir)
+             (Assert "module compile reapply skips dependency initializer"
+                     0
+                     (value *native-module-regression-effects*))
+             (Assert "module dependency arities stay compiler-local"
+                     InitialArity
+                     (arity native-module-regression-shared))
+             (Assert "module dependency signatures stay compiler-local"
+                     InitialSignature
+                     (assoc native-module-regression-shared
+                            (value shen.*sigf*)))
+             (Assert "module compile leaves live function binding"
+                     140
+                     (eval [native-module-regression-shared 40]))
+             (Assert "module app rejects ambiguous direct exports"
+                     failed
+                     (trap-error
+                      (shen-scheme.build-module-app
+                       MainDeclaration Dir AppObject)
+                      (/. E failed)))
+             (Assert "module app build skips source initializer"
+                     0
+                     (value *native-module-regression-effects*))
+             (set *native-module-regression-effects* 0)
+             (shen-scheme.load-module MainDeclaration Dir)
+             (Assert "module load does not repeat transitive initializer"
+                     1
+                     (value *native-module-regression-effects*))
+             (Assert "module compile uses later dependency metadata"
+                     42
+                     (eval [native-module-regression-main 40])))))))
