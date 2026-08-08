@@ -60,6 +60,12 @@ runtime separately; it does not generate a custom boot file.
 make prefix=/opt/shen-scheme # optional prefix, defaults to /usr/local
 ```
 
+The Makefile verifies downloaded Chez, Shen kernel, and bootstrap archives
+against pinned SHA-256 checksums. When selecting a different `csversion`,
+`shenversion`, or `prebuilt_version`, also provide its trusted checksum as
+`chez_sha256`, `kernel_sha256`, or `prebuilt_sha256`; the build will not extract
+an unverified archive.
+
 Runtime generation can be configured with
 `SHEN_SCHEME_OPTIMIZE_LEVEL`, `SHEN_SCHEME_DEBUG_LEVEL`,
 `SHEN_SCHEME_INSPECTOR`, and `SHEN_SCHEME_SOURCE_INFO`.

@@ -57,9 +57,25 @@ endif
 
 shenversion ?= 41.2
 csversion ?= 10.3.0
+prebuilt_version ?= 0.26
+
+chez_sha256_10.3.0 = d237d9874c6e8b0ccf7758daa8286a6e825528b13ce3b2bca56eb1f73cddbc2c
+kernel_sha256_41.2 = d2182d70453d3e93d13bc20f763efdc18cdb23b481f41afb9943f5e9a0798f61
+prebuilt_sha256_0.26_linux = 2859384f3b16cd6cf596084cfff7e2d9d5b31a11df3d1f7c9e1f1746ed6ef798
+prebuilt_sha256_0.26_macOS = a9c321a286daf354dda8ab51eb2b191cbdc339c2087e4490488c88ce462f5dc6
+prebuilt_sha256_0.26_windows = 7c5ab365cdd42aa02bfba90f857fddc7b431672fe01928f14f2b0f1156042549
+
+chez_sha256 ?= $(chez_sha256_$(csversion))
+kernel_sha256 ?= $(kernel_sha256_$(shenversion))
+prebuilt_sha256 ?= $(prebuilt_sha256_$(prebuilt_version)_$(os))
+
+chez_archive = csv$(csversion).tar.gz
+kernel_archive = ShenOSKernel-$(shenversion).tar.gz
+prebuilt_archive = shen-scheme-v$(prebuilt_version)-$(os)-bin$(archiveext)
 build_dir ?= _build
 chez_build_dir ?= $(build_dir)$(S)chez
 csdir ?= $(chez_build_dir)$(S)csv$(csversion)
+chez_source_stamp = $(chez_build_dir)$(S).csv$(csversion)-$(chez_sha256).extracted
 cslicense = $(csdir)$(S)LICENSE
 cscopyright = $(csdir)$(S)NOTICE
 csbootpath = $(csdir)$(S)$(m)$(S)boot$(S)$(m)
@@ -82,6 +98,8 @@ SHEN_SCHEME_OPTIMIZE_LEVEL ?= 2
 SHEN_SCHEME_DEBUG_LEVEL ?= 0
 SHEN_SCHEME_INSPECTOR ?= false
 SHEN_SCHEME_SOURCE_INFO ?= false
+CURL ?= curl
+CURL_FLAGS ?= --fail --location --show-error --retry 3
 
 petite_bootfile = $(build_dir)/lib/shen-scheme/petite.boot
 scheme_bootfile = $(build_dir)/lib/shen-scheme/scheme.boot
@@ -118,12 +136,19 @@ endif
 .PHONY: all
 all: $(exe) $(runtime_artifacts)
 
-$(csdir):
+$(chez_source_stamp):
+	$(if $(strip $(chez_sha256)),,$(error no SHA-256 checksum is configured for $(chez_archive); set chez_sha256))
 	echo "Downloading and uncompressing Chez..."
 	mkdir -p $(chez_build_dir)
-	cd $(chez_build_dir); curl -LO 'https://github.com/cisco/ChezScheme/releases/download/v$(csversion)/csv$(csversion).tar.gz'; tar xzf csv$(csversion).tar.gz; rm csv$(csversion).tar.gz
+	cd $(chez_build_dir) && \
+		$(CURL) $(CURL_FLAGS) --output $(chez_archive) 'https://github.com/cisco/ChezScheme/releases/download/v$(csversion)/$(chez_archive)' && \
+		sh "$(CURDIR)/scripts/verify-sha256.sh" "$(chez_sha256)" "$(chez_archive)" && \
+		tar xzf $(chez_archive) && \
+		rm $(chez_archive)
+	test -d "$(csdir)"
+	touch "$@"
 
-$(cskernel): $(csdir)
+$(cskernel): $(chez_source_stamp)
 	echo "Building Chez..."
 ifeq ($(os), windows)
 	cmd.exe /C 'cd $(csdir) && build.bat ta6nt'
@@ -180,19 +205,23 @@ $(runtime_obj): | $(runtime_stamp)
 
 .PHONY: fetch-kernel
 fetch-kernel:
-	curl -LO 'https://github.com/Shen-Language/shen-sources/releases/download/shen-$(shenversion)/ShenOSKernel-$(shenversion).tar.gz'
-	tar xzf ShenOSKernel-$(shenversion).tar.gz
+	$(if $(strip $(kernel_sha256)),,$(error no SHA-256 checksum is configured for $(kernel_archive); set kernel_sha256))
+	$(CURL) $(CURL_FLAGS) --output $(kernel_archive) 'https://github.com/Shen-Language/shen-sources/releases/download/shen-$(shenversion)/$(kernel_archive)'
+	sh scripts/verify-sha256.sh "$(kernel_sha256)" "$(kernel_archive)"
+	tar xzf $(kernel_archive)
 	cp ShenOSKernel-$(shenversion)/klambda/*.kl $(klsources_dir)/
 
 .PHONY: fetch-prebuilt
 fetch-prebuilt:
+	$(if $(strip $(prebuilt_sha256)),,$(error no SHA-256 checksum is configured for $(prebuilt_archive); set prebuilt_sha256))
 	mkdir -p $(build_dir)
-	curl -LO 'https://github.com/tizoc/shen-scheme/releases/download/v0.26/shen-scheme-v0.26-$(os)-bin$(archiveext)'
-	$(uncompress) shen-scheme-v0.26-$(os)-bin$(archiveext) $(uncompressToFlag)$(build_dir)
+	$(CURL) $(CURL_FLAGS) --output $(prebuilt_archive) 'https://github.com/tizoc/shen-scheme/releases/download/v$(prebuilt_version)/$(prebuilt_archive)'
+	sh scripts/verify-sha256.sh "$(prebuilt_sha256)" "$(prebuilt_archive)"
+	$(uncompress) $(prebuilt_archive) $(uncompressToFlag)$(build_dir)
 
 .PHONY: precompile-with-prebuilt
 precompile-with-prebuilt:
-	$(build_dir)$(S)shen-scheme-v0.26-$(os)-bin$(S)bin$(S)shen-scheme$(binext) script scripts/do-build.shen > /dev/null
+	$(build_dir)$(S)shen-scheme-v$(prebuilt_version)-$(os)-bin$(S)bin$(S)shen-scheme$(binext) script scripts/do-build.shen > /dev/null
 
 .PHONY: precompile
 precompile:
