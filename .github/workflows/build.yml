@@ -9,18 +9,19 @@ on:
 jobs:
   build:
     name: Build and test
-    runs-on: ${{ matrix.os }}-latest
+    runs-on: ${{ matrix.os }}
     env:
       CHEZ_SCHEME_VERSION: '10.3.0'
     strategy:
+      fail-fast: false
       matrix:
-        os: [macos, ubuntu, windows]
+        os: [macos-latest, ubuntu-latest, windows-2022]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
       - name: Chez cache
         id: shen-scheme-chez10-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: _build/chez
           key: ${{ matrix.os }}-chez-${{ env.CHEZ_SCHEME_VERSION }}
@@ -28,7 +29,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y uuid-dev
-        if: runner.os == 'linux'
+        if: runner.os == 'Linux'
       - name: Build Chez
         run: make chez_kernel
       - name: Build and test
@@ -39,3 +40,10 @@ jobs:
           make precompile-with-prebuilt
           make csversion=${{ env.CHEZ_SCHEME_VERSION }}
           make test
+      - name: Test clean parallel build
+        run: make test-clean-parallel-build
+      - name: Test runtime artifact recovery
+        run: make test-runtime-artifact-recovery
+      - name: Test external runtime modes
+        if: runner.os == 'Linux'
+        run: make test-external-runtime
