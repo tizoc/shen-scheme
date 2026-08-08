@@ -1,0 +1,9 @@
+(shen.aot.module
+  (name realistic.bench.whole-compatible)
+  (mode compatible)
+  (sources "benchmarks/realistic/core.shen"
+           "benchmarks/realistic/analysis.shen"
+           "benchmarks/realistic/optimize.shen"
+           "benchmarks/realistic/compile.shen"
+           "benchmarks/realistic/vm.shen"
+           "benchmarks/realistic/main.shen"))

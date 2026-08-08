@@ -1,0 +1,9 @@
+(shen.aot.module
+  (name port.bench.whole-compatible)
+  (mode compatible)
+  (sources "benchmarks/port-adapter.shen"
+           "benchmarks/port/data.shen"
+           "benchmarks/port/control-flow.shen"
+           "benchmarks/port/shen-compilation.shen"
+           "benchmarks/port/pattern-matching.shen"
+           "benchmarks/port/equality-check.shen"))

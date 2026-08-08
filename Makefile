@@ -254,6 +254,31 @@ test-native: $(exe) $(runtime_artifacts)
 	./$(exe) eval -q -e "(shen-scheme.load-compiled \"_build/native-tests/cli-app-profile-wpo.so\")" -e "(if (= (value *native-app-init-events*) [1 12]) ok (error \"native CLI WPO profile app initializer order failed\"))" -e "(if (= (native-app-main 31) 42) ok (error \"native CLI WPO profile app build failed\"))" -e "(if (= (native-app-length [1 2 3]) 3) ok (error \"native CLI WPO profile app runtime call failed\"))" -e "(if (= (native-app-absvector?) true) ok (error \"native CLI WPO profile app absvector failed\"))" -e "(if (= (native-app-list-equal?) true) ok (error \"native CLI WPO profile app generic equality failed\"))" -e "(if (= (native-app-sysfunc?) true) ok (error \"native CLI WPO profile app static global failed\"))"
 	./$(exe) load-compiled _build/native-tests/cli-simple.so
 
+.PHONY: bench-native
+bench-native: $(exe) $(runtime_artifacts)
+	mkdir -p _build/native-bench
+	./$(exe) script scripts/bench-native-sealed.shen
+
+.PHONY: bench-port
+bench-port: $(exe) $(runtime_artifacts)
+	mkdir -p _build/native-bench
+	./$(exe) script benchmarks/run-port-comparison.shen $(PORT_BENCH_ARGS)
+
+.PHONY: bench-port-smoke
+bench-port-smoke: $(exe) $(runtime_artifacts)
+	mkdir -p _build/native-bench
+	./$(exe) script benchmarks/run-port-comparison.shen --quick
+
+.PHONY: bench-realistic
+bench-realistic: $(exe) $(runtime_artifacts)
+	mkdir -p _build/native-bench
+	./$(exe) script benchmarks/run-realistic-comparison.shen $(REALISTIC_BENCH_ARGS)
+
+.PHONY: bench-realistic-smoke
+bench-realistic-smoke: $(exe) $(runtime_artifacts)
+	mkdir -p _build/native-bench
+	./$(exe) script benchmarks/run-realistic-comparison.shen --quick
+
 .PHONY: test-runtime-artifact-recovery
 test-runtime-artifact-recovery: $(runtime_artifacts)
 	$(RM) "$(runtime_obj)"
