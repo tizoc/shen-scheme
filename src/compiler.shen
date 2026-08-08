@@ -8,6 +8,8 @@
                      eq? eqv? equal? scm. scm.import import *sterror* *toplevel*
                      letrec let* scm.letrec scm.with-input-from-string scm.read
                      scm.define scm.goto-label scm.begin
+                     compatible sealed app
+                     scm.dynamic-wind
                      scm.value/or scm.get/or scm.<-vector/or scm.<-address/or]
 
 (define initialize-compiler
@@ -35,7 +37,9 @@
            \\_scm.*static-globals*
            \\_scm.*compiling-shen-sources*
          ])
-         (set *global-prefix* (intern "kl:global/"))))
+         (set *global-prefix* (intern "kl:global/"))
+         (set *native-mode* compatible)
+         (set *native-local-map* [])))
 
 (define unbound-symbol?
   Sym Scope -> (not (element? Sym Scope)) where (or (symbol? Sym) (= Sym ,))
@@ -98,7 +102,11 @@
   [tlstr S] Scope -> [let [[tmp (compile-expression S Scope)]]
                        [substring tmp 1 [string-length tmp]]]
   [absvector N] Scope -> [make-vector (compile-expression N Scope)
-                                      [(prefix-op fail)]]
+                                      (emit-static-application-fallback
+                                       (native-mode)
+                                       fail
+                                       []
+                                       Scope)]
   [<-address V N] Scope -> [vector-ref (compile-expression V Scope)
                                        (compile-expression N Scope)]
   [address-> V N X] Scope -> [let [[tmp (compile-expression V Scope)]]
@@ -114,6 +122,8 @@
   [scm. Code] _ -> ((foreign scm.with-input-from-string) Code (freeze ((foreign scm.read)))) where (string? Code)
   [scm. Form] _ -> (emit-scm-form Form)
   [scm. kl : Name] _ -> (intern (cn "kl:" (str Name))) where (symbol? Name)
+  [fn Name] _ -> (native-local-name Name)
+      where (not (= (native-local-name Name) (fail)))
   [Op | Args] Scope -> (emit-application Op Args Scope)
   X _ -> X                      \* literal *\
   )
@@ -240,9 +250,11 @@ but not otherwise.
       where (or (string? V1) (string? V2))
   [] V2 Scope -> [null? (compile-expression V2 Scope)]
   V1 [] Scope -> [null? (compile-expression V1 Scope)]
-  V1 V2 Scope -> [(intern "kl:=")
-                  (compile-expression V1 Scope)
-                  (compile-expression V2 Scope)])
+  V1 V2 Scope -> (emit-static-application-fallback
+                  (native-mode)
+                  =
+                  [V1 V2]
+                  Scope))
 
 (define binary-op-mapping
   +               -> +
@@ -265,6 +277,10 @@ but not otherwise.
   hd              -> car
   tl              -> cdr
   _               -> (fail))
+
+(define emit-static-application-fallback
+  _ Op Params Scope -> (let Args (map (/. P (compile-expression P Scope)) Params)
+                         [(prefix-op Op) | Args]))
 
 (define emit-application
   Op Params Scope -> (emit-application* Op (arity Op) Params Scope))
@@ -300,6 +316,42 @@ but not otherwise.
 (define prefix-global
   Sym -> (concat (value *global-prefix*) Sym))
 
+(define native-mode
+  -> (trap-error (value *native-mode*) (/. E compatible)))
+
+(define native-local-map
+  -> (trap-error (value *native-local-map*) (/. E [])))
+
+(define with-native-context
+  Mode LocalMap F -> (let OldMode (native-mode)
+                          OldLocalMap (native-local-map)
+                       ((foreign scm.dynamic-wind)
+                        (freeze
+                         (do (set *native-mode* Mode)
+                             (set *native-local-map* LocalMap)))
+                        F
+                        (freeze
+                         (do (set *native-mode* OldMode)
+                             (set *native-local-map* OldLocalMap))))))
+
+(define native-local-name*
+  _ [] -> (fail)
+  Op [[Op Local] | _] -> Local
+  Op [_ | Rest] -> (native-local-name* Op Rest))
+
+(define native-local-name-for-mode
+  sealed Op -> (native-local-name* Op (native-local-map))
+  app Op -> (native-local-name* Op (native-local-map))
+  _ _ -> (fail))
+
+(define native-local-name
+  Op -> (native-local-name-for-mode (native-mode) Op))
+
+(define definition-name
+  Name -> (native-local-name Name)
+      where (not (= (native-local-name Name) (fail)))
+  Name -> (prefix-op Name))
+
 (define not-fail
   Obj F -> (F Obj) where (not (= Obj (fail)))
   Obj _ -> Obj)
@@ -323,9 +375,17 @@ but not otherwise.
                             (let Args (map (/. P (compile-expression P Scope))
                                            Params)
                               [MappedOp | Args])))
-  Op _ Params Scope -> (let Args (map (/. P (compile-expression P Scope))
-                                      Params)
-                         [(prefix-op Op) | Args]))
+  Op _ Params Scope <- (not-fail
+                        (native-local-name Op)
+                        (/. LocalOp
+                            (let Args (map (/. P (compile-expression P Scope))
+                                           Params)
+                              [LocalOp | Args])))
+  Op _ Params Scope -> (emit-static-application-fallback
+                        (native-mode)
+                        Op
+                        Params
+                        Scope))
 
 (define emit-application*
   Op Arity Params Scope
@@ -349,14 +409,14 @@ but not otherwise.
 
 (define compile-factorised-branches
   [] -> []
-  [[defun Name Args Body] | Rest] -> [[define [(prefix-op Name) | Args] (compile-expression Body Args)]
+  [[defun Name Args Body] | Rest] -> [[define [(definition-name Name) | Args] (compile-expression Body Args)]
                                       | (compile-factorised-branches Rest)])
 
 (define kl->scheme
   [defun Name Args Body] -> (let Branches (trap-error (value shen.*branches-stack*) (/. E []))
                                  Clear (set shen.*branches-stack* [])
                               (compiling-function Name
-                                (freeze [define [(prefix-op Name) | Args] |
+                                (freeze [define [(definition-name Name) | Args] |
                                           (append
                                             (compile-factorised-branches Branches)
                                             [(compile-expression Body Args)])])))

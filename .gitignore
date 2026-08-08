@@ -3,8 +3,8 @@
 /shen-sources
 /shen-chez.scm
 /shen-scheme.scm
+/shen-scheme-runtime.ss
 /shen-scheme
-/shen.boot
 *.o
 /_build
 /_dist

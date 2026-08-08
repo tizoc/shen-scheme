@@ -19,6 +19,31 @@
 
 )
 
+(define bootstrap.source-rules
+  [{ | Rest] -> (bootstrap.source-rules-after-signature Rest)
+  Rules -> Rules)
+
+(define bootstrap.source-rules-after-signature
+  [} | Rules] -> Rules
+  [_ | Rest] -> (bootstrap.source-rules-after-signature Rest))
+
+(define bootstrap.source-rule-arity
+  [Arrow | _] -> 0 where (= Arrow (intern "->"))
+  [Arrow | _] -> 0 where (= Arrow (intern "<-"))
+  [_ | Rest] -> (+ 1 (bootstrap.source-rule-arity Rest)))
+
+(define bootstrap.register-source-arities
+  [] -> []
+  [[define Name | Rules] | Rest]
+  -> (do (update-lambda-table
+          Name
+          (bootstrap.source-rule-arity
+           (bootstrap.source-rules Rules)))
+         (bootstrap.register-source-arities Rest))
+  [_ | Rest] -> (bootstrap.register-source-arities Rest))
+
+(bootstrap.register-source-arities (read-file "src/compiler.shen"))
+
 (load "scripts/build.shen")
 
 (build program "shen-scheme.scm")

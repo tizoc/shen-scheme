@@ -78,9 +78,29 @@ compiled_dir ?= compiled
 exe ?= $(build_dir)/bin/shen-scheme$(binext)
 prefix ?= /usr/local
 home_path ?= "$(prefix)/lib/shen-scheme"
-bootfile = $(build_dir)/lib/shen-scheme/shen.boot
+SHEN_SCHEME_OPTIMIZE_LEVEL ?= 2
+SHEN_SCHEME_DEBUG_LEVEL ?= 0
+SHEN_SCHEME_INSPECTOR ?= false
+SHEN_SCHEME_SOURCE_INFO ?= false
 
-precompiled_dir = $(build_dir)$(S)shen-scheme-v0.26-src
+petite_bootfile = $(build_dir)/lib/shen-scheme/petite.boot
+scheme_bootfile = $(build_dir)/lib/shen-scheme/scheme.boot
+runtime_src = shen-scheme-runtime.ss
+runtime_obj = $(build_dir)/lib/shen-scheme/shen-scheme/runtime.so
+runtime_main_obj = $(build_dir)/obj/shen-scheme-main.so
+runtime_lib_obj = $(build_dir)/obj/shen-scheme/runtime.so
+runtime_config = o$(SHEN_SCHEME_OPTIMIZE_LEVEL)-d$(SHEN_SCHEME_DEBUG_LEVEL)-i$(SHEN_SCHEME_INSPECTOR)-s$(SHEN_SCHEME_SOURCE_INFO)
+runtime_stamp_prefix = $(build_dir)/obj/shen-scheme-runtime
+runtime_stamp = $(runtime_stamp_prefix)-$(runtime_config).stamp
+runtime_stamps = $(runtime_stamp_prefix)*.stamp
+runtime_artifacts = $(petite_bootfile) $(scheme_bootfile) $(runtime_obj)
+runtime_inputs = $(psboot) $(csboot) shen-scheme.scm $(runtime_src) src/* \
+	$(compiled_dir)/*.scm scripts/build-runtime.ss
+runtime_artifact_dirs = mkdir -p $(build_dir)/obj/shen-scheme $(build_dir)/lib/shen-scheme/shen-scheme
+runtime_artifact_build = "$(scmexe)" -q -b "$(psboot)" -b "$(csboot)" --script scripts/build-runtime.ss \
+	shen-scheme.scm "$(runtime_main_obj)" "$(runtime_src)" "$(runtime_lib_obj)" "$(runtime_obj)" \
+	"$(SHEN_SCHEME_OPTIMIZE_LEVEL)" "$(SHEN_SCHEME_DEBUG_LEVEL)" \
+	"$(SHEN_SCHEME_INSPECTOR)" "$(SHEN_SCHEME_SOURCE_INFO)"
 
 git_tag ?= $(shell git tag -l --contains HEAD 2> /dev/null)
 ifeq ("$(git_tag)","")
@@ -96,7 +116,7 @@ endif
 
 .DEFAULT: all
 .PHONY: all
-all: $(exe) $(bootfile)
+all: $(exe) $(runtime_artifacts)
 
 $(csdir):
 	echo "Downloading and uncompressing Chez..."
@@ -110,6 +130,11 @@ ifeq ($(os), windows)
 else
 	cd $(csdir) && ./configure --threads --disable-curses --disable-iconv --disable-x11 && make
 endif
+
+# The Chez build creates its kernel and stock boot files together. Declaring
+# that relationship keeps fresh parallel builds from racing the boot copies.
+$(psboot) $(csboot): | $(cskernel)
+	test -f "$@"
 
 .PHONY: chez_kernel
 chez_kernel: $(cskernel)
@@ -133,9 +158,25 @@ else
 	$(CC) -c -o $@ $< -I$(csbootpath) -I./lib -Wall -Wextra -pedantic $(CFLAGS)
 endif
 
-$(bootfile): $(psboot) $(csboot) shen-scheme.scm src/* $(compiled_dir)/*.scm
+$(petite_bootfile): $(psboot)
 	mkdir -p $(build_dir)/lib/shen-scheme
-	echo '(make-boot-file "$(bootfile)" (list)  "$(psboot)" "$(csboot)" "shen-scheme.scm")' | "$(scmexe)" -q -b "$(psboot)" -b "$(csboot)"
+	cp "$<" "$@"
+
+$(scheme_bootfile): $(csboot)
+	mkdir -p $(build_dir)/lib/shen-scheme
+	cp "$<" "$@"
+
+# Keeping only the active configuration stamp makes changing any build option,
+# including changing it back, rebuild the runtime.
+$(runtime_stamp): $(runtime_inputs)
+	$(runtime_artifact_dirs)
+	$(RM) $(runtime_stamps)
+	$(runtime_artifact_build)
+	touch "$@"
+
+$(runtime_obj): | $(runtime_stamp)
+	@test -f "$@" || $(runtime_artifact_dirs)
+	@test -f "$@" || $(runtime_artifact_build)
 
 .PHONY: fetch-kernel
 fetch-kernel:
@@ -153,44 +194,33 @@ fetch-prebuilt:
 precompile-with-prebuilt:
 	$(build_dir)$(S)shen-scheme-v0.26-$(os)-bin$(S)bin$(S)shen-scheme$(binext) script scripts/do-build.shen > /dev/null
 
-$(precompiled_dir):
-	mkdir -p $(build_dir)
-	curl -LO 'https://github.com/tizoc/shen-scheme/releases/download/v0.26/shen-scheme-v0.26-src.tar.gz'
-	tar xzf shen-scheme-v0.26-src.tar.gz -C $(build_dir)
-	rm -f $(precompiled_dir)$(S)Makefile
-	cp Makefile $(precompiled_dir)$(S)Makefile
-
 .PHONY: precompile
 precompile:
 	$(SHEN) script scripts/do-build.shen > /dev/null
 
-.PHONY: build-precompiled
-build-precompiled: $(precompiled_dir) $(cskernel)
-	mkdir -p $(precompiled_dir)$(S)_build
-	cp -a $(chez_build_dir) $(precompiled_dir)$(S)$(chez_build_dir)
-	cd $(precompiled_dir); make csversion=$(csversion)
-
 .PHONY: test-shen
-test-shen: $(exe) $(bootfile)
+test-shen: $(exe) $(runtime_artifacts)
 	./$(exe) script scripts/run-shen-tests.shen
 
 .PHONY: test-compiler
-test-compiler: $(exe) $(bootfile)
+test-compiler: $(exe) $(runtime_artifacts)
 	./$(exe) script scripts/run-compiler-tests.shen
 
 .PHONY: test
 test: test-shen test-compiler
 
 .PHONY: run
-run: $(exe) $(bootfile)
+run: $(exe) $(runtime_artifacts)
 	./$(exe)
 
 .PHONY: install
-install: $(exe) $(bootfile)
+install: $(exe) $(runtime_artifacts)
 	mkdir -p $(DESTDIR)$(prefix)/bin
-	mkdir -p $(DESTDIR)$(home_path)
+	mkdir -p $(DESTDIR)$(home_path)/shen-scheme
 	install -m 0755 $(exe) $(DESTDIR)$(prefix)/bin
-	install -m 0644 $(bootfile) $(DESTDIR)$(home_path)/
+	install -m 0644 $(petite_bootfile) $(DESTDIR)$(home_path)/
+	install -m 0644 $(scheme_bootfile) $(DESTDIR)$(home_path)/
+	install -m 0644 $(runtime_obj) $(DESTDIR)$(home_path)/shen-scheme/
 
 .PHONY: source-release
 source-release:
@@ -198,19 +228,22 @@ source-release:
 	git archive --format=tar --prefix="$(archive_name)/" $(git_tag) | (cd _dist && tar xf -)
 	cp $(compiled_dir)/*.scm "_dist/$(archive_name)/compiled/"
 	cp shen-scheme.scm "_dist/$(archive_name)/shen-scheme.scm"
+	cp $(runtime_src) "_dist/$(archive_name)/$(runtime_src)"
 	rm -rf "_dist/$(archive_name)/".git*
 	rm "_dist/$(archive_name)/"*/.gitignore
 	cd _dist; tar cvzf "$(archive_name).tar.gz" "$(archive_name)/";	rm -rf "$(archive_name)/"
 	echo "Generated tarball for tag $(git_tag) as _dist/$(archive_name).tar.gz"
 
 .PHONY: binary-release
-binary-release: $(exe) $(bootfile)
+binary-release: $(exe) $(runtime_artifacts)
 	mkdir -p "_dist/shen-scheme-$(git_tag)-$(os)-bin"
 	mkdir -p "_dist/shen-scheme-$(git_tag)-$(os)-bin/bin"
-	mkdir -p "_dist/shen-scheme-$(git_tag)-$(os)-bin/lib/shen-scheme"
+	mkdir -p "_dist/shen-scheme-$(git_tag)-$(os)-bin/lib/shen-scheme/shen-scheme"
 	mkdir -p "_dist/shen-scheme-$(git_tag)-$(os)-bin/chez-legal"
 	cp $(exe) "_dist/shen-scheme-$(git_tag)-$(os)-bin/bin"
-	cp $(bootfile) "_dist/shen-scheme-$(git_tag)-$(os)-bin/lib/shen-scheme"
+	cp $(petite_bootfile) "_dist/shen-scheme-$(git_tag)-$(os)-bin/lib/shen-scheme"
+	cp $(scheme_bootfile) "_dist/shen-scheme-$(git_tag)-$(os)-bin/lib/shen-scheme"
+	cp $(runtime_obj) "_dist/shen-scheme-$(git_tag)-$(os)-bin/lib/shen-scheme/shen-scheme"
 	cp README.md "_dist/shen-scheme-$(git_tag)-$(os)-bin/README.txt"
 	cp LICENSE "_dist/shen-scheme-$(git_tag)-$(os)-bin/LICENSE.txt"
 	cp $(cslicense) "_dist/shen-scheme-$(git_tag)-$(os)-bin/chez-legal/LICENSE.txt"
@@ -219,4 +252,5 @@ binary-release: $(exe) $(bootfile)
 
 .PHONY: clean
 clean:
-	rm -f $(exe) $(bootfile) *.o *.obj
+	rm -f $(exe) $(petite_bootfile) $(scheme_bootfile) $(runtime_obj) \
+		$(runtime_main_obj) $(runtime_lib_obj) $(runtime_stamps) *.o *.obj

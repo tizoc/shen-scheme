@@ -119,6 +119,180 @@
         (function-name scm-expr)
         result)))
 
+(define (shen-scheme-write-forms scheme-file forms include-chez-import?)
+  (when (file-exists? scheme-file)
+    (delete-file scheme-file))
+  (call-with-output-file scheme-file
+    (lambda (out)
+      (when include-chez-import?
+        (display "(import (chezscheme))" out)
+        (newline out)
+        (newline out))
+      (let loop ((forms forms))
+        (unless (null? forms)
+          (pretty-print (car forms) out)
+          (newline out)
+          (loop (cdr forms)))))))
+
+(define (shen-scheme-write-native-forms scheme-file forms)
+  (shen-scheme-write-forms scheme-file forms #t))
+
+(define (shen-scheme-compile-file-message?)
+  (not (shen-global-get '*hush* (lambda (_) #f))))
+
+(define (shen-scheme-compile-scheme-file scheme-file object optimize debug inspector source-info wpo)
+  (parameterize ([optimize-level optimize]
+                 [debug-level debug]
+                 [generate-inspector-information inspector]
+                 [generate-procedure-source-information source-info]
+                 [generate-wpo-files wpo]
+                 [compile-file-message (shen-scheme-compile-file-message?)])
+    (compile-file scheme-file object))
+  object)
+
+(define (shen-scheme-compile-native-forms scheme-file object forms optimize debug inspector source-info wpo)
+  (shen-scheme-write-native-forms scheme-file forms)
+  (shen-scheme-compile-scheme-file scheme-file object optimize debug inspector source-info wpo))
+
+(define (shen-scheme-compile-native-forms-direct object forms optimize debug inspector source-info wpo)
+  (parameterize ([optimize-level optimize]
+                 [debug-level debug]
+                 [generate-inspector-information inspector]
+                 [generate-procedure-source-information source-info]
+                 [generate-wpo-files wpo]
+                 [compile-file-message (shen-scheme-compile-file-message?)])
+    (compile-to-file (cons '(import (chezscheme)) forms) object))
+  object)
+
+(define (shen-scheme-parent-directory directory)
+  (let ((len (string-length directory)))
+    (let loop ((i (- len 1)))
+      (cond ((<= i 0) #f)
+            ((char=? (string-ref directory i) #\/)
+             (substring directory 0 i))
+            (else (loop (- i 1)))))))
+
+(define (shen-scheme-ensure-directory-path directory)
+  (unless (file-exists? directory)
+    (let ((parent (shen-scheme-parent-directory directory)))
+      (when parent
+        (shen-scheme-ensure-directory-path parent)))
+    (mkdir directory)))
+
+(define (shen-scheme-replace-suffix filename suffix)
+  (let* ((len (string-length filename))
+         (dot-index
+          (let loop ((i (- len 1)))
+            (cond ((< i 0) #f)
+                  ((char=? (string-ref filename i) #\.) i)
+                  (else (loop (- i 1)))))))
+    (if dot-index
+        (string-append (substring filename 0 dot-index) suffix)
+        (string-append filename suffix))))
+
+(define (shen-scheme-native-app-module-program-forms module-forms)
+  (if (null? module-forms)
+      '()
+      (let ((module-form (car module-forms)))
+        (cons module-form
+              (cons `(import ,(cadr module-form))
+                    (shen-scheme-native-app-module-program-forms
+                     (cdr module-forms)))))))
+
+(define (shen-scheme-compile-native-app root-dir module-forms program-forms object optimize debug inspector source-info wpo)
+  (shen-scheme-ensure-directory-path root-dir)
+  (let* ((program-file (string-append root-dir "/main.ss"))
+         (program-object (if wpo
+                             (string-append root-dir "/main.so")
+                             object))
+         (program-wpo (shen-scheme-replace-suffix program-object ".wpo")))
+    (shen-scheme-write-forms program-file
+                             (append
+                              '((import (chezscheme) (shen-scheme runtime)))
+                              (shen-scheme-native-app-module-program-forms
+                               module-forms)
+                              program-forms)
+                             #f)
+    (parameterize ([optimize-level optimize]
+                   [debug-level debug]
+                   [generate-inspector-information inspector]
+                   [generate-procedure-source-information source-info]
+                   [generate-wpo-files wpo]
+                   [compile-file-message (shen-scheme-compile-file-message?)]
+                   [library-directories
+                    (cons (cons (get-shen-scheme-home-path)
+                                (get-shen-scheme-home-path))
+                          (library-directories))])
+      (compile-program program-file program-object)
+      (if wpo
+          (list object (compile-whole-program program-wpo object))
+          (list object '())))))
+
+(define shen-scheme-native-load-init (make-parameter #t))
+
+(define (shen-scheme-native-load-init?)
+  (shen-scheme-native-load-init))
+
+(define (shen-scheme-load-compiled object)
+  (load object)
+  object)
+
+(define (shen-scheme-load-compiled-for-compilation object)
+  (parameterize ([shen-scheme-native-load-init #f])
+    (load object))
+  object)
+
+(define shen-scheme-fnv64-offset 14695981039346656037)
+(define shen-scheme-fnv64-prime 1099511628211)
+(define shen-scheme-fnv64-modulus (expt 2 64))
+
+(define (shen-scheme-fnv64-update hash byte)
+  (modulo (* (bitwise-xor hash byte) shen-scheme-fnv64-prime)
+          shen-scheme-fnv64-modulus))
+
+(define (shen-scheme-hash-bytes bytes seed)
+  (let loop ((bytes bytes)
+             (hash seed))
+    (if (null? bytes)
+        hash
+        (loop (cdr bytes)
+              (shen-scheme-fnv64-update hash (car bytes))))))
+
+(define (shen-scheme-hash-string string seed)
+  (let ((len (string-length string)))
+    (let loop ((i 0)
+               (hash seed))
+      (if (= i len)
+          hash
+          (loop (+ i 1)
+                (shen-scheme-fnv64-update hash (char->integer (string-ref string i))))))))
+
+(define (shen-scheme-hash->hex hash)
+  (let ((hex (number->string hash 16)))
+    (string-append (make-string (- 16 (string-length hex)) #\0) hex)))
+
+(define (shen-scheme-file-hash filename)
+  (shen-scheme-hash->hex
+   (shen-scheme-hash-bytes
+    (read-file-as-bytelist filename)
+    shen-scheme-fnv64-offset)))
+
+(define (shen-scheme-native-source-key source)
+  (list (full-path-for-file source) (shen-scheme-file-hash source)))
+
+(define (shen-scheme-native-key sources options)
+  (shen-scheme-hash->hex
+   (shen-scheme-hash-string
+    (call-with-string-output-port
+     (lambda (out)
+       (write (list (map shen-scheme-native-source-key sources) options) out)))
+    shen-scheme-fnv64-offset)))
+
+(define (shen-scheme-delete-file-if-exists filename)
+  (when (file-exists? filename)
+    (delete-file filename))
+  #t)
+
 ;; Streams and I/O
 ;;
 
