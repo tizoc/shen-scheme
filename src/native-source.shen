@@ -3,6 +3,7 @@
 
 (package shen-scheme
  [release debug wpo unsafe
+  tc+ tc-
   define defun defprolog declare defmacro datatype synonyms package
   native-unit runtime compiletime source-kl quote eval update-lambda-table
   _scm.prefix-op scm.dynamic-wind scm.hashtable-copy]
@@ -185,10 +186,103 @@
   [native-expanded Xs CTs Ps]
   -> (do (shen.find-arities Xs)
          (let Ts (shen.find-types Xs)
-           [native-source-data
-            (map (/. X (shen.process-applications X Ts)) Xs)
-            (mapcan (/. X X) CTs)
-            Ps])))
+              Fs (map (/. X (shen.process-applications X Ts)) Xs)
+           [native-source-data Fs (mapcan (/. X X) CTs) Ps
+            (native-type-table Fs)])))
+
+(define native-module-source-mode
+  [module-source M _] -> M)
+
+(define native-module-source-path
+  [module-source _ P] -> P)
+
+(define native-check-source-form
+  F T -> (let Check (shen.typecheck F T)
+           (if (= Check false)
+               (shen.type-error)
+               skip)))
+
+(define native-source-state-effect
+  [declare F T] -> (declare F T)
+  _ -> skip)
+
+(define native-check-source-forms
+  [] -> []
+  [F Colon T | Fs]
+  -> (do (native-check-source-form F T)
+         (native-source-state-effect F)
+         [F | (native-check-source-forms Fs)])
+    where (= Colon (intern ":"))
+  [F | Fs]
+  -> (do (native-check-source-form F (protect A))
+         (native-source-state-effect F)
+         [F | (native-check-source-forms Fs)]))
+
+(define native-source-state-effects
+  [] -> skip
+  [F Colon _ | Fs]
+  -> (do (native-source-state-effect F)
+         (native-source-state-effects Fs))
+    where (= Colon (intern ":"))
+  [F | Fs]
+  -> (do (native-source-state-effect F)
+         (native-source-state-effects Fs)))
+
+(define native-assumption-table->types
+  [] -> []
+  [F T | Ts] -> [[F T] | (native-assumption-table->types Ts)])
+
+(define native-check-module-source
+  tc+ Fs Table -> (do (shen.assumetypes Table)
+                      (native-check-source-forms Fs))
+  tc- Fs _ -> (do (native-source-state-effects Fs)
+                  Fs))
+
+(define native-source-data-forms
+  [native-source-data Fs _ _ _] -> Fs)
+
+(define native-source-data-compiletime
+  [native-source-data _ CT _ _] -> CT)
+
+(define native-source-data-packages
+  [native-source-data _ _ Ps _] -> Ps)
+
+(define native-process-module-source
+  [module-source M P]
+  -> (native-process-module-source*
+      M (native-expand-forms (read-file-unprocessed P))))
+
+(define native-process-module-source*
+  M [native-expanded Xs CTs Ps]
+  -> (do (shen.find-arities Xs)
+         (let Ts (shen.find-types Xs)
+              Fs (map (/. X (shen.process-applications X Ts)) Xs)
+              Table (if (= M tc+)
+                        (mapcan (/. F (shen.typetable F)) Fs)
+                        [])
+           (let RuntimeFs (native-check-module-source M Fs Table)
+             [native-source-data
+              RuntimeFs
+              (append
+              (native-type-declaration-forms
+               (native-assumption-table->types Table))
+               (mapcan (/. X X) CTs))
+              Ps
+              []]))))
+
+(define native-process-module-sources
+  [] -> [native-source-data [] [] [] []]
+  [S | Ss]
+  -> (let D (native-process-module-source S)
+          R (native-process-module-sources Ss)
+       [native-source-data
+            (append (native-source-data-forms D)
+                    (native-source-data-forms R))
+            (append (native-source-data-compiletime D)
+                    (native-source-data-compiletime R))
+            (append (native-source-data-packages D)
+                    (native-source-data-packages R))
+            []]))
 
 (define native-read-source
   S -> (native-read-sources [S]))
@@ -223,16 +317,19 @@
   [_ | Fs] -> (native-processed-inits Fs))
 
 (define native-forms->unit
-  Fs CT Ps -> (let All (native-processed-defines Fs)
+  Fs CT Ps Types -> (let All (native-processed-defines Fs)
                    Ds (native-last-defines All)
                    KL (map (function native-shen->kl) Ds)
                    Is (map (function native-init->kl) (native-processed-inits Fs))
-                   Ts (native-type-declaration-forms (native-type-table All))
+                   Ts (native-type-declaration-forms Types)
                 [native-unit KL Is (append Ts CT)
                  Ps]))
 
 (define native-unit-kl
   [native-unit KL _ _ _] -> KL)
+
+(define native-unit-packages
+  [native-unit _ _ _ Ps] -> Ps)
 
 (define native-arity-form
   [defun F As _] -> [(_scm.prefix-op update-lambda-table) [quote F] (length As)])
@@ -244,7 +341,14 @@
   Ss -> (with-native-compiler-state
          (freeze (native-source-data->unit (native-read-sources Ss)))))
 
+(define native-module-sources->unit
+  Ss -> (with-native-compiler-state
+         (freeze
+          (native-source-data->unit
+           (native-process-module-sources Ss)))))
+
 (define native-source-data->unit
-  [native-source-data Fs CT Ps] -> (native-forms->unit Fs CT Ps))
+  [native-source-data Fs CT Ps Types]
+  -> (native-forms->unit Fs CT Ps Types))
 
 )

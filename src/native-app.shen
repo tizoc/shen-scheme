@@ -217,14 +217,14 @@
   [] _ _ Ms Fs -> [Ms Fs]
   [D | Ds] App I Ms Fs
   -> (let N (native-module-declaration-name D)
-          Ss (native-module-declaration-sources D)
+          Ss (native-module-declaration-source-specs D)
           Rs (native-module-declaration-requires D)
           Xs (native-module-declaration-exports D)
           MD (native-module-declaration-metadata D)
        (do (native-module-app-validate-required-exports Rs Ms)
            (let RM (native-module-app-required-visible-map Rs Ms)
                 As (native-module-app-required-visible-arities Rs Ms)
-                U (native-sources->unit/with-arities Ss As)
+                U (native-module-sources->unit/with-arities Ss As)
                 KL (native-unit-kl U)
                 LM (native-app-local-map KL I)
                 CXs (native-validate-exports Xs LM)

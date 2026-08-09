@@ -3,10 +3,10 @@
 
 (define native-test.run-core-regressions
   -> (let Dir "_build/native-tests"
-          ForwardCaller "_build/native-tests/core-forward-caller.shen"
-          ForwardTarget "_build/native-tests/core-forward-target.shen"
-          ForwardCompatible "_build/native-tests/core-forward-compatible.shenmod"
-          ForwardSealed "_build/native-tests/core-forward-sealed.shenmod"
+          OrderedCaller "_build/native-tests/core-ordered-caller.shen"
+          OrderedTarget "_build/native-tests/core-ordered-target.shen"
+          OrderedCompatible "_build/native-tests/core-ordered-compatible.shenmod"
+          OrderedSealed "_build/native-tests/core-ordered-sealed.shenmod"
           Duplicate "_build/native-tests/core-duplicate.shen"
           DuplicateModule "_build/native-tests/core-duplicate.shenmod"
           ArityBase "_build/native-tests/core-arity-base.shen"
@@ -18,54 +18,54 @@
           Assert (/. L E A (native-test.assert-equal L E A))
        (do
          (native-test.write-file
-          ForwardCaller
-          "(define native-core-forward-call
-  X -> (native-core-forward-target X 2))
+          OrderedCaller
+          "(define native-core-ordered-call
+  X -> (native-core-ordered-target X 2))
 ")
          (native-test.write-file
-          ForwardTarget
-          "(define native-core-forward-target
+          OrderedTarget
+          "(define native-core-ordered-target
   X Y -> (+ X Y))
 ")
          (native-test.write-file
-          ForwardCompatible
+          OrderedCompatible
           (make-string "(shen.module
   (version 1)
-  (name native.test.core-forward-compatible)
+  (name native.test.core-ordered-compatible)
   (sources tc- ~S ~S)
   (extension shen/scheme
     (mode compatible)))
 "
-                       (native-test.basename ForwardCaller)
-                       (native-test.basename ForwardTarget)))
+                       (native-test.basename OrderedTarget)
+                       (native-test.basename OrderedCaller)))
          (native-test.write-file
-          ForwardSealed
+          OrderedSealed
           (make-string "(shen.module
   (version 1)
-  (name native.test.core-forward-sealed)
+  (name native.test.core-ordered-sealed)
   (sources tc- ~S ~S)
   (extension shen/scheme
     (mode sealed)
-    (exports native-core-forward-call)))
+    (exports native-core-ordered-call)))
 "
-                       (native-test.basename ForwardCaller)
-                       (native-test.basename ForwardTarget)))
+                       (native-test.basename OrderedTarget)
+                       (native-test.basename OrderedCaller)))
          (shen-scheme.compile-module
-          ForwardCompatible
-          "_build/native-tests/core-forward-compatible.so")
+          OrderedCompatible
+          "_build/native-tests/core-ordered-compatible.so")
          (shen-scheme.load-compiled
-          "_build/native-tests/core-forward-compatible.so")
-         (Assert "compatible source set sees later arity"
+          "_build/native-tests/core-ordered-compatible.so")
+         (Assert "compatible source set sees earlier arity"
                  42
-                 (eval [native-core-forward-call 40]))
+                 (eval [native-core-ordered-call 40]))
          (shen-scheme.compile-module
-          ForwardSealed
-          "_build/native-tests/core-forward-sealed.so")
+          OrderedSealed
+          "_build/native-tests/core-ordered-sealed.so")
          (shen-scheme.load-compiled
-          "_build/native-tests/core-forward-sealed.so")
-         (Assert "sealed source set sees later arity"
+          "_build/native-tests/core-ordered-sealed.so")
+         (Assert "sealed source set sees earlier arity"
                  42
-                 (eval [native-core-forward-call 40]))
+                 (eval [native-core-ordered-call 40]))
 
          (native-test.write-file
          Duplicate

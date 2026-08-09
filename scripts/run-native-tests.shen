@@ -260,7 +260,7 @@
   Source -> (make-string "(shen.module
   (version 1)
   (name native.test.typed)
-  (sources tc- ~S)
+  (sources tc+ ~S)
   (extension shen/scheme
     (mode sealed)
     (exports native-module-typed)))
@@ -496,6 +496,118 @@
   (unknown-field true))
 "
                          (native-test.basename Source)))
+
+(define native-test.module-invalid-typed-source
+  -> "(define native-module-tc-invalid
+  { number --> number }
+  X -> true)
+")
+
+(define native-test.module-tc-a-source
+  -> "(define native-module-tc-a
+  { number --> number }
+  X -> (+ X 1))
+")
+
+(define native-test.module-tc-b-source
+  -> "(define native-module-tc-b
+  { number --> number }
+  X -> (+ X 10))
+")
+
+(define native-test.module-tc-c-source
+  -> "(define native-module-tc-c
+  { number --> number }
+  X -> (+ X 100))
+")
+
+(define native-test.module-tc-ascribed-source
+  -> "(define native-module-tc-ascribed
+  { number --> number }
+  X -> (+ X 1))
+
+(native-module-tc-ascribed 41) : number
+")
+
+(define native-test.module-tc-order-declare-source
+  -> "(declare native-module-tc-order [string --> string])
+")
+
+(define native-test.module-tc-order-define-source
+  -> "(define native-module-tc-order
+  { number --> number }
+  X -> (+ X 1))
+")
+
+(define native-test.module-tc-before-synonym-source
+  -> "(define native-module-tc-before-synonym
+  { native-module-tc-number --> native-module-tc-number }
+  X -> (+ X 1))
+")
+
+(define native-test.module-tc-late-synonym-source
+  -> "(synonyms native-module-tc-number number)
+")
+
+(define native-test.module-tc-unchecked-ascription-source
+  -> "(set *native-module-tc-unchecked-ascription* 1)
+  : (set *native-module-tc-unchecked-ascription* 2)
+
+(define native-module-tc-unchecked-ascription
+  -> (value *native-module-tc-unchecked-ascription*))
+")
+
+(define native-test.module-single-source-tc-declaration-source
+  Name Mode Export Source -> (make-string "(shen.module
+  (version 1)
+  (name ~A)
+  (sources ~A ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports ~A)))
+"
+                                           Name Mode
+                                           (native-test.basename Source)
+                                           Export))
+
+(define native-test.module-tc-transition-declaration-source
+  A B C -> (make-string "(shen.module
+  (version 1)
+  (name native.test.tc-transition)
+  (sources tc+ ~S tc- ~S tc+ ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-tc-a
+             native-module-tc-b
+             native-module-tc-c)))
+"
+                         (native-test.basename A)
+                         (native-test.basename B)
+                         (native-test.basename C)))
+
+(define native-test.module-tc-order-declaration-source
+  Declare Define -> (make-string "(shen.module
+  (version 1)
+  (name native.test.tc-order)
+  (sources tc- ~S tc+ ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-tc-order)))
+"
+                                 (native-test.basename Declare)
+                                 (native-test.basename Define)))
+
+(define native-test.module-tc-late-synonym-declaration-source
+  Define Synonym -> (make-string "(shen.module
+  (version 1)
+  (name native.test.tc-late-synonym)
+  (sources tc+ ~S ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-tc-before-synonym)))
+"
+                                  (native-test.basename Define)
+                                  (native-test.basename Synonym)))
 
 (define native-test.compile-load
   Source Object Scheme -> (do (shen-scheme.compile-file/emit Source Object Scheme)
@@ -1157,6 +1269,152 @@
                        "_build/native-tests")
                       (/. E failed))))))))
 
+(define native-test.run-module-source-typechecking
+  -> (let InvalidSource "_build/native-tests/module-tc-invalid.shen"
+          InvalidDeclaration "_build/native-tests/module-tc-invalid.shenmod"
+          UncheckedDeclaration "_build/native-tests/module-tc-unchecked.shenmod"
+          InvalidObject "_build/native-tests/module-tc-invalid.so"
+          InvalidAppObject "_build/native-tests/module-tc-invalid-app.so"
+          UncheckedObject "_build/native-tests/module-tc-unchecked.so"
+          A "_build/native-tests/module-tc-a.shen"
+          B "_build/native-tests/module-tc-b.shen"
+          C "_build/native-tests/module-tc-c.shen"
+          TransitionDeclaration "_build/native-tests/module-tc-transition.shenmod"
+          TransitionObject "_build/native-tests/module-tc-transition.so"
+          AscribedSource "_build/native-tests/module-tc-ascribed.shen"
+          AscribedDeclaration "_build/native-tests/module-tc-ascribed.shenmod"
+          AscribedObject "_build/native-tests/module-tc-ascribed.so"
+          OrderDeclare "_build/native-tests/module-tc-order-declare.shen"
+          OrderDefine "_build/native-tests/module-tc-order-define.shen"
+          OrderDeclaration "_build/native-tests/module-tc-order.shenmod"
+          OrderObject "_build/native-tests/module-tc-order.so"
+          BeforeSynonym "_build/native-tests/module-tc-before-synonym.shen"
+          LateSynonym "_build/native-tests/module-tc-late-synonym.shen"
+          LateSynonymDeclaration
+          "_build/native-tests/module-tc-late-synonym.shenmod"
+          LateSynonymObject "_build/native-tests/module-tc-late-synonym.so"
+          UncheckedAscriptionSource
+          "_build/native-tests/module-tc-unchecked-ascription.shen"
+          UncheckedAscriptionDeclaration
+          "_build/native-tests/module-tc-unchecked-ascription.shenmod"
+          UncheckedAscriptionObject
+          "_build/native-tests/module-tc-unchecked-ascription.so"
+          Assert (/. Label Expected Actual
+                    (native-test.assert-equal Label Expected Actual))
+       (do
+         (native-test.write-file InvalidSource
+                                 (native-test.module-invalid-typed-source))
+         (native-test.write-file
+          InvalidDeclaration
+          (native-test.module-single-source-tc-declaration-source
+           native.test.tc-invalid tc+ native-module-tc-invalid InvalidSource))
+         (native-test.write-file
+          UncheckedDeclaration
+          (native-test.module-single-source-tc-declaration-source
+           native.test.tc-unchecked tc- native-module-tc-invalid InvalidSource))
+         (native-test.write-file A (native-test.module-tc-a-source))
+         (native-test.write-file B (native-test.module-tc-b-source))
+         (native-test.write-file C (native-test.module-tc-c-source))
+         (native-test.write-file
+          TransitionDeclaration
+          (native-test.module-tc-transition-declaration-source A B C))
+         (native-test.write-file AscribedSource
+                                 (native-test.module-tc-ascribed-source))
+         (native-test.write-file
+          AscribedDeclaration
+          (native-test.module-single-source-tc-declaration-source
+           native.test.tc-ascribed tc+ native-module-tc-ascribed
+           AscribedSource))
+         (native-test.write-file OrderDeclare
+                                 (native-test.module-tc-order-declare-source))
+         (native-test.write-file OrderDefine
+                                 (native-test.module-tc-order-define-source))
+         (native-test.write-file
+          OrderDeclaration
+          (native-test.module-tc-order-declaration-source
+           OrderDeclare OrderDefine))
+         (native-test.write-file
+          BeforeSynonym
+          (native-test.module-tc-before-synonym-source))
+         (native-test.write-file
+          LateSynonym
+          (native-test.module-tc-late-synonym-source))
+         (native-test.write-file
+          LateSynonymDeclaration
+          (native-test.module-tc-late-synonym-declaration-source
+           BeforeSynonym LateSynonym))
+         (native-test.write-file
+          UncheckedAscriptionSource
+          (native-test.module-tc-unchecked-ascription-source))
+         (native-test.write-file
+          UncheckedAscriptionDeclaration
+          (native-test.module-single-source-tc-declaration-source
+           native.test.tc-unchecked-ascription tc-
+           native-module-tc-unchecked-ascription
+           UncheckedAscriptionSource))
+         (Assert "module tc+ rejects invalid signed definition"
+                 failed
+                 (trap-error
+                  (shen-scheme.compile-module InvalidDeclaration InvalidObject)
+                  (/. E failed)))
+         (Assert "module app tc+ rejects invalid signed definition"
+                 failed
+                 (trap-error
+                  (shen-scheme.build-module-app
+                   InvalidDeclaration
+                   "_build/native-tests"
+                   InvalidAppObject)
+                  (/. E failed)))
+         (Assert "module tc+ cannot see a later synonym"
+                 failed
+                 (trap-error
+                  (shen-scheme.compile-module
+                   LateSynonymDeclaration LateSynonymObject)
+                  (/. E failed)))
+         (shen-scheme.compile-module UncheckedDeclaration UncheckedObject)
+         (shen-scheme.load-compiled UncheckedObject)
+         (Assert "module tc- permits invalid signed definition"
+                 true
+                 (eval [native-module-tc-invalid 0]))
+         (Assert "module tc- omits inline signature"
+                 []
+                 (assoc native-module-tc-invalid (value shen.*sigf*)))
+         (shen-scheme.compile-module
+          UncheckedAscriptionDeclaration UncheckedAscriptionObject)
+         (shen-scheme.load-compiled UncheckedAscriptionObject)
+         (Assert "module tc- retains top-level ascription forms"
+                 2
+                 (eval [native-module-tc-unchecked-ascription]))
+         (shen-scheme.compile-module TransitionDeclaration TransitionObject)
+         (shen-scheme.load-compiled TransitionObject)
+         (Assert "module source mode transitions run"
+                 126
+                 (eval [+ [native-module-tc-a 5]
+                          [+ [native-module-tc-b 5]
+                             [native-module-tc-c 5]]]))
+         (Assert "module tc+ first source retains inline signature"
+                 true
+                 (not (= [] (assoc native-module-tc-a
+                                   (value shen.*sigf*)))))
+         (Assert "module tc- middle source omits inline signature"
+                 []
+                 (assoc native-module-tc-b (value shen.*sigf*)))
+         (Assert "module tc+ final source retains inline signature"
+                 true
+                 (not (= [] (assoc native-module-tc-c
+                                   (value shen.*sigf*)))))
+         (shen-scheme.compile-module AscribedDeclaration AscribedObject)
+         (shen-scheme.load-compiled AscribedObject)
+         (Assert "module tc+ compiles top-level ascription once"
+                 42
+                 (eval [native-module-tc-ascribed 41]))
+         (shen-scheme.compile-module OrderDeclaration OrderObject)
+         (shen-scheme.load-compiled OrderObject)
+         (Assert "module signatures retain source order"
+                 number
+                 (shen.typecheck [native-module-tc-order 1]
+                                 number)))))
+
 (define native-test.run-app-builder
   -> (let Result (shen-scheme.build-app/profile
                    "tests/native/app-main.shen"
@@ -1298,6 +1556,7 @@
     (native-test.run-package-effects)
     (native-test.run-profiles)
     (native-test.run-module-declarations)
+    (native-test.run-module-source-typechecking)
     (native-test.run-private-dependency-arity)
     (native-test.run-dependency-package-metadata)
     (native-test.run-compatible-redefinition)

@@ -6,7 +6,7 @@
   shen/scheme mode exports metadata profile tc+ tc-
   module-declaration infer-all runtime compiletime source-kl
   compatible sealed release skip
-  update-lambda-table
+  quote update-lambda-table _scm.prefix-op
   scm.shen-scheme-native-key scm.shen-scheme-load-compiled
   scm.shen-scheme-load-compiled-for-compilation
   scm.shen-scheme-resolve-module-source
@@ -187,12 +187,6 @@
   Es -> Es where (element? shen/scheme (native-module-extension-ids Es))
   Es -> (append Es [(native-default-shen-scheme-extension)]))
 
-(define native-module-source-mode
-  [module-source M _] -> M)
-
-(define native-module-source-path
-  [module-source _ P] -> P)
-
 (define native-resolve-module-source-path
   D S -> ((foreign scm.shen-scheme-resolve-module-source) D S))
 
@@ -294,7 +288,8 @@
   D -> (let M (native-module-declaration-mode D)
          (native-scheme-forms*
           (native-module-declaration-module-name/mode D M)
-          (native-sources->unit (native-module-declaration-sources D))
+          (native-module-sources->unit
+           (native-module-declaration-source-specs D))
           M
           (native-module-declaration-exports D)
           (native-module-declaration-metadata D))))
@@ -349,20 +344,33 @@
   [[F A] | As] -> (do (native-register-arities As)
                        (update-lambda-table F A)))
 
-(define native-sources->unit/with-arities
-  Ss As -> (with-native-compiler-state
-            (freeze (native-sources->unit/with-arities* Ss As))))
+(define native-record-package-form
+  [F [quote N] [quote Xs]] -> (shen.record-external N Xs)
+    where (= F (_scm.prefix-op shen.record-external))
+  [F [quote N] [quote Xs] [quote Fs]] -> (shen.record-internal N Xs Fs)
+    where (= F (_scm.prefix-op shen.record-internal)))
 
-(define native-sources->unit/with-arities*
-  Ss As -> (let X (native-expand-forms (native-read-source-forms Ss))
-                O (value *property-vector*)
+(define native-record-package-forms
+  [] -> skip
+  [F | Fs] -> (do (native-record-package-form F)
+                  (native-record-package-forms Fs)))
+
+(define native-module-sources->unit/with-arities
+  Ss As -> (with-native-compiler-state
+            (freeze (native-module-sources->unit/with-arities* Ss As))))
+
+(define native-module-sources->unit/with-arities*
+  Ss As -> (let O (value *property-vector*)
                 N (native-copy-property-vector O)
-             ((foreign scm.dynamic-wind)
-              (freeze (set *property-vector* N))
-              (freeze
-               (do (native-register-arities As)
-                   (native-source-data->unit (native-process-expanded X))))
-              (freeze (set *property-vector* O)))))
+                U ((foreign scm.dynamic-wind)
+                   (freeze (set *property-vector* N))
+                   (freeze
+                    (do (native-register-arities As)
+                        (native-source-data->unit
+                         (native-process-module-sources Ss))))
+                   (freeze (set *property-vector* O)))
+             (do (native-record-package-forms (native-unit-packages U))
+                 U)))
 
 (define native-defun-arity
   [defun F As _] -> [F (length As)])
@@ -375,7 +383,8 @@
   compatible _ Xs -> (error "native compiler explicit exports require sealed mode, got: ~S~%" Xs)
     where (not (= Xs infer-all))
   _ Ss Xs
-  -> (let KL (native-unit-kl (native-sources->unit/with-arities Ss []))
+  -> (let KL (native-unit-kl
+              (native-module-sources->unit/with-arities Ss []))
           CXs (native-validate-exports Xs (native-local-map KL))
        (native-register-arities (native-exported-arities KL CXs))))
 
@@ -383,7 +392,7 @@
   D Dir Stack L
   -> (let N (native-module-declaration-name D)
           M (native-module-declaration-mode D)
-          Ss (native-module-declaration-sources D)
+          Ss (native-module-declaration-source-specs D)
           Rs (native-module-declaration-requires D)
           Xs (native-module-declaration-exports D)
        (if (element? N Stack)

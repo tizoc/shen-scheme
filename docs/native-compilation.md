@@ -194,9 +194,17 @@ The `shen/scheme` extension has these fields:
 | `profile` | `release` | `release`, `debug`, `wpo`, or `unsafe` for standalone compilation |
 
 Relative source paths are resolved from the descriptor's directory. Absolute
-paths are left unchanged. The listed files are read in order and analyzed as
-one unit, so a definition may call another definition appearing in a later
-source. If a function is defined repeatedly, the final definition is compiled.
+paths are left unchanged. The listed files are compiled in order, so macros,
+declarations, datatypes, synonyms, and arities established by one source are
+available to the sources that follow it. Put a definition before sources that
+need its arity. If a function is defined repeatedly, the final definition is
+compiled.
+
+`tc+` and `tc-` are stateful markers within `sources`; each applies until the
+next marker. A `tc+` source is typechecked and its inline function signatures
+are included in compile-time metadata. A `tc-` source is compiled without
+typechecking and does not contribute inline signatures. Explicit `declare`
+forms remain effective in either mode.
 
 An explicit Shen/Scheme export list requires `sealed` mode for a standalone module.
 `compatible` standalone modules use `infer-all`, because dynamically resolved
