@@ -233,6 +233,11 @@ test-shen: $(exe) $(runtime_artifacts)
 	./$(exe) script scripts/run-shen-tests.shen
 	./$(exe) script tests/kernel-compatibility.shen
 
+.PHONY: test-ppm
+test-ppm: $(exe) $(runtime_artifacts)
+	./$(exe) script scripts/run-programmable-pattern-matching-tests.shen
+	SHEN_SCHEME_RUNTIME=petite ./$(exe) script scripts/run-programmable-pattern-matching-tests.shen
+
 .PHONY: test-compiler
 test-compiler: $(exe) $(runtime_artifacts)
 	./$(exe) script scripts/run-compiler-tests.shen
@@ -349,7 +354,7 @@ test-clean-parallel-build: chez_kernel
 	./$(exe) --version
 
 .PHONY: test
-test: test-shen test-compiler test-native test-native-examples
+test: test-shen test-ppm test-compiler test-native test-native-examples
 
 .PHONY: test-external-runtime
 test-external-runtime: $(exe) $(runtime_artifacts)
