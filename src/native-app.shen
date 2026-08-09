@@ -126,8 +126,9 @@
 
 (define native-module-app-sources
   [] -> []
-  [[module-declaration _ _ Ss _ _ _ _] | Ds]
-  -> (append Ss (native-module-app-sources Ds)))
+  [D | Ds]
+  -> (append (native-module-declaration-sources D)
+             (native-module-app-sources Ds)))
 
 (define native-module-app-key
   Ds Os WPO? -> ((foreign scm.shen-scheme-native-key)
@@ -214,19 +215,24 @@
 
 (define native-module-app-module-forms*
   [] _ _ Ms Fs -> [Ms Fs]
-  [[module-declaration N _ Ss Rs Xs MD _] | Ds] App I Ms Fs
-  -> (do (native-module-app-validate-required-exports Rs Ms)
-         (let RM (native-module-app-required-visible-map Rs Ms)
-              As (native-module-app-required-visible-arities Rs Ms)
-              U (native-sources->unit/with-arities Ss As)
-              KL (native-unit-kl U)
-              LM (native-app-local-map KL I)
-              CXs (native-validate-exports Xs LM)
-              XM (native-exported-local-map LM CXs)
-              AM (native-exported-arities KL CXs)
-              F (native-module-app-module-form App I CXs MD U LM XM RM)
-              MM [module-app-map N I XM AM]
-           (native-module-app-module-forms*
-            Ds App (+ I 1) [MM | Ms] [F | Fs]))))
+  [D | Ds] App I Ms Fs
+  -> (let N (native-module-declaration-name D)
+          Ss (native-module-declaration-sources D)
+          Rs (native-module-declaration-requires D)
+          Xs (native-module-declaration-exports D)
+          MD (native-module-declaration-metadata D)
+       (do (native-module-app-validate-required-exports Rs Ms)
+           (let RM (native-module-app-required-visible-map Rs Ms)
+                As (native-module-app-required-visible-arities Rs Ms)
+                U (native-sources->unit/with-arities Ss As)
+                KL (native-unit-kl U)
+                LM (native-app-local-map KL I)
+                CXs (native-validate-exports Xs LM)
+                XM (native-exported-local-map LM CXs)
+                AM (native-exported-arities KL CXs)
+                F (native-module-app-module-form App I CXs MD U LM XM RM)
+                MM [module-app-map N I XM AM]
+             (native-module-app-module-forms*
+              Ds App (+ I 1) [MM | Ms] [F | Fs])))))
 
 )

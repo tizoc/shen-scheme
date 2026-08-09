@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Native AOT compilation for Shen source files and declared modules, including
   top-level `defprolog` and `package` forms and arbitrary top-level Shen
   expression effects.
+- Versioned portable `shen.module` declarations with namespaced Shen/Scheme
+  native-compilation settings.
 - Compatible and sealed compilation modes, build profiles, dependency
   resolution, standalone app builds, and whole-program optimization support.
 - Port-style and realistic benchmark suites comparing dynamic loading,

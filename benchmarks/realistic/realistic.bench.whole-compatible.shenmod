@@ -1,9 +1,11 @@
-(shen.aot.module
+(shen.module
+  (version 1)
   (name realistic.bench.whole-compatible)
-  (mode compatible)
-  (sources "benchmarks/realistic/core.shen"
+  (sources tc- "benchmarks/realistic/core.shen"
            "benchmarks/realistic/analysis.shen"
            "benchmarks/realistic/optimize.shen"
            "benchmarks/realistic/compile.shen"
            "benchmarks/realistic/vm.shen"
-           "benchmarks/realistic/main.shen"))
+           "benchmarks/realistic/main.shen")
+  (extension shen/scheme
+    (mode compatible)))

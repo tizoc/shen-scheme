@@ -228,220 +228,268 @@
 ")
 
 (define native-test.module-declaration-source
-  Lib Main -> (make-string "(shen.aot.module
-  (profile debug)
-  (exports native-module-main)
-  (sources ~S ~S)
+  Lib Main -> (make-string "(shen.module
+  (version 1)
   (name native.test.module)
-  (mode sealed)
-  (metadata compiletime runtime))
+  (requires-features shen/scheme)
+  (sources tc- ~S ~S)
+  (extension example/tool
+    (flag true))
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-main)
+    (metadata compiletime runtime)
+    (profile debug)))
 "
                            Lib
                            Main))
 
 (define native-test.module-default-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.defaults)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme))
 "
                          Source))
 
 (define native-test.module-typed-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.typed)
-  (mode sealed)
-  (exports native-module-typed)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-typed)))
 "
                          Source))
 
 (define native-test.module-runtime-only-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.runtime-only)
-  (mode sealed)
-  (exports native-module-runtime-only)
-  (metadata runtime)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-runtime-only)
+    (metadata runtime)))
 "
                          Source))
 
 (define native-test.module-declared-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.declared)
-  (mode sealed)
-  (exports native-module-declared)
-  (metadata runtime compiletime)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-declared)
+    (metadata runtime compiletime)))
 "
                          Source))
 
 (define native-test.module-runtime-only-declared-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.runtime-only-declared)
-  (mode sealed)
-  (exports native-module-runtime-only-declared)
-  (metadata runtime)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-runtime-only-declared)
+    (metadata runtime)))
 "
                          Source))
 
 (define native-test.module-compiletime-only-declaration-source
-  Name Source -> (make-string "(shen.aot.module
+  Name Source -> (make-string "(shen.module
+  (version 1)
   (name ~A)
-  (mode sealed)
-  (metadata compiletime)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (metadata compiletime)))
 "
                               Name
                               Source))
 
 (define native-test.module-source-kl-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.source-kl)
-  (mode sealed)
-  (exports native-module-source-kl)
-  (metadata runtime source-kl)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-source-kl)
+    (metadata runtime source-kl)))
 "
                          Source))
 
 (define native-test.module-no-source-kl-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.no-source-kl)
-  (mode sealed)
-  (exports native-module-no-source-kl)
-  (metadata runtime compiletime)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-no-source-kl)
+    (metadata runtime compiletime)))
 "
                          Source))
 
 (define native-test.module-required-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.required)
-  (mode sealed)
-  (exports native-module-required-helper)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-required-helper)))
 "
                          Source))
 
 (define native-test.module-requirer-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.requirer)
-  (mode sealed)
   (requires native.test.required)
-  (exports native-module-requirer)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-requirer)))
 "
                          Source))
 
 (define native-test.module-private-arity-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.private-arity)
-  (mode sealed)
-  (exports native-module-private-arity-export)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-private-arity-export)))
 "
                          Source))
 
 (define native-test.module-private-arity-main-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.private-arity-main)
-  (mode sealed)
   (requires native.test.private-arity)
-  (exports native-module-private-arity-main)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-private-arity-main)))
 "
                          Source))
 
 (define native-test.module-package-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.package)
-  (mode sealed)
-  (exports native-module-package-export)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-package-export)))
 "
                          Source))
 
 (define native-test.module-package-main-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.package-main)
-  (mode sealed)
   (requires native.test.package)
-  (exports native-module-package-main)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-package-main)))
 "
                          Source))
 
 (define native-test.module-cycle-a-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.cycle-a)
-  (mode sealed)
   (requires native.test.cycle-b)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)))
 "
                          Source))
 
 (define native-test.module-cycle-b-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.cycle-b)
-  (mode sealed)
   (requires native.test.cycle-a)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)))
 "
                          Source))
 
 (define native-test.module-app-base-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.app-base)
-  (mode sealed)
-  (exports native-module-app-base)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-app-base)))
 "
                          Source))
 
 (define native-test.module-app-main-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.app-main)
-  (mode sealed)
   (requires native.test.app-base)
-  (exports native-module-app-main)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-app-main)))
 "
                          Source))
 
 (define native-test.module-app-private-call-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.app-private-call)
-  (mode sealed)
   (requires native.test.app-base)
-  (exports native-module-app-private-probe)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-app-private-probe)))
 "
                          Source))
 
 (define native-test.module-app-missing-require-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.app-missing-require)
-  (mode sealed)
   (requires native.test.app-missing)
-  (exports native-module-app-main)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-app-main)))
 "
                          Source))
 
 (define native-test.module-app-bad-export-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.app-bad-export)
-  (mode sealed)
-  (exports native-module-app-missing)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-app-missing)))
 "
                          Source))
 
 (define native-test.module-bad-declaration-source
-  Source -> (make-string "(shen.aot.module
+  Source -> (make-string "(shen.module
+  (version 1)
   (name native.test.bad)
-  (sources ~S)
+  (sources tc- ~S)
   (unknown-field true))
 "
                          Source))
@@ -490,8 +538,14 @@
                            [[native-test-shared native-test-first]]
                            [[native-test-shared 1]]]])
           BadDependency
-          [module-declaration native.test.bad-dependency compatible
-           [Source] [] [native-test-add] [] release]
+          (shen-scheme.native-parse-module-declaration
+           [shen.module
+            [version 1]
+            [name native.test.bad-dependency]
+            [sources tc- Source]
+            [extension shen/scheme
+             [mode compatible]
+             [exports native-test-add]]])
        (do
          (native-test.assert-facade-arities
           [[shen-scheme.native-compile-profile-options 1]
@@ -576,10 +630,13 @@
          (native-test.assert-equal
           "compatible declaration name skips source key"
           skip
-          (shen-scheme.native-module-declaration-module-name/mode
-           [module-declaration native.test.missing-key compatible
-            ["_build/native-tests/missing-key-source.shen"]
-            [] infer-all [] release]
+         (shen-scheme.native-module-declaration-module-name/mode
+           (shen-scheme.native-parse-module-declaration
+            [shen.module
+             [version 1]
+             [name native.test.missing-key]
+             [sources tc-
+              "_build/native-tests/missing-key-source.shen"]])
            compatible)))))
 
 (define native-test.run-private-dependency-arity
@@ -920,6 +977,16 @@
              (Assert "module declaration sources"
                      [Lib Main]
                      (shen-scheme.native-module-declaration-sources Module))
+             (Assert "module declaration source modes"
+                     [tc- tc-]
+                     (shen-scheme.native-module-declaration-source-modes Module))
+             (Assert "module declaration required features"
+                     [shen/scheme]
+                     (shen-scheme.native-module-declaration-required-features Module))
+             (Assert "module declaration preserves foreign extensions"
+                     [[flag true]]
+                     (shen-scheme.native-module-declaration-extension
+                      example/tool Module))
              (Assert "module declaration exports"
                      [native-module-main]
                      (shen-scheme.native-module-declaration-exports Module))
@@ -936,6 +1003,72 @@
                      failed
                      (trap-error
                       (shen-scheme.native-read-module-declaration BadDeclaration)
+                      (/. E failed)))
+             (Assert "module declaration rejects legacy head"
+                     failed
+                     (trap-error
+                      (shen-scheme.native-parse-module-declaration
+                       [shen.aot.module
+                        [name legacy]
+                        [sources tc- "legacy.shen"]])
+                      (/. E failed)))
+             (Assert "module declaration requires version one"
+                     failed
+                     (trap-error
+                      (shen-scheme.native-parse-module-declaration
+                       [shen.module
+                        [version 2]
+                        [name future]
+                        [sources tc- "future.shen"]])
+                      (/. E failed)))
+             (Assert "module declaration requires source mode"
+                     failed
+                     (trap-error
+                      (shen-scheme.native-parse-module-declaration
+                       [shen.module
+                        [version 1]
+                        [name unmarked]
+                        [sources "unmarked.shen"]])
+                      (/. E failed)))
+             (Assert "module declaration rejects unavailable features"
+                     failed
+                     (trap-error
+                      (shen-scheme.native-parse-module-declaration
+                       [shen.module
+                        [version 1]
+                        [name missing-feature]
+                        [requires-features native.test.missing-feature]
+                        [sources tc- "missing-feature.shen"]])
+                      (/. E failed)))
+             (Assert "module declaration rejects dangling source mode"
+                     failed
+                     (trap-error
+                      (shen-scheme.native-parse-module-declaration
+                       [shen.module
+                        [version 1]
+                        [name dangling-mode]
+                        [sources tc- "one.shen" tc+]])
+                      (/. E failed)))
+             (Assert "module declaration rejects duplicate extensions"
+                     failed
+                     (trap-error
+                      (shen-scheme.native-parse-module-declaration
+                       [shen.module
+                        [version 1]
+                        [name duplicate-extension]
+                        [sources tc- "duplicate-extension.shen"]
+                        [extension example/tool]
+                        [extension example/tool]])
+                      (/. E failed)))
+             (Assert "module declaration validates Shen/Scheme extension"
+                     failed
+                     (trap-error
+                      (shen-scheme.native-parse-module-declaration
+                       [shen.module
+                        [version 1]
+                        [name bad-extension]
+                        [sources tc- "bad-extension.shen"]
+                        [extension shen/scheme [unknown true]]])
                       (/. E failed)))
              (Assert "module metadata accepts arbitrary effects"
                      []

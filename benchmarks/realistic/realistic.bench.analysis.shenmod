@@ -1,7 +1,9 @@
-(shen.aot.module
+(shen.module
+  (version 1)
   (name realistic.bench.analysis)
-  (mode sealed)
   (requires realistic.bench.core)
-  (exports realistic-bench.free-vars
-           realistic-bench.ast-size)
-  (sources "benchmarks/realistic/analysis.shen"))
+  (sources tc- "benchmarks/realistic/analysis.shen")
+  (extension shen/scheme
+    (mode sealed)
+    (exports realistic-bench.free-vars
+             realistic-bench.ast-size)))

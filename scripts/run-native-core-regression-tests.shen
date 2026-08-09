@@ -29,19 +29,23 @@
 ")
          (native-test.write-file
           ForwardCompatible
-          (make-string "(shen.aot.module
+          (make-string "(shen.module
+  (version 1)
   (name native.test.core-forward-compatible)
-  (mode compatible)
-  (sources ~S ~S))
+  (sources tc- ~S ~S)
+  (extension shen/scheme
+    (mode compatible)))
 "
                        ForwardCaller ForwardTarget))
          (native-test.write-file
           ForwardSealed
-          (make-string "(shen.aot.module
+          (make-string "(shen.module
+  (version 1)
   (name native.test.core-forward-sealed)
-  (mode sealed)
-  (exports native-core-forward-call)
-  (sources ~S ~S))
+  (sources tc- ~S ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-core-forward-call)))
 "
                        ForwardCaller ForwardTarget))
          (shen-scheme.compile-module
@@ -89,11 +93,13 @@
                                 (value shen.*sigf*)))))
          (native-test.write-file
           DuplicateModule
-          (make-string "(shen.aot.module
+          (make-string "(shen.module
+  (version 1)
   (name native.test.core-duplicate)
-  (mode sealed)
-  (exports native-core-duplicate-call)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-core-duplicate-call)))
 "
                        Duplicate))
          (shen-scheme.build-module-app

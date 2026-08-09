@@ -77,11 +77,12 @@ build-module-app.
   Exe -> (@s "Usage: " Exe
              " compile-module <DECLARATION> -o <OBJECT> [--emit-scheme <SCHEME>] [--module-dir <DIR>]
 
-Compiles a Shen-readable native module declaration to a Chez object file.
+Compiles a portable shen.module version 1 declaration to a Chez object file.
 
 The declaration file is parsed as raw Shen data without macro expansion. The
-module declaration compiler supports explicit source lists and static
-dependencies. Standalone module compilation requires sealed mode for explicit
+The portable core supports ordered source lists, feature requirements, and
+static dependencies. Shen/Scheme compilation settings live in the shen/scheme
+extension. Standalone module compilation requires sealed mode for explicit
 exports. With --module-dir, symbolic requires are resolved as
 <DIR>/<module-name>.shenmod and analyzed from source without loading their
 compiled objects, installing ordinary definitions, or running initializers.

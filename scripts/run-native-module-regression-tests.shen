@@ -43,31 +43,37 @@
 ")
          (native-test.write-file
           BDeclaration
-          (make-string "(shen.aot.module
+          (make-string "(shen.module
+  (version 1)
   (name native.test.precedence-b)
-  (mode sealed)
-  (exports native-module-regression-shared)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-regression-shared)))
 "
                        BSource))
          (native-test.write-file
           ADeclaration
-          (make-string "(shen.aot.module
+          (make-string "(shen.module
+  (version 1)
   (name native.test.precedence-a)
-  (mode sealed)
   (requires native.test.precedence-b)
-  (exports native-module-regression-shared)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-regression-shared)))
 "
                        ASource))
          (native-test.write-file
           MainDeclaration
-          (make-string "(shen.aot.module
+          (make-string "(shen.module
+  (version 1)
   (name native.test.precedence-main)
-  (mode sealed)
   (requires native.test.precedence-a native.test.precedence-b)
-  (exports native-module-regression-main)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-regression-main)))
 "
                        MainSource))
          (native-test.delete-file-if-exists BObject)

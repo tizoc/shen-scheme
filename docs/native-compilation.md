@@ -142,13 +142,14 @@ They solve different problems:
 - A Shen `package` form is part of the Shen language. It qualifies internal
   symbols and records the package's external and internal names. Native
   compilation supports package forms and preserves package registration.
-- A `.shenmod` file is build metadata. It names a compilation unit, lists its
-  source files and dependencies, and controls native exports and metadata. It
-  does not qualify Shen symbols and does not replace `package`.
+- A `.shenmod` file is portable module metadata. Its core names a compilation
+  unit and lists source files, feature requirements, and module dependencies.
+  Namespaced extensions carry settings used by a particular implementation.
+  It does not qualify Shen symbols and does not replace `package`.
 
-A source listed by a module can contain one or more packages. The descriptor's
-`exports` are the native boundary; package externals are the Shen namespace
-boundary. Keep both when both concepts are useful.
+A source listed by a module can contain one or more packages. The Shen/Scheme
+extension's `exports` are the native boundary; package externals are the Shen
+namespace boundary. Keep both when both concepts are useful.
 
 See [package-effects.shen](../examples/native/package-effects.shen) for a
 package whose effects are restored when its compiled object is loaded.
@@ -158,22 +159,36 @@ package whose effects are restored when its compiled object is loaded.
 A declaration is one raw Shen form. It is read without macro expansion:
 
 ```shen
-(shen.aot.module
+(shen.module
+  (version 1)
   (name my.math)
-  (mode sealed)
   (requires my.core)
-  (exports my.add my.sum)
-  (metadata runtime compiletime source-kl)
-  (profile release)
-  (sources "src/math.shen"))
+  (requires-features shen/scheme)
+  (sources tc- "src/math.shen")
+  (extension shen/scheme
+    (mode sealed)
+    (exports my.add my.sum)
+    (metadata runtime compiletime source-kl)
+    (profile release)))
 ```
 
-| Field | Required/default | Meaning |
+Portable fields are order-independent. `extension` may occur once per
+extension name; Shen/Scheme preserves extensions it does not recognize.
+
+| Core field | Required/default | Meaning |
 | --- | --- | --- |
+| `version` | Required, exactly `1` | Portable descriptor format version |
 | `name` | Required | Symbolic module name used by `requires` and file lookup |
-| `sources` | Required, one or more paths | Source files forming one compilation unit |
-| `mode` | `compatible` | `compatible` or `sealed` for standalone `compile-module` |
 | `requires` | Empty | Symbolic module dependencies |
+| `requires-features` | Empty | Port or library features needed by the module |
+| `sources` | Required, one or more paths | Ordered source paths, each following a `tc+` or `tc-` marker |
+| `extension` | Optional, repeatable | Namespaced implementation settings |
+
+The `shen/scheme` extension has these fields:
+
+| Extension field | Default | Meaning |
+| --- | --- | --- |
+| `mode` | `compatible` | `compatible` or `sealed` for standalone `compile-module` |
 | `exports` | `infer-all` | Exported function names, or every definition |
 | `metadata` | `runtime compiletime` | Any of `runtime`, `compiletime`, and `source-kl` |
 | `profile` | `release` | `release`, `debug`, `wpo`, or `unsafe` for standalone compilation |
@@ -183,7 +198,7 @@ descriptor's directory. The listed files are read in order and analyzed as one
 unit, so a definition may call another definition appearing in a later source.
 If a function is defined repeatedly, the final definition is compiled.
 
-An explicit export list requires `sealed` mode for a standalone module.
+An explicit Shen/Scheme export list requires `sealed` mode for a standalone module.
 `compatible` standalone modules use `infer-all`, because dynamically resolved
 top-level calls do not provide a private native boundary.
 
