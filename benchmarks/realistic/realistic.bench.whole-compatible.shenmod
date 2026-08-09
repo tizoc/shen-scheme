@@ -1,11 +1,11 @@
 (shen.module
   (version 1)
   (name realistic.bench.whole-compatible)
-  (sources tc- "benchmarks/realistic/core.shen"
-           "benchmarks/realistic/analysis.shen"
-           "benchmarks/realistic/optimize.shen"
-           "benchmarks/realistic/compile.shen"
-           "benchmarks/realistic/vm.shen"
-           "benchmarks/realistic/main.shen")
+  (sources tc- "core.shen"
+           "analysis.shen"
+           "optimize.shen"
+           "compile.shen"
+           "vm.shen"
+           "main.shen")
   (extension shen/scheme
     (mode compatible)))

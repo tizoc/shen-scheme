@@ -193,10 +193,10 @@ The `shen/scheme` extension has these fields:
 | `metadata` | `runtime compiletime` | Any of `runtime`, `compiletime`, and `source-kl` |
 | `profile` | `release` | `release`, `debug`, `wpo`, or `unsafe` for standalone compilation |
 
-Source paths are resolved from the process working directory, not from the
-descriptor's directory. The listed files are read in order and analyzed as one
-unit, so a definition may call another definition appearing in a later source.
-If a function is defined repeatedly, the final definition is compiled.
+Relative source paths are resolved from the descriptor's directory. Absolute
+paths are left unchanged. The listed files are read in order and analyzed as
+one unit, so a definition may call another definition appearing in a later
+source. If a function is defined repeatedly, the final definition is compiled.
 
 An explicit Shen/Scheme export list requires `sealed` mode for a standalone module.
 `compatible` standalone modules use `infer-all`, because dynamically resolved
@@ -213,7 +213,7 @@ Compile each object under the name used by the resolver, then load the root:
 
 ```sh
 mkdir -p _build/native-examples/modules
-cp examples/native/modules/*.shenmod _build/native-examples/modules/
+cp examples/native/modules/native-example.* _build/native-examples/modules/
 ./_build/bin/shen-scheme compile-module \
   _build/native-examples/modules/native-example.core.shenmod \
   -o _build/native-examples/modules/native-example.core.so

@@ -1,11 +1,11 @@
 (shen.module
   (version 1)
   (name port.bench.whole-sealed)
-  (sources tc- "benchmarks/port-adapter.shen"
-           "benchmarks/port/data.shen"
-           "benchmarks/port/control-flow.shen"
-           "benchmarks/port/shen-compilation.shen"
-           "benchmarks/port/pattern-matching.shen"
-           "benchmarks/port/equality-check.shen")
+  (sources tc- "../port-adapter.shen"
+           "data.shen"
+           "control-flow.shen"
+           "shen-compilation.shen"
+           "pattern-matching.shen"
+           "equality-check.shen")
   (extension shen/scheme
     (mode sealed)))

@@ -9,6 +9,7 @@
   update-lambda-table
   scm.shen-scheme-native-key scm.shen-scheme-load-compiled
   scm.shen-scheme-load-compiled-for-compilation
+  scm.shen-scheme-resolve-module-source
   scm.file-exists? scm.dynamic-wind]
 
 (define native-single-form
@@ -18,8 +19,10 @@
                  P (length Fs)))
 
 (define native-read-module-declaration
-  P -> (native-parse-module-declaration
-        (native-single-form P (read-file-unprocessed P))))
+  P -> (native-resolve-module-declaration
+        P
+        (native-parse-module-declaration
+         (native-single-form P (read-file-unprocessed P)))))
 
 (define native-parse-module-declaration
   [shen.module | Fs] -> (native-parse-module-fields
@@ -189,6 +192,20 @@
 
 (define native-module-source-path
   [module-source _ P] -> P)
+
+(define native-resolve-module-source-path
+  D S -> ((foreign scm.shen-scheme-resolve-module-source) D S))
+
+(define native-resolve-module-source
+  D [module-source M S]
+  -> [module-source M (native-resolve-module-source-path D S)])
+
+(define native-resolve-module-declaration
+  D [module-declaration N Ss Rs Fs Es]
+  -> [module-declaration
+      N
+      (map (/. S (native-resolve-module-source D S)) Ss)
+      Rs Fs Es])
 
 (define native-module-declaration-name
   [module-declaration N _ _ _ _] -> N)

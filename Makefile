@@ -288,8 +288,7 @@ test-native: $(exe) $(runtime_artifacts)
 .PHONY: test-native-examples
 test-native-examples: $(exe) $(runtime_artifacts)
 	mkdir -p _build/native-examples/modules
-	cp examples/native/modules/native-example.core.shenmod _build/native-examples/modules/
-	cp examples/native/modules/native-example.app.shenmod _build/native-examples/modules/
+	cp examples/native/modules/native-example.* _build/native-examples/modules/
 	./$(exe) compile examples/native/single-file.shen -o _build/native-examples/single-file.so
 	./$(exe) eval -q -e "(shen-scheme.load-compiled \"_build/native-examples/single-file.so\")" -e "(if (= (answer 5) 26) ok (error \"native single-file example failed\"))"
 	./$(exe) compile examples/native/binding.shen -o _build/native-examples/compatible.so

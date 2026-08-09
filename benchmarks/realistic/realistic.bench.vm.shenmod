@@ -2,7 +2,7 @@
   (version 1)
   (name realistic.bench.vm)
   (requires realistic.bench.core)
-  (sources tc- "benchmarks/realistic/vm.shen")
+  (sources tc- "vm.shen")
   (extension shen/scheme
     (mode sealed)
     (exports realistic-bench.run-code

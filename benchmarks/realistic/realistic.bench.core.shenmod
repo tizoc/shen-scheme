@@ -1,7 +1,7 @@
 (shen.module
   (version 1)
   (name realistic.bench.core)
-  (sources tc- "benchmarks/realistic/core.shen")
+  (sources tc- "core.shen")
   (extension shen/scheme
     (mode sealed)
     (exports realistic-bench.member?

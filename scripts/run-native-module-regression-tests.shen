@@ -51,7 +51,7 @@
     (mode sealed)
     (exports native-module-regression-shared)))
 "
-                       BSource))
+                       (native-test.basename BSource)))
          (native-test.write-file
           ADeclaration
           (make-string "(shen.module
@@ -63,7 +63,7 @@
     (mode sealed)
     (exports native-module-regression-shared)))
 "
-                       ASource))
+                       (native-test.basename ASource)))
          (native-test.write-file
           MainDeclaration
           (make-string "(shen.module
@@ -75,7 +75,7 @@
     (mode sealed)
     (exports native-module-regression-main)))
 "
-                       MainSource))
+                       (native-test.basename MainSource)))
          (native-test.delete-file-if-exists BObject)
          (native-test.delete-file-if-exists AObject)
          (native-test.delete-file-if-exists MainObject)

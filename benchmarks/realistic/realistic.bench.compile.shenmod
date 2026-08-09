@@ -1,7 +1,7 @@
 (shen.module
   (version 1)
   (name realistic.bench.compile)
-  (sources tc- "benchmarks/realistic/compile.shen")
+  (sources tc- "compile.shen")
   (extension shen/scheme
     (mode sealed)
     (exports realistic-bench.compile-ast)))

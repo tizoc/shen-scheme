@@ -3,7 +3,7 @@
   (name realistic.bench.optimize)
   (requires realistic.bench.core
             realistic.bench.analysis)
-  (sources tc- "benchmarks/realistic/optimize.shen")
+  (sources tc- "optimize.shen")
   (extension shen/scheme
     (mode sealed)
     (exports realistic-bench.normalise

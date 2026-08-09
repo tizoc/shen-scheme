@@ -1,7 +1,7 @@
 (shen.module
   (version 1)
   (name native-example.core)
-  (sources tc- "examples/native/modules/native-example.core.shen")
+  (sources tc- "native-example.core.shen")
   (extension shen/scheme
     (mode sealed)
     (exports add-ten)

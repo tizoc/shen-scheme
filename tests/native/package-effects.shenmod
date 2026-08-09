@@ -1,7 +1,7 @@
 (shen.module
   (version 1)
   (name native.test.package-effects)
-  (sources tc- "tests/native/package-effects.shen")
+  (sources tc- "package-effects.shen")
   (extension shen/scheme
     (mode sealed)
     (exports)

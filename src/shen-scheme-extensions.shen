@@ -80,12 +80,13 @@ build-module-app.
 Compiles a portable shen.module version 1 declaration to a Chez object file.
 
 The declaration file is parsed as raw Shen data without macro expansion. The
-The portable core supports ordered source lists, feature requirements, and
+portable core supports ordered source lists, feature requirements, and
 static dependencies. Shen/Scheme compilation settings live in the shen/scheme
 extension. Standalone module compilation requires sealed mode for explicit
 exports. With --module-dir, symbolic requires are resolved as
 <DIR>/<module-name>.shenmod and analyzed from source without loading their
 compiled objects, installing ordinary definitions, or running initializers.
+Relative source paths are resolved from the declaration file's directory.
 Dependency macros must be self-contained or use helpers already loaded in the
 compiler, and their transformer names must not collide with live bindings.
 Foreign Scheme definition-context forms are not supported as native

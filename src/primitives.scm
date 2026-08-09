@@ -280,6 +280,11 @@
 (define (shen-scheme-native-source-key source)
   (list (full-path-for-file source) (shen-scheme-file-hash source)))
 
+(define (shen-scheme-resolve-module-source declaration source)
+  (if (path-absolute? source)
+      source
+      (path-build (path-parent (full-path-for-file declaration)) source)))
+
 (define (shen-scheme-native-key sources options)
   (shen-scheme-hash->hex
    (shen-scheme-hash-string

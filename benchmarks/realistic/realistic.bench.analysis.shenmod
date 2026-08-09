@@ -2,7 +2,7 @@
   (version 1)
   (name realistic.bench.analysis)
   (requires realistic.bench.core)
-  (sources tc- "benchmarks/realistic/analysis.shen")
+  (sources tc- "analysis.shen")
   (extension shen/scheme
     (mode sealed)
     (exports realistic-bench.free-vars

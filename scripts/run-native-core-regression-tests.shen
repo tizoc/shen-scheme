@@ -36,7 +36,8 @@
   (extension shen/scheme
     (mode compatible)))
 "
-                       ForwardCaller ForwardTarget))
+                       (native-test.basename ForwardCaller)
+                       (native-test.basename ForwardTarget)))
          (native-test.write-file
           ForwardSealed
           (make-string "(shen.module
@@ -47,7 +48,8 @@
     (mode sealed)
     (exports native-core-forward-call)))
 "
-                       ForwardCaller ForwardTarget))
+                       (native-test.basename ForwardCaller)
+                       (native-test.basename ForwardTarget)))
          (shen-scheme.compile-module
           ForwardCompatible
           "_build/native-tests/core-forward-compatible.so")
@@ -101,7 +103,7 @@
     (mode sealed)
     (exports native-core-duplicate-call)))
 "
-                       Duplicate))
+                       (native-test.basename Duplicate)))
          (shen-scheme.build-module-app
           DuplicateModule
           Dir

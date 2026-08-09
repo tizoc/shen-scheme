@@ -6,7 +6,7 @@
             realistic.bench.optimize
             realistic.bench.compile
             realistic.bench.vm)
-  (sources tc- "benchmarks/realistic/main.shen")
+  (sources tc- "main.shen")
   (extension shen/scheme
     (mode sealed)
     (exports realistic-bench.pipeline

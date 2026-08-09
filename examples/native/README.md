@@ -78,12 +78,13 @@ instead describes native compilation, dependencies, exports, and metadata. The
 example modules use both mechanisms.
 
 `load-module` resolves both declarations and compiled objects by module name in
-one module directory. Copy the declarations to the build directory so generated
-objects stay outside the source tree:
+one module directory. Relative sources are resolved from each declaration's
+directory, so copy each example module's source and declaration together while
+keeping generated objects outside the source tree:
 
 ```sh
 mkdir -p _build/native-examples/modules
-cp examples/native/modules/*.shenmod _build/native-examples/modules/
+cp examples/native/modules/native-example.* _build/native-examples/modules/
 
 ./_build/bin/shen-scheme compile-module \
   _build/native-examples/modules/native-example.core.shenmod \

@@ -52,6 +52,9 @@
                  (do (pr Body Out)
                      (close Out))))
 
+(define native-test.basename
+  (@s "_build/native-tests/" File) -> File)
+
 (define native-test.delete-file-if-exists
   File -> (shen-scheme.delete-file-if-exists File))
 
@@ -241,8 +244,8 @@
     (metadata compiletime runtime)
     (profile debug)))
 "
-                           Lib
-                           Main))
+                           (native-test.basename Lib)
+                           (native-test.basename Main)))
 
 (define native-test.module-default-declaration-source
   Source -> (make-string "(shen.module
@@ -251,7 +254,7 @@
   (sources tc- ~S)
   (extension shen/scheme))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-typed-declaration-source
   Source -> (make-string "(shen.module
@@ -262,7 +265,7 @@
     (mode sealed)
     (exports native-module-typed)))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-runtime-only-declaration-source
   Source -> (make-string "(shen.module
@@ -274,7 +277,7 @@
     (exports native-module-runtime-only)
     (metadata runtime)))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-declared-declaration-source
   Source -> (make-string "(shen.module
@@ -286,7 +289,7 @@
     (exports native-module-declared)
     (metadata runtime compiletime)))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-runtime-only-declared-declaration-source
   Source -> (make-string "(shen.module
@@ -298,7 +301,7 @@
     (exports native-module-runtime-only-declared)
     (metadata runtime)))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-compiletime-only-declaration-source
   Name Source -> (make-string "(shen.module
@@ -310,7 +313,7 @@
     (metadata compiletime)))
 "
                               Name
-                              Source))
+                              (native-test.basename Source)))
 
 (define native-test.module-source-kl-declaration-source
   Source -> (make-string "(shen.module
@@ -322,7 +325,7 @@
     (exports native-module-source-kl)
     (metadata runtime source-kl)))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-no-source-kl-declaration-source
   Source -> (make-string "(shen.module
@@ -334,7 +337,7 @@
     (exports native-module-no-source-kl)
     (metadata runtime compiletime)))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-required-declaration-source
   Source -> (make-string "(shen.module
@@ -345,7 +348,7 @@
     (mode sealed)
     (exports native-module-required-helper)))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-requirer-declaration-source
   Source -> (make-string "(shen.module
@@ -357,7 +360,7 @@
     (mode sealed)
     (exports native-module-requirer)))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-private-arity-declaration-source
   Source -> (make-string "(shen.module
@@ -368,7 +371,7 @@
     (mode sealed)
     (exports native-module-private-arity-export)))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-private-arity-main-declaration-source
   Source -> (make-string "(shen.module
@@ -380,7 +383,7 @@
     (mode sealed)
     (exports native-module-private-arity-main)))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-package-declaration-source
   Source -> (make-string "(shen.module
@@ -391,7 +394,7 @@
     (mode sealed)
     (exports native-module-package-export)))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-package-main-declaration-source
   Source -> (make-string "(shen.module
@@ -403,7 +406,7 @@
     (mode sealed)
     (exports native-module-package-main)))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-cycle-a-declaration-source
   Source -> (make-string "(shen.module
@@ -414,7 +417,7 @@
   (extension shen/scheme
     (mode sealed)))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-cycle-b-declaration-source
   Source -> (make-string "(shen.module
@@ -425,7 +428,7 @@
   (extension shen/scheme
     (mode sealed)))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-app-base-declaration-source
   Source -> (make-string "(shen.module
@@ -436,7 +439,7 @@
     (mode sealed)
     (exports native-module-app-base)))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-app-main-declaration-source
   Source -> (make-string "(shen.module
@@ -448,7 +451,7 @@
     (mode sealed)
     (exports native-module-app-main)))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-app-private-call-declaration-source
   Source -> (make-string "(shen.module
@@ -460,7 +463,7 @@
     (mode sealed)
     (exports native-module-app-private-probe)))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-app-missing-require-declaration-source
   Source -> (make-string "(shen.module
@@ -472,7 +475,7 @@
     (mode sealed)
     (exports native-module-app-main)))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-app-bad-export-declaration-source
   Source -> (make-string "(shen.module
@@ -483,7 +486,7 @@
     (mode sealed)
     (exports native-module-app-missing)))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.module-bad-declaration-source
   Source -> (make-string "(shen.module
@@ -492,7 +495,7 @@
   (sources tc- ~S)
   (unknown-field true))
 "
-                         Source))
+                         (native-test.basename Source)))
 
 (define native-test.compile-load
   Source Object Scheme -> (do (shen-scheme.compile-file/emit Source Object Scheme)
@@ -964,6 +967,11 @@
           (native-test.module-bad-declaration-source DefaultSource))
          (let Module (shen-scheme.native-read-module-declaration Declaration)
               Defaults (shen-scheme.native-read-module-declaration DefaultDeclaration)
+              ExpectedSources
+              [(shen-scheme.native-resolve-module-source-path
+                Declaration (native-test.basename Lib))
+               (shen-scheme.native-resolve-module-source-path
+                Declaration (native-test.basename Main))]
            (do
              (Assert "module declaration name"
                      native.test.module
@@ -975,8 +983,16 @@
                      debug
                      (shen-scheme.native-module-declaration-profile Module))
              (Assert "module declaration sources"
-                     [Lib Main]
+                     ExpectedSources
                      (shen-scheme.native-module-declaration-sources Module))
+             (Assert "module declaration resolved sources exist"
+                     true
+                     (every? (function shen-scheme.file-exists?)
+                             ExpectedSources))
+             (Assert "module declaration preserves absolute sources"
+                     (hd ExpectedSources)
+                     (shen-scheme.native-resolve-module-source-path
+                      Declaration (hd ExpectedSources)))
              (Assert "module declaration source modes"
                      [tc- tc-]
                      (shen-scheme.native-module-declaration-source-modes Module))
