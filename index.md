@@ -1,6 +1,6 @@
 # Shen/Scheme
 
-[![Shen Version](https://img.shields.io/badge/shen-41.2-blue.svg)](https://github.com/Shen-Language)
+[![Shen Version](https://img.shields.io/badge/shen-41.3-blue.svg)](https://github.com/Shen-Language)
 [![build](https://github.com/tizoc/shen-scheme/workflows/build/badge.svg)](https://github.com/tizoc/shen-scheme/actions?query=workflow%3Abuild)
 
 * [Shen](https://shen-language.github.io/)
