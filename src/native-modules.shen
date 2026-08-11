@@ -10,6 +10,7 @@
   scm.shen-scheme-native-key scm.shen-scheme-load-compiled
   scm.shen-scheme-load-compiled-for-compilation
   scm.shen-scheme-resolve-module-source
+  scm.shen-scheme-relative-path?
   scm.file-exists? scm.dynamic-wind]
 
 (define native-single-form
@@ -88,6 +89,10 @@
 (define native-source-list
   Ss -> (native-source-list* Ss (fail) [] false))
 
+(define native-relative-source
+  S -> S where ((foreign scm.shen-scheme-relative-path?) S)
+  S -> (error "module declaration source must be relative, got: ~S~%" S))
+
 (define native-source-list*
   [] _ [] _ -> (error "module declaration requires at least one source~%")
   [] M _ true
@@ -103,7 +108,8 @@
   -> (error "module declaration source ~S must follow tc+ or tc-~%" S)
     where (= M (fail))
   [S | Ss] M Out _
-  -> (native-source-list* Ss M [[module-source M S] | Out] false)
+  -> (native-source-list*
+      Ss M [[module-source M (native-relative-source S)] | Out] false)
     where (string? S)
   [S | _] _ _ _
   -> (error "module declaration source must be a string, got: ~S~%" S))
@@ -310,6 +316,16 @@
   F _ -> F where ((foreign scm.file-exists?) F)
   F D -> (error "native module expected ~A to exist: ~A~%" D F))
 
+(define native-read-required-module-declaration
+  M Dir
+  -> (let P (native-module-declaration-path Dir M)
+          P (native-require-existing-file P "required module declaration")
+          D (native-read-module-declaration P)
+       (if (= M (native-module-declaration-name D))
+           D
+           (error "native module required ~A but ~A declares ~A~%"
+                  M P (native-module-declaration-name D)))))
+
 (define native-require-module-dir
   [] _ -> skip
   _ Dir -> (if (= Dir (fail))
@@ -333,9 +349,7 @@
 (define native-prepare-module-requirements*
   [] _ _ L -> L
   [R | Rs] Dir Stack L
-  -> (let P (native-module-declaration-path Dir R)
-          P (native-require-existing-file P "required module declaration")
-          D (native-read-module-declaration P)
+  -> (let D (native-read-required-module-declaration R Dir)
           L (native-prepare-module/declaration* D Dir Stack L)
        (native-prepare-module-requirements* Rs Dir Stack L)))
 
@@ -412,9 +426,7 @@
 (define native-load-module-requirements*/with
   _ _ [] _ _ L -> L
   Ld Rd [R | Rs] Dir Stack L
-  -> (let P (native-module-declaration-path Dir R)
-          P (native-require-existing-file P "required module declaration")
-          D (native-read-module-declaration P)
+  -> (let D (native-read-required-module-declaration R Dir)
           L (load-module/declaration*/with Ld Rd D Dir Stack L)
        (native-load-module-requirements*/with Ld Rd Rs Dir Stack L)))
 

@@ -193,8 +193,8 @@ The `shen/scheme` extension has these fields:
 | `metadata` | `runtime compiletime` | Any of `runtime`, `compiletime`, and `source-kl` |
 | `profile` | `release` | `release`, `debug`, `wpo`, or `unsafe` for standalone compilation |
 
-Relative source paths are resolved from the descriptor's directory. Absolute
-paths are left unchanged. The listed files are compiled in order, so macros,
+Source paths must be relative and are resolved from the descriptor's
+directory. The listed files are compiled in order, so macros,
 declarations, datatypes, synonyms, and arities established by one source are
 available to the sources that follow it. Put a definition before sources that
 need its arity. If a function is defined repeatedly, the final definition is

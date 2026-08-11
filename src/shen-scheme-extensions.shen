@@ -86,7 +86,8 @@ extension. Standalone module compilation requires sealed mode for explicit
 exports. With --module-dir, symbolic requires are resolved as
 <DIR>/<module-name>.shenmod and analyzed from source without loading their
 compiled objects, installing ordinary definitions, or running initializers.
-Relative source paths are resolved from the declaration file's directory.
+Source paths must be relative and are resolved from the declaration file's
+directory.
 Sources following tc+ are typechecked; sources following tc- are not. The mode
 continues until the next marker in the ordered source list.
 Dependency macros must be self-contained or use helpers already loaded in the

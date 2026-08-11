@@ -115,9 +115,7 @@
 (define native-module-app-requirements
   [] _ _ L Ds -> [L Ds]
   [M | Ms] Dir Stack L Ds
-  -> (let P (native-module-declaration-path Dir M)
-          P (native-require-existing-file P "required module declaration")
-          D (native-read-module-declaration P)
+  -> (let D (native-read-required-module-declaration M Dir)
           R (native-module-app-declarations* D Dir Stack L Ds)
        (native-module-app-requirements
         Ms Dir Stack

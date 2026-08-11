@@ -362,6 +362,23 @@
 "
                          (native-test.basename Source)))
 
+(define native-test.module-mismatched-declaration-source
+  Source -> (make-string "(shen.module
+  (version 1)
+  (name native.test.other)
+  (sources tc- ~S))
+"
+                         (native-test.basename Source)))
+
+(define native-test.module-mismatch-requirer-declaration-source
+  Source -> (make-string "(shen.module
+  (version 1)
+  (name native.test.mismatch-requirer)
+  (requires native.test.mismatch)
+  (sources tc- ~S))
+"
+                         (native-test.basename Source)))
+
 (define native-test.module-private-arity-declaration-source
   Source -> (make-string "(shen.module
   (version 1)
@@ -986,6 +1003,14 @@
           RequirerDeclaration "_build/native-tests/native.test.requirer.shenmod"
           CycleADeclaration "_build/native-tests/native.test.cycle-a.shenmod"
           CycleBDeclaration "_build/native-tests/native.test.cycle-b.shenmod"
+          MismatchDeclaration
+          "_build/native-tests/native.test.mismatch.shenmod"
+          MismatchRequirerDeclaration
+          "_build/native-tests/module-mismatch-requirer.shenmod"
+          MismatchError
+          (make-string
+           "native module required native.test.mismatch but ~A declares native.test.other~%"
+           MismatchDeclaration)
           BadDeclaration "_build/native-tests/module-bad.shenmod"
           Object "_build/native-tests/module-decl.so"
           DefaultObject "_build/native-tests/module-default.so"
@@ -1075,6 +1100,12 @@
           CycleBDeclaration
           (native-test.module-cycle-b-declaration-source DefaultSource))
          (native-test.write-file
+          MismatchDeclaration
+          (native-test.module-mismatched-declaration-source DefaultSource))
+         (native-test.write-file
+          MismatchRequirerDeclaration
+          (native-test.module-mismatch-requirer-declaration-source DefaultSource))
+         (native-test.write-file
           BadDeclaration
           (native-test.module-bad-declaration-source DefaultSource))
          (let Module (shen-scheme.native-read-module-declaration Declaration)
@@ -1101,10 +1132,24 @@
                      true
                      (every? (function shen-scheme.file-exists?)
                              ExpectedSources))
-             (Assert "module declaration preserves absolute sources"
-                     (hd ExpectedSources)
-                     (shen-scheme.native-resolve-module-source-path
-                      Declaration (hd ExpectedSources)))
+             (Assert "module declaration rejects absolute sources"
+                     failed
+                     (trap-error
+                      (shen-scheme.native-parse-module-declaration
+                       [shen.module
+                        [version 1]
+                        [name absolute-source]
+                        [sources tc- (hd ExpectedSources)]])
+                      (/. E failed)))
+             (Assert "module declaration rejects empty sources"
+                     failed
+                     (trap-error
+                      (shen-scheme.native-parse-module-declaration
+                       [shen.module
+                        [version 1]
+                        [name empty-source]
+                        [sources tc- ""]])
+                      (/. E failed)))
              (Assert "module declaration source modes"
                      [tc- tc-]
                      (shen-scheme.native-module-declaration-source-modes Module))
@@ -1267,7 +1312,33 @@
                       (shen-scheme.load-module
                        CycleADeclaration
                        "_build/native-tests")
-                      (/. E failed))))))))
+                      (/. E failed)))
+             (Assert "module compile rejects mismatched required name"
+                     MismatchError
+                     (trap-error
+                      (do (shen-scheme.compile-module/in-dir
+                           MismatchRequirerDeclaration
+                           RequirerObject
+                           "_build/native-tests")
+                          unexpected-success)
+                      (/. E (error-to-string E))))
+             (Assert "module load rejects mismatched required name"
+                     MismatchError
+                     (trap-error
+                      (do (shen-scheme.load-module
+                           MismatchRequirerDeclaration
+                           "_build/native-tests")
+                          unexpected-success)
+                      (/. E (error-to-string E))))
+             (Assert "module app rejects mismatched required name"
+                     MismatchError
+                     (trap-error
+                      (do (shen-scheme.build-module-app
+                           MismatchRequirerDeclaration
+                           "_build/native-tests"
+                           RequirerObject)
+                          unexpected-success)
+                      (/. E (error-to-string E)))))))))
 
 (define native-test.run-module-source-typechecking
   -> (let InvalidSource "_build/native-tests/module-tc-invalid.shen"
