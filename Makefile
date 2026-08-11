@@ -55,12 +55,13 @@ ifeq ($(os), linux)
 	linkerflags = -lm -ldl -lpthread -luuid
 endif
 
-shenversion ?= 41.2
+shenversion ?= 41.3
 csversion ?= 10.3.0
 prebuilt_version ?= 0.26
 
 chez_sha256_10.3.0 = d237d9874c6e8b0ccf7758daa8286a6e825528b13ce3b2bca56eb1f73cddbc2c
 kernel_sha256_41.2 = d2182d70453d3e93d13bc20f763efdc18cdb23b481f41afb9943f5e9a0798f61
+kernel_sha256_41.3 = 559beda9a5f710811a7cd9d2d85bf224060e9fc5118e847a1e95edbc7e2e4d26
 prebuilt_sha256_0.26_linux = 2859384f3b16cd6cf596084cfff7e2d9d5b31a11df3d1f7c9e1f1746ed6ef798
 prebuilt_sha256_0.26_macOS = a9c321a286daf354dda8ab51eb2b191cbdc339c2087e4490488c88ce462f5dc6
 prebuilt_sha256_0.26_windows = 7c5ab365cdd42aa02bfba90f857fddc7b431672fe01928f14f2b0f1156042549
@@ -230,6 +231,7 @@ precompile:
 .PHONY: test-shen
 test-shen: $(exe) $(runtime_artifacts)
 	./$(exe) script scripts/run-shen-tests.shen
+	./$(exe) script tests/kernel-compatibility.shen
 
 .PHONY: test-compiler
 test-compiler: $(exe) $(runtime_artifacts)
