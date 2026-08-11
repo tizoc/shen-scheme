@@ -109,6 +109,12 @@
 (define shen.read-unit-string
   _ -> (error "character input streams are not supported~%"))
 
+\* Shen 41.3 expands source input+ calls to shen.input-h+, but its
+   lambda table still refers to input+ directly. *\
+
+(define input+
+  Type Stream -> (shen.input-h+ Type Stream))
+
 \* factorise *\
 
 \\ Branches are pushed into a stack instead of being evaluated

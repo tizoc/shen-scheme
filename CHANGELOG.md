@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Updated kernel to S41.3.
 - Compiler arity registrations are generated from compiled definitions instead
   of maintaining a parallel manual list.
 - Shen/Scheme now starts from the stock Chez boot files and loads a combined
