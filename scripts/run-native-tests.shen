@@ -76,6 +76,11 @@
   X -> (+ X 1))
 ")
 
+(define native-test.module-home-source
+  -> "(define native-module-home-main
+  X -> (+ X 1))
+")
+
 (define native-test.module-typed-source
   -> "(define native-module-typed
   { number --> number }
@@ -253,6 +258,17 @@
   (name native.test.defaults)
   (sources tc- ~S)
   (extension shen/scheme))
+"
+                         (native-test.basename Source)))
+
+(define native-test.module-home-declaration-source
+  Source -> (make-string "(shen.module
+  (version 1)
+  (name native.test.home)
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-home-main)))
 "
                          (native-test.basename Source)))
 
@@ -976,6 +992,7 @@
           Lib "_build/native-tests/module-lib.shen"
           Main "_build/native-tests/module-main.shen"
           DefaultSource "_build/native-tests/module-default.shen"
+          HomeSource "_build/native-tests/module-home.shen"
           TypedSource "_build/native-tests/module-typed.shen"
           RuntimeOnlySource "_build/native-tests/module-runtime-only.shen"
           DeclaredSource "_build/native-tests/module-declared.shen"
@@ -992,6 +1009,7 @@
           RequirerSource "_build/native-tests/module-requirer.shen"
           Declaration "_build/native-tests/module-decl.shenmod"
           DefaultDeclaration "_build/native-tests/module-default.shenmod"
+          HomeDeclaration "_build/native-tests/module-home.shenmod"
           TypedDeclaration "_build/native-tests/module-typed.shenmod"
           RuntimeOnlyDeclaration "_build/native-tests/module-runtime-only.shenmod"
           DeclaredDeclaration "_build/native-tests/module-declared.shenmod"
@@ -1016,6 +1034,7 @@
           BadDeclaration "_build/native-tests/module-bad.shenmod"
           Object "_build/native-tests/module-decl.so"
           DefaultObject "_build/native-tests/module-default.so"
+          HomeObject "_build/native-tests/module-home.so"
           TypedObject "_build/native-tests/module-typed.so"
           RuntimeOnlyObject "_build/native-tests/module-runtime-only.so"
           RequiredObject
@@ -1031,6 +1050,7 @@
          (native-test.write-file Lib (native-test.module-lib-source))
          (native-test.write-file Main (native-test.module-main-source))
          (native-test.write-file DefaultSource (native-test.module-default-source))
+         (native-test.write-file HomeSource (native-test.module-home-source))
          (native-test.write-file TypedSource (native-test.module-typed-source))
          (native-test.write-file RuntimeOnlySource (native-test.module-runtime-only-source))
          (native-test.write-file DeclaredSource (native-test.module-declared-source))
@@ -1058,6 +1078,9 @@
          (native-test.write-file
           DefaultDeclaration
           (native-test.module-default-declaration-source DefaultSource))
+         (native-test.write-file
+          HomeDeclaration
+          (native-test.module-home-declaration-source HomeSource))
          (native-test.write-file
           TypedDeclaration
           (native-test.module-typed-declaration-source TypedSource))
@@ -1266,6 +1289,15 @@
              (Assert "module declaration default compile"
                      6
                      (eval [native-module-default-main 5]))
+             (let OldHome (value *home-directory*)
+               (do (set *home-directory* "_build/native-tests/")
+                   (shen-scheme.compile-module
+                    "module-home.shenmod" HomeObject)
+                   (shen-scheme.load-compiled HomeObject)
+                   (Assert "module declaration honors Shen home"
+                           42
+                           (eval [native-module-home-main 41]))
+                   (set *home-directory* OldHome)))
              (shen-scheme.compile-module TypedDeclaration TypedObject)
              (shen-scheme.load-compiled TypedObject)
              (Assert "module declaration typed call"

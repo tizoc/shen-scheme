@@ -283,7 +283,9 @@
 (define (shen-scheme-resolve-module-source declaration source)
   (if (path-absolute? source)
       source
-      (path-build (path-parent (full-path-for-file declaration)) source)))
+      (path-build
+       (path-parent (full-path-for-file (with-home-directory declaration)))
+       source)))
 
 (define (shen-scheme-relative-path? path)
   (and (> (string-length path) 0)

@@ -6,7 +6,8 @@
   tc+ tc-
   define defun defprolog declare defmacro datatype synonyms package
   native-unit runtime compiletime source-kl quote eval update-lambda-table
-  _scm.prefix-op scm.dynamic-wind scm.hashtable-copy]
+  _scm.prefix-op scm.dynamic-wind scm.hashtable-copy
+  scm.read-file-as-bytelist]
 
 (set *native-compiler-state-depth* 0)
 
@@ -71,10 +72,15 @@
   [_ _ _ _ WPO] _ -> WPO)
 
 (define read-file-unprocessed
-  F -> (let Bs (read-file-as-bytelist F)
-            Fs (trap-error (compile (/. X (shen.<s-exprs> X)) Bs)
-                           (/. E (shen.reader-error (value shen.*residue*))))
-         Fs))
+  F -> (read-bytelist-unprocessed (read-file-as-bytelist F)))
+
+(define native-read-file-unprocessed
+  F -> (read-bytelist-unprocessed
+        ((foreign scm.read-file-as-bytelist) F)))
+
+(define read-bytelist-unprocessed
+  Bs -> (trap-error (compile (/. X (shen.<s-exprs> X)) Bs)
+                    (/. X (shen.reader-error (value shen.*residue*)))))
 
 (define native-shen->kl
   [define F | _] -> (error "~A is not a legitimate function name~%" F)
@@ -250,7 +256,7 @@
 (define native-process-module-source
   [module-source M P]
   -> (native-process-module-source*
-      M (native-expand-forms (read-file-unprocessed P))))
+      M (native-expand-forms (native-read-file-unprocessed P))))
 
 (define native-process-module-source*
   M [native-expanded Xs CTs Ps]
