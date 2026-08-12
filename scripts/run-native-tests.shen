@@ -698,7 +698,7 @@
            [shen-scheme.compile-module/in-dir 3]
            [shen-scheme.compile-module/emit 3]
            [shen-scheme.compile-module/emit/in-dir 4]
-           [shen-scheme.load-module 2]
+           [shen-scheme.load-module 3]
            [shen-scheme.build-app 3]
            [shen-scheme.build-app/wpo 3]
            [shen-scheme.build-app/profile 4]
@@ -971,7 +971,9 @@
                  (shen-scheme.file-exists? DebugScheme)))))
 
 (define native-test.run-module-declarations
-  -> (let Lib "_build/native-tests/module-lib.shen"
+  -> (let ModuleDir "_build/native-tests"
+          ObjectDir "_build/native-tests/module-objects"
+          Lib "_build/native-tests/module-lib.shen"
           Main "_build/native-tests/module-main.shen"
           DefaultSource "_build/native-tests/module-default.shen"
           TypedSource "_build/native-tests/module-typed.shen"
@@ -1016,9 +1018,12 @@
           DefaultObject "_build/native-tests/module-default.so"
           TypedObject "_build/native-tests/module-typed.so"
           RuntimeOnlyObject "_build/native-tests/module-runtime-only.so"
-          RequiredObject "_build/native-tests/native.test.required.so"
-          RequirerObject "_build/native-tests/native.test.requirer.so"
-          RequirerEmitObject "_build/native-tests/native.test.requirer.emit.so"
+          RequiredObject
+          "_build/native-tests/module-objects/native.test.required.so"
+          RequirerObject
+          "_build/native-tests/module-objects/native.test.requirer.so"
+          RequirerEmitObject
+          "_build/native-tests/module-objects/native.test.requirer.emit.so"
           RequirerScheme "_build/native-tests/native.test.requirer.emit.scm"
           Assert (/. Label Expected Actual
                     (native-test.assert-equal Label Expected Actual))
@@ -1290,10 +1295,11 @@
              (shen-scheme.compile-module/in-dir
               RequirerDeclaration
               RequirerObject
-              "_build/native-tests")
+              ModuleDir)
              (shen-scheme.load-module
               RequirerDeclaration
-              "_build/native-tests")
+              ModuleDir
+              ObjectDir)
              (Assert "module requires loaded dependency"
                      52
                      (eval [native-module-requirer 42]))
@@ -1301,7 +1307,7 @@
               RequirerDeclaration
               RequirerEmitObject
               RequirerScheme
-              "_build/native-tests")
+              ModuleDir)
              (shen-scheme.load-compiled RequirerEmitObject)
              (Assert "module requires emit compile"
                      53
@@ -1311,7 +1317,8 @@
                      (trap-error
                       (shen-scheme.load-module
                        CycleADeclaration
-                       "_build/native-tests")
+                       ModuleDir
+                       ObjectDir)
                       (/. E failed)))
              (Assert "module compile rejects mismatched required name"
                      MismatchError
@@ -1319,7 +1326,7 @@
                       (do (shen-scheme.compile-module/in-dir
                            MismatchRequirerDeclaration
                            RequirerObject
-                           "_build/native-tests")
+                           ModuleDir)
                           unexpected-success)
                       (/. E (error-to-string E))))
              (Assert "module load rejects mismatched required name"
@@ -1327,7 +1334,8 @@
                      (trap-error
                       (do (shen-scheme.load-module
                            MismatchRequirerDeclaration
-                           "_build/native-tests")
+                           ModuleDir
+                           ObjectDir)
                           unexpected-success)
                       (/. E (error-to-string E))))
              (Assert "module app rejects mismatched required name"
@@ -1335,10 +1343,87 @@
                      (trap-error
                       (do (shen-scheme.build-module-app
                            MismatchRequirerDeclaration
-                           "_build/native-tests"
+                           ModuleDir
                            RequirerObject)
                           unexpected-success)
                       (/. E (error-to-string E)))))))))
+
+(define native-test.run-nested-module-graph
+  -> (let ModuleDir "_build/native-tests/nested-modules"
+          ObjectDir "_build/native-tests/nested-objects"
+          NestedSource
+          "_build/native-tests/nested-modules/native.test/nested.shen"
+          RootSource "_build/native-tests/nested-modules/nested-root.shen"
+          NestedDeclaration
+          "_build/native-tests/nested-modules/native.test/nested.shenmod"
+          RootDeclaration
+          "_build/native-tests/nested-modules/native.test.nested-root.shenmod"
+          NestedObject
+          "_build/native-tests/nested-objects/native.test/nested.so"
+          RootObject
+          "_build/native-tests/nested-objects/native.test.nested-root.so"
+          WrongNestedObject
+          "_build/native-tests/nested-modules/native.test/nested.so"
+          WrongRootObject
+          "_build/native-tests/nested-modules/native.test.nested-root.so"
+          AppObject "_build/native-tests/nested-module-app.so"
+          Assert (/. Label Expected Actual
+                    (native-test.assert-equal Label Expected Actual))
+       (do
+         (native-test.write-file
+          NestedSource
+          "(define native-test-nested-helper
+  X -> (+ X 10))
+")
+         (native-test.write-file
+          RootSource
+          "(define native-test-nested-main
+  X -> (native-test-nested-helper X))
+")
+         (native-test.write-file
+          NestedDeclaration
+          (make-string "(shen.module
+  (version 1)
+  (name native.test/nested)
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-test-nested-helper)))
+"
+                       "nested.shen"))
+         (native-test.write-file
+          RootDeclaration
+          (make-string "(shen.module
+  (version 1)
+  (name native.test.nested-root)
+  (requires native.test/nested)
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-test-nested-main)))
+"
+                       "nested-root.shen"))
+         (native-test.delete-file-if-exists NestedObject)
+         (native-test.delete-file-if-exists RootObject)
+         (native-test.delete-file-if-exists WrongNestedObject)
+         (native-test.delete-file-if-exists WrongRootObject)
+         (shen-scheme.compile-module/in-dir
+          RootDeclaration RootObject ModuleDir)
+         (Assert "nested module compile needs no dependency object"
+                 false
+                 (shen-scheme.file-exists? NestedObject))
+         (let Result
+              (shen-scheme.build-module-app RootDeclaration ModuleDir AppObject)
+           (do
+             (shen-scheme.load-compiled (hd Result))
+             (Assert "nested module app traverses slash names"
+                     43
+                     (eval [native-test-nested-main 33]))))
+         (shen-scheme.compile-module NestedDeclaration NestedObject)
+         (shen-scheme.load-module RootDeclaration ModuleDir ObjectDir)
+         (Assert "nested module graph loads from separate roots"
+                 42
+                 (eval [native-test-nested-main 32])))))
 
 (define native-test.run-module-source-typechecking
   -> (let InvalidSource "_build/native-tests/module-tc-invalid.shen"
@@ -1627,6 +1712,7 @@
     (native-test.run-package-effects)
     (native-test.run-profiles)
     (native-test.run-module-declarations)
+    (native-test.run-nested-module-graph)
     (native-test.run-module-source-typechecking)
     (native-test.run-private-dependency-arity)
     (native-test.run-dependency-package-metadata)

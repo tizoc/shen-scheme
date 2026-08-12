@@ -335,12 +335,6 @@
 (define native-cycle-error
   M -> (error "native module dependency cycle includes: ~A~%" M))
 
-(define native-load-module-requirements
-  Rs Dir Stack L -> (native-load-module-requirements/with
-                     (function load-compiled)
-                     (function native-load-compiled-for-compilation)
-                     Rs Dir Stack L))
-
 (define native-prepare-module-requirements
   Rs Dir Stack L
   -> (do (native-require-module-dir Rs Dir)
@@ -419,43 +413,50 @@
                      [N | L]))))))
 
 (define native-load-module-requirements/with
-  Ld Rd Rs Dir Stack L
-  -> (do (native-require-module-dir Rs Dir)
-         (native-load-module-requirements*/with Ld Rd Rs Dir Stack L)))
+  Ld Rd Rs ModuleDir ObjectDir Stack L
+  -> (do (native-require-module-dir Rs ModuleDir)
+         (native-load-module-requirements*/with
+          Ld Rd Rs ModuleDir ObjectDir Stack L)))
 
 (define native-load-module-requirements*/with
-  _ _ [] _ _ L -> L
-  Ld Rd [R | Rs] Dir Stack L
-  -> (let D (native-read-required-module-declaration R Dir)
-          L (load-module/declaration*/with Ld Rd D Dir Stack L)
-       (native-load-module-requirements*/with Ld Rd Rs Dir Stack L)))
+  _ _ [] _ _ _ L -> L
+  Ld Rd [R | Rs] ModuleDir ObjectDir Stack L
+  -> (let D (native-read-required-module-declaration R ModuleDir)
+          L (load-module/declaration*/with
+             Ld Rd D ModuleDir ObjectDir Stack L)
+       (native-load-module-requirements*/with
+        Ld Rd Rs ModuleDir ObjectDir Stack L)))
 
 (define load-module
-  F Dir -> (load-module/declaration (native-read-module-declaration F) Dir))
+  F ModuleDir ObjectDir
+  -> (load-module/declaration
+      (native-read-module-declaration F) ModuleDir ObjectDir))
 
 (define load-module/declaration
-  D Dir -> (load-module/declaration* D Dir [] []))
+  D ModuleDir ObjectDir
+  -> (load-module/declaration* D ModuleDir ObjectDir [] []))
 
 (define load-module/declaration*
-  D Dir Stack L -> (load-module/declaration*/with
-                    (function load-compiled)
-                    (function native-load-compiled-for-compilation)
-                    D Dir Stack L))
+  D ModuleDir ObjectDir Stack L
+  -> (load-module/declaration*/with
+      (function load-compiled)
+      (function native-load-compiled-for-compilation)
+      D ModuleDir ObjectDir Stack L))
 
 (define load-module/declaration*/with
   Ld Rd
-  D Dir Stack L
+  D ModuleDir ObjectDir Stack L
   -> (let M (native-module-declaration-name D)
           Rs (native-module-declaration-requires D)
        (if (element? M Stack)
            (native-cycle-error M)
            (if (element? M L)
-               (let O (native-module-object-path Dir M)
+               (let O (native-module-object-path ObjectDir M)
                     O (native-require-existing-file O "module object")
                  (do (Rd O) L))
                (let L (native-load-module-requirements/with
-                        Ld Rd Rs Dir [M | Stack] L)
-                    O (native-module-object-path Dir M)
+                        Ld Rd Rs ModuleDir ObjectDir [M | Stack] L)
+                    O (native-module-object-path ObjectDir M)
                     O (native-require-existing-file O "module object")
                  (do (Ld O) [M | L]))))))
 

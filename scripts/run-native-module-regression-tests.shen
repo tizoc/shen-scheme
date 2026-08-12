@@ -3,15 +3,19 @@
 
 (define native-test.run-module-dependency-regressions
   -> (let Dir "_build/native-tests"
+          ObjectDir "_build/native-tests/module-regression-objects"
           BSource "_build/native-tests/module-precedence-b.shen"
           ASource "_build/native-tests/module-precedence-a.shen"
           MainSource "_build/native-tests/module-precedence-main.shen"
           BDeclaration "_build/native-tests/native.test.precedence-b.shenmod"
           ADeclaration "_build/native-tests/native.test.precedence-a.shenmod"
           MainDeclaration "_build/native-tests/native.test.precedence-main.shenmod"
-          BObject "_build/native-tests/native.test.precedence-b.so"
-          AObject "_build/native-tests/native.test.precedence-a.so"
-          MainObject "_build/native-tests/native.test.precedence-main.so"
+          BObject
+          "_build/native-tests/module-regression-objects/native.test.precedence-b.so"
+          AObject
+          "_build/native-tests/module-regression-objects/native.test.precedence-a.so"
+          MainObject
+          "_build/native-tests/module-regression-objects/native.test.precedence-main.so"
           AppObject "_build/native-tests/module-precedence-app.so"
           Assert (/. Label Expected Actual
                     (native-test.assert-equal Label Expected Actual))
@@ -123,7 +127,7 @@
                      0
                      (value *native-module-regression-effects*))
              (set *native-module-regression-effects* 0)
-             (shen-scheme.load-module MainDeclaration Dir)
+             (shen-scheme.load-module MainDeclaration Dir ObjectDir)
              (Assert "module load does not repeat transitive initializer"
                      1
                      (value *native-module-regression-effects*))

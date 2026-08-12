@@ -37,7 +37,8 @@ shen-scheme compile SOURCE -o OBJECT
 shen-scheme load-compiled OBJECT
 shen-scheme compile-module DECLARATION -o OBJECT
   [--emit-scheme SCHEME] [--module-dir DIR]
-shen-scheme load-module DECLARATION --module-dir DIR
+shen-scheme load-module DECLARATION
+  --module-dir MODULE_DIR --object-dir OBJECT_DIR
 shen-scheme build-app MAIN [--module SOURCE ...] -o OBJECT
   [--wpo] [--profile release|debug|wpo|unsafe]
 shen-scheme build-module-app DECLARATION --module-dir DIR -o OBJECT
@@ -217,31 +218,31 @@ The example descriptors are:
 - [native-example.core.shenmod](../examples/native/modules/native-example.core.shenmod)
 - [native-example.app.shenmod](../examples/native/modules/native-example.app.shenmod)
 
-Compile each object under the name used by the resolver, then load the root:
+Keep declarations beside their sources, compile each object under the name used
+by the resolver, then load the root with separate module and object roots:
 
 ```sh
-mkdir -p _build/native-examples/modules
-cp examples/native/modules/native-example.* _build/native-examples/modules/
+mkdir -p _build/native-examples/objects
 ./_build/bin/shen-scheme compile-module \
-  _build/native-examples/modules/native-example.core.shenmod \
-  -o _build/native-examples/modules/native-example.core.so
+  examples/native/modules/native-example.core.shenmod \
+  -o _build/native-examples/objects/native-example.core.so
 ./_build/bin/shen-scheme compile-module \
-  _build/native-examples/modules/native-example.app.shenmod \
-  --module-dir _build/native-examples/modules \
-  -o _build/native-examples/modules/native-example.app.so
+  examples/native/modules/native-example.app.shenmod \
+  --module-dir examples/native/modules \
+  -o _build/native-examples/objects/native-example.app.so
 ./_build/bin/shen-scheme eval \
-  -e '(shen-scheme.load-module "_build/native-examples/modules/native-example.app.shenmod" "_build/native-examples/modules")' \
+  -e '(shen-scheme.load-module "examples/native/modules/native-example.app.shenmod" "examples/native/modules" "_build/native-examples/objects")' \
   -e '(run-example 32)' \
   -e '(module-events)'
 ```
 
 The last two expressions return `42` and `[42]`.
 
-For a required module named `my.core`, `--module-dir DIR` resolves:
+For a required module named `my.core`, the two roots resolve:
 
 ```text
-DIR/my.core.shenmod
-DIR/my.core.so
+MODULE_DIR/my.core.shenmod
+OBJECT_DIR/my.core.so
 ```
 
 `compile-module` analyzes dependency declarations and source files in
@@ -450,12 +451,13 @@ Each returns `O`.
 (shen-scheme.compile-module/emit F O Scm)
 (shen-scheme.compile-module/emit/in-dir F O Scm Dir)
 (shen-scheme.load-compiled O)
-(shen-scheme.load-module F Dir)
+(shen-scheme.load-module F ModuleDir ObjectDir)
 ```
 
 The compilation functions and `load-compiled` return `O`. `load-module`
 returns the loaded module-name list; dependencies are initialized before
-dependants.
+dependants. `ModuleDir` contains declarations and `ObjectDir` contains compiled
+module objects.
 
 ### Applications
 

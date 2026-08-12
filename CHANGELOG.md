@@ -29,7 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   of maintaining a parallel manual list.
 - Relative `.shenmod` source paths are resolved from the descriptor rather than
   the process working directory. Portable module declarations require relative
-  source paths and verify the names of required declarations.
+  source paths and verify the names of required declarations. Module loading
+  uses separate declaration and compiled-object roots.
 - Native module compilation honors per-source `tc+` and `tc-` transitions and
   emits inline type metadata only for checked sources.
 - Shen/Scheme now starts from the stock Chez boot files and loads a combined

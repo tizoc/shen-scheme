@@ -36,8 +36,9 @@ corruption. Use only for trusted, well-tested code.
     compile-module <DECLARATION> -o <OBJECT> [--emit-scheme <SCHEME>] [--module-dir <DIR>]
         Compiles a Shen-readable native module declaration to a Chez object file.
 
-    load-module <DECLARATION> --module-dir <DIR>
-        Loads a compiled native module and its required modules from DIR.
+    load-module <DECLARATION> --module-dir <DIR> --object-dir <DIR>
+        Loads declarations from the module directory and compiled objects from
+        the object directory.
 
     build-app <MAIN> [--module <SOURCE> ...] -o <OBJECT> [--wpo] [--profile release|debug|wpo|unsafe]
         Builds a Shen application object from generated Chez libraries.
@@ -98,11 +99,11 @@ initializers.
 
 (define shen-scheme.load-module-help-text
   Exe -> (@s "Usage: " Exe
-             " load-module <DECLARATION> --module-dir <DIR>
+             " load-module <DECLARATION> --module-dir <DIR> --object-dir <DIR>
 
-Loads a compiled native module and its transitive required modules from DIR.
-Module names resolve as <DIR>/<module-name>.shenmod and
-<DIR>/<module-name>.so.
+Loads a compiled native module and its transitive required modules.
+Module names resolve as <module-dir>/<module-name>.shenmod and
+<object-dir>/<module-name>.so.
 "))
 
 (define shen-scheme.build-app-help-text
@@ -222,12 +223,39 @@ initializers.
   Exe Args -> (shen-scheme.compile-module-command*
                Exe (shen-scheme.parse-compile-module-args Args)))
 
-(define shen-scheme.load-module-command
-  Exe ["--help"] -> [show-help (shen-scheme.load-module-help-text Exe)]
-  _ [Declaration "--module-dir" ModuleDir]
-  -> (do (shen-scheme.load-module Declaration ModuleDir)
+(define shen-scheme.parse-load-module-args
+  [Declaration | Args]
+  -> (shen-scheme.parse-load-module-options
+      Args Declaration (fail) (fail))
+  _ -> [error])
+
+(define shen-scheme.parse-load-module-options
+  [] Declaration ModuleDir ObjectDir
+  -> [ok Declaration ModuleDir ObjectDir]
+  ["--module-dir" ModuleDir | Rest] Declaration _ ObjectDir
+  -> (shen-scheme.parse-load-module-options
+      Rest Declaration ModuleDir ObjectDir)
+  ["--object-dir" ObjectDir | Rest] Declaration ModuleDir _
+  -> (shen-scheme.parse-load-module-options
+      Rest Declaration ModuleDir ObjectDir)
+  [Arg | _] _ _ _ -> [error Arg])
+
+(define shen-scheme.load-module-command*
+  Exe [ok _ ModuleDir _]
+  -> [error (shen-scheme.load-module-help-text Exe)]
+    where (= ModuleDir (fail))
+  Exe [ok _ _ ObjectDir]
+  -> [error (shen-scheme.load-module-help-text Exe)]
+    where (= ObjectDir (fail))
+  _ [ok Declaration ModuleDir ObjectDir]
+  -> (do (shen-scheme.load-module Declaration ModuleDir ObjectDir)
          [success])
   Exe _ -> [error (shen-scheme.load-module-help-text Exe)])
+
+(define shen-scheme.load-module-command
+  Exe ["--help"] -> [show-help (shen-scheme.load-module-help-text Exe)]
+  Exe Args -> (shen-scheme.load-module-command*
+               Exe (shen-scheme.parse-load-module-args Args)))
 
 (define shen-scheme.parse-build-app-args
   [] Modules Object Wpo Profile -> [ok (reverse Modules) Object Wpo Profile]
