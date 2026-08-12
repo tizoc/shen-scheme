@@ -14,7 +14,12 @@
   _ _ -> false)
 
 (define native-test.unit-compiletime
-  [native-unit _ _ CT _] -> CT)
+  [native-unit _ _ CT _] -> (native-test.compiletime-scheme-forms CT))
+
+(define native-test.compiletime-scheme-forms
+  [] -> []
+  [[native-compiletime-group CT _] | Gs]
+  -> (append CT (native-test.compiletime-scheme-forms Gs)))
 
 (define native-test.compiletime-kind
   [_ [quote [defmacro | _]]] -> defmacro
@@ -1752,9 +1757,11 @@
     (native-test.run-sealed-redefinition)
     (native-test.run-app-builder)
     (native-test.run-module-app-builder)
+    (native-test.run-native-ppm)
     (native-test.run-core-regressions)
     (native-test.run-module-dependency-regressions)))
 
 (load "scripts/run-native-core-regression-tests.shen")
 (load "scripts/run-native-module-regression-tests.shen")
+(load "scripts/run-native-ppm-tests.shen")
 (native-test.run)

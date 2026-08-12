@@ -195,11 +195,11 @@ The `shen/scheme` extension has these fields:
 | `profile` | `release` | `release`, `debug`, `wpo`, or `unsafe` for standalone compilation |
 
 Source paths must be relative and are resolved from the descriptor's
-directory. The listed files are compiled in order, so macros,
-declarations, datatypes, synonyms, and arities established by one source are
-available to the sources that follow it. Put a definition before sources that
-need its arity. If a function is defined repeatedly, the final definition is
-compiled.
+directory. The listed files are compiled in order, so macros, declarations,
+datatypes, synonyms, registered pattern handlers, and arities established by
+one source are available to the sources that follow it. Put a definition
+before sources that need its arity. If a function is defined repeatedly, the
+final definition is compiled.
 
 `tc+` and `tc-` are stateful markers within `sources`; each applies until the
 next marker. A `tc+` source is typechecked and its inline function signatures
@@ -256,6 +256,14 @@ available while compiling dependants.
 dependants and returns a list of the loaded module names. Cycles and missing
 declarations or objects are errors. If standalone direct requirements export
 the same function, the later direct requirement takes precedence.
+
+Top-level programmable-pattern-matching `register-handler` and
+`unregister-handler` calls take effect at the end of their source file. A
+handler is therefore available to later source files and dependent modules,
+but not to definitions in the file that registers it. Put custom-pattern
+consumers in a following source. Native objects replay these operations as
+compile-time metadata and as runtime initializers; a sealed handler may remain
+private because its compiled closure is carried by the registration operation.
 
 ## Application objects
 
@@ -325,7 +333,8 @@ Descriptor metadata controls what is restored in the loading Shen image:
 
 - `runtime` records exported arities and installs the needed exported
   top-level bindings for sealed modules and module apps.
-- `compiletime` replays declarations, macros, datatypes, and synonyms.
+- `compiletime` replays declarations, macros, datatypes, synonyms, and
+  programmable-pattern handler changes.
 - `source-kl` records KLambda for `ps` and user-definition introspection.
 
 Package external/internal registration is preserved independently of that
@@ -573,6 +582,9 @@ The primitive workloads are vendored unchanged from `shen-sources`; see their
 - A dependency macro must be self-contained or use helpers already present in
   the compiler. Ordinary helpers defined only in dependency source are not
   installed during dependency analysis.
+- A pattern handler used during native compilation must likewise be
+  self-contained or use helpers already present in the compiler. The handler
+  itself may remain private to a sealed module.
 - Macro transformer names share the live compiler namespace and must not
   collide with existing bindings.
 - Unusual compile-time rewrites that depend on another module's `declare`

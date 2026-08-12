@@ -374,8 +374,7 @@
                    (freeze (set *property-vector* N))
                    (freeze
                     (do (native-register-arities As)
-                        (native-source-data->unit
-                         (native-process-module-sources Ss))))
+                        (native-process-module-sources Ss)))
                    (freeze (set *property-vector* O)))
              (do (native-record-package-forms (native-unit-packages U))
                  U)))

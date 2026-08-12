@@ -193,8 +193,9 @@
           VM (append LM RM)
           Ds (native-compile-kl-forms app VM KL)
           Init (native-compile-kl-forms app VM Is)
+          CF (native-compiletime-forms app VM CT)
           RT (native-module-runtime-forms KL LM Xs MD Ps)
-          Meta (native-module-compiletime-forms KL CT MD)
+          Meta (native-module-compiletime-forms KL CF MD)
           Run (native-module-init-forms Init)
        [module M (native-app-exports XM RI CI II)
         | (append Ds [[define [RI] | RT]
