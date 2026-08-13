@@ -54,6 +54,7 @@ jobs:
     env:
       CHEZ_SCHEME_VERSION: '10.3.0'
     strategy:
+      fail-fast: false
       matrix:
         config:
           - os: macos
@@ -70,7 +71,7 @@ jobs:
             OSNAME: linux
           - os: windows
             arch: x64
-            runs_on: windows-latest
+            runs_on: windows-2022
             BUNDLE_EXT: zip
             ASSET_CONTENT_TYPE: application/zip
             OSNAME: windows
