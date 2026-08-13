@@ -77,23 +77,23 @@ A Shen package controls source-level qualification. A `.shenmod` declaration
 instead describes native compilation, dependencies, exports, and metadata. The
 example modules use both mechanisms.
 
-`load-module` resolves both declarations and compiled objects by module name in
-one module directory. Copy the declarations to the build directory so generated
-objects stay outside the source tree:
+`load-module` resolves declarations and compiled objects by module name from
+separate roots. Relative sources are resolved from each declaration's
+directory, so declarations stay beside their sources while generated objects
+go under `_build`:
 
 ```sh
-mkdir -p _build/native-examples/modules
-cp examples/native/modules/*.shenmod _build/native-examples/modules/
+mkdir -p _build/native-examples/objects
 
 ./_build/bin/shen-scheme compile-module \
-  _build/native-examples/modules/native-example.core.shenmod \
-  -o _build/native-examples/modules/native-example.core.so
+  examples/native/modules/native-example.core.shenmod \
+  -o _build/native-examples/objects/native-example.core.so
 ./_build/bin/shen-scheme compile-module \
-  _build/native-examples/modules/native-example.app.shenmod \
-  --module-dir _build/native-examples/modules \
-  -o _build/native-examples/modules/native-example.app.so
+  examples/native/modules/native-example.app.shenmod \
+  --module-dir examples/native/modules \
+  -o _build/native-examples/objects/native-example.app.so
 ./_build/bin/shen-scheme eval \
-  -e '(shen-scheme.load-module "_build/native-examples/modules/native-example.app.shenmod" "_build/native-examples/modules")' \
+  -e '(shen-scheme.load-module "examples/native/modules/native-example.app.shenmod" "examples/native/modules" "_build/native-examples/objects")' \
   -e '(run-example 32)' \
   -e '(module-events)'
 ```
@@ -108,8 +108,8 @@ cross-module calls.
 
 ```sh
 ./_build/bin/shen-scheme build-module-app \
-  _build/native-examples/modules/native-example.app.shenmod \
-  --module-dir _build/native-examples/modules \
+  examples/native/modules/native-example.app.shenmod \
+  --module-dir examples/native/modules \
   -o _build/native-examples/app.so
 ./_build/bin/shen-scheme eval \
   -e '(shen-scheme.load-compiled "_build/native-examples/app.so")' \

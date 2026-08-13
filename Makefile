@@ -233,6 +233,11 @@ test-shen: $(exe) $(runtime_artifacts)
 	./$(exe) script scripts/run-shen-tests.shen
 	./$(exe) script tests/kernel-compatibility.shen
 
+.PHONY: test-ppm
+test-ppm: $(exe) $(runtime_artifacts)
+	./$(exe) script scripts/run-programmable-pattern-matching-tests.shen
+	SHEN_SCHEME_RUNTIME=petite ./$(exe) script scripts/run-programmable-pattern-matching-tests.shen
+
 .PHONY: test-compiler
 test-compiler: $(exe) $(runtime_artifacts)
 	./$(exe) script scripts/run-compiler-tests.shen
@@ -243,6 +248,10 @@ test-compiler: $(exe) $(runtime_artifacts)
 .PHONY: test-native
 test-native: $(exe) $(runtime_artifacts)
 	mkdir -p _build/native-tests
+	mkdir -p _build/native-tests/module-objects
+	mkdir -p _build/native-tests/module-regression-objects
+	mkdir -p _build/native-tests/nested-modules/native.test
+	mkdir -p _build/native-tests/nested-objects/native.test
 	./$(exe) script scripts/run-native-tests.shen
 	./$(exe) eval -q -e "(shen-scheme.delete-file-if-exists \"_build/native-tests/cli-direct.so.scm\")"
 	./$(exe) compile tests/native/simple.shen -o _build/native-tests/cli-direct.so
@@ -273,10 +282,10 @@ test-native: $(exe) $(runtime_artifacts)
 	./$(exe) eval -q -e "(shen-scheme.load-compiled \"_build/native-tests/cli-module-source-kl.so\")" -e "(if (= (native-module-source-kl 41) 42) ok (error \"native CLI module source-kl call failed\"))" -e "(if (= defun (hd (ps native-module-source-kl))) ok (error \"native CLI module source-kl ps failed\"))" -e "(if (= native-module-source-kl (hd (tl (ps native-module-source-kl)))) ok (error \"native CLI module source-kl recorded wrong name\"))" -e "(if (element? native-module-source-kl (value shen.*userdefs*)) ok (error \"native CLI module source-kl userdefs failed\"))"
 	./$(exe) compile-module _build/native-tests/module-no-source-kl.shenmod -o _build/native-tests/cli-module-no-source-kl.so
 	./$(exe) eval -q -e "(shen-scheme.load-compiled \"_build/native-tests/cli-module-no-source-kl.so\")" -e "(if (= (native-module-no-source-kl 41) 42) ok (error \"native CLI module no-source-kl call failed\"))" -e "(if (= missing (trap-error (ps native-module-no-source-kl) (/. E missing))) ok (error \"native CLI module no-source-kl leaked ps\"))" -e "(if (not (element? native-module-no-source-kl (value shen.*userdefs*))) ok (error \"native CLI module no-source-kl leaked userdefs\"))"
-	./$(exe) compile-module _build/native-tests/native.test.required.shenmod -o _build/native-tests/native.test.required.so
-	./$(exe) compile-module _build/native-tests/native.test.requirer.shenmod --module-dir _build/native-tests -o _build/native-tests/native.test.requirer.so
-	./$(exe) eval -q -e "(shen-scheme.load-module \"_build/native-tests/native.test.requirer.shenmod\" \"_build/native-tests\")" -e "(if (= (native-module-requirer 32) 42) ok (error \"native CLI module requires failed\"))"
-	./$(exe) load-module _build/native-tests/native.test.requirer.shenmod --module-dir _build/native-tests
+	./$(exe) compile-module _build/native-tests/native.test.required.shenmod -o _build/native-tests/module-objects/native.test.required.so
+	./$(exe) compile-module _build/native-tests/native.test.requirer.shenmod --module-dir _build/native-tests -o _build/native-tests/module-objects/native.test.requirer.so
+	./$(exe) eval -q -e "(shen-scheme.load-module \"_build/native-tests/native.test.requirer.shenmod\" \"_build/native-tests\" \"_build/native-tests/module-objects\")" -e "(if (= (native-module-requirer 32) 42) ok (error \"native CLI module requires failed\"))"
+	./$(exe) load-module _build/native-tests/native.test.requirer.shenmod --object-dir _build/native-tests/module-objects --module-dir _build/native-tests
 	./$(exe) build-module-app _build/native-tests/native.test.app-main.shenmod --module-dir _build/native-tests -o _build/native-tests/cli-module-app-wpo.so --wpo
 	./$(exe) eval -q -e "(shen-scheme.load-compiled \"_build/native-tests/cli-module-app-wpo.so\")" -e "(if (= (value *native-module-app-init-events*) [10 11]) ok (error \"native CLI module app initializer order failed\"))" -e "(if (= (native-module-app-main 32) 42) ok (error \"native CLI module app failed\"))" -e "(load \"_build/native-tests/module-app-base-updated.shen\")" -e "(if (= (native-module-app-base 1) 1001) ok (error \"native CLI module app dependency redefine failed\"))" -e "(if (= (native-module-app-main 32) 42) ok (error \"native CLI module app lost direct dependency binding\"))"
 	./$(exe) build-app tests/native/app-main.shen --module tests/native/app-lib.shen -o _build/native-tests/cli-app-wpo.so --wpo
@@ -287,9 +296,7 @@ test-native: $(exe) $(runtime_artifacts)
 
 .PHONY: test-native-examples
 test-native-examples: $(exe) $(runtime_artifacts)
-	mkdir -p _build/native-examples/modules
-	cp examples/native/modules/native-example.core.shenmod _build/native-examples/modules/
-	cp examples/native/modules/native-example.app.shenmod _build/native-examples/modules/
+	mkdir -p _build/native-examples/objects
 	./$(exe) compile examples/native/single-file.shen -o _build/native-examples/single-file.so
 	./$(exe) eval -q -e "(shen-scheme.load-compiled \"_build/native-examples/single-file.so\")" -e "(if (= (answer 5) 26) ok (error \"native single-file example failed\"))"
 	./$(exe) compile examples/native/binding.shen -o _build/native-examples/compatible.so
@@ -298,12 +305,12 @@ test-native-examples: $(exe) $(runtime_artifacts)
 	./$(exe) eval -q -e "(shen-scheme.load-compiled \"_build/native-examples/sealed.so\")" -e "(load \"examples/native/binding-update.shen\")" -e "(if (= (call-helper 1) 2) ok (error \"native sealed example failed\"))"
 	./$(exe) compile examples/native/package-effects.shen -o _build/native-examples/package-effects.so
 	./$(exe) eval -q -e "(shen-scheme.load-compiled \"_build/native-examples/package-effects.so\")" -e "(if (= (effect-events) [\"inside-before-definition\" \"after-definition\"]) ok (error \"native package effects example failed\"))"
-	./$(exe) compile-module _build/native-examples/modules/native-example.core.shenmod -o _build/native-examples/modules/native-example.core.so
-	./$(exe) compile-module _build/native-examples/modules/native-example.app.shenmod --module-dir _build/native-examples/modules -o _build/native-examples/modules/native-example.app.so
-	./$(exe) eval -q -e "(shen-scheme.load-module \"_build/native-examples/modules/native-example.app.shenmod\" \"_build/native-examples/modules\")" -e "(if (= (run-example 32) 42) ok (error \"native module graph example failed\"))" -e "(if (= (module-events) [42]) ok (error \"native module initializer example failed\"))"
-	./$(exe) build-module-app _build/native-examples/modules/native-example.app.shenmod --module-dir _build/native-examples/modules -o _build/native-examples/app.so
+	./$(exe) compile-module examples/native/modules/native-example.core.shenmod -o _build/native-examples/objects/native-example.core.so
+	./$(exe) compile-module examples/native/modules/native-example.app.shenmod --module-dir examples/native/modules -o _build/native-examples/objects/native-example.app.so
+	./$(exe) eval -q -e "(shen-scheme.load-module \"examples/native/modules/native-example.app.shenmod\" \"examples/native/modules\" \"_build/native-examples/objects\")" -e "(if (= (run-example 32) 42) ok (error \"native module graph example failed\"))" -e "(if (= (module-events) [42]) ok (error \"native module initializer example failed\"))"
+	./$(exe) build-module-app examples/native/modules/native-example.app.shenmod --module-dir examples/native/modules -o _build/native-examples/app.so
 	./$(exe) eval -q -e "(shen-scheme.load-compiled \"_build/native-examples/app.so\")" -e "(if (= (run-example 32) 42) ok (error \"native module app example failed\"))" -e "(if (= (module-events) [42]) ok (error \"native module app initializer example failed\"))"
-	./$(exe) build-module-app _build/native-examples/modules/native-example.app.shenmod --module-dir _build/native-examples/modules -o _build/native-examples/app-wpo.so --wpo
+	./$(exe) build-module-app examples/native/modules/native-example.app.shenmod --module-dir examples/native/modules -o _build/native-examples/app-wpo.so --wpo
 	./$(exe) eval -q -e "(shen-scheme.load-compiled \"_build/native-examples/app-wpo.so\")" -e "(if (= (run-example 32) 42) ok (error \"native WPO module app example failed\"))"
 	SHEN_SCHEME_RUNTIME=petite ./$(exe) eval -q -e "(shen-scheme.load-compiled \"_build/native-examples/single-file.so\")" -e "(if (= (answer 5) 26) ok (error \"native full-to-Petite example failed\"))"
 
@@ -350,7 +357,7 @@ test-clean-parallel-build: chez_kernel
 	./$(exe) --version
 
 .PHONY: test
-test: test-shen test-compiler test-native test-native-examples
+test: test-shen test-ppm test-compiler test-native test-native-examples
 
 .PHONY: test-external-runtime
 test-external-runtime: $(exe) $(runtime_artifacts)

@@ -3,15 +3,19 @@
 
 (define native-test.run-module-dependency-regressions
   -> (let Dir "_build/native-tests"
+          ObjectDir "_build/native-tests/module-regression-objects"
           BSource "_build/native-tests/module-precedence-b.shen"
           ASource "_build/native-tests/module-precedence-a.shen"
           MainSource "_build/native-tests/module-precedence-main.shen"
           BDeclaration "_build/native-tests/native.test.precedence-b.shenmod"
           ADeclaration "_build/native-tests/native.test.precedence-a.shenmod"
           MainDeclaration "_build/native-tests/native.test.precedence-main.shenmod"
-          BObject "_build/native-tests/native.test.precedence-b.so"
-          AObject "_build/native-tests/native.test.precedence-a.so"
-          MainObject "_build/native-tests/native.test.precedence-main.so"
+          BObject
+          "_build/native-tests/module-regression-objects/native.test.precedence-b.so"
+          AObject
+          "_build/native-tests/module-regression-objects/native.test.precedence-a.so"
+          MainObject
+          "_build/native-tests/module-regression-objects/native.test.precedence-main.so"
           AppObject "_build/native-tests/module-precedence-app.so"
           Assert (/. Label Expected Actual
                     (native-test.assert-equal Label Expected Actual))
@@ -43,33 +47,39 @@
 ")
          (native-test.write-file
           BDeclaration
-          (make-string "(shen.aot.module
+          (make-string "(shen.module
+  (version 1)
   (name native.test.precedence-b)
-  (mode sealed)
-  (exports native-module-regression-shared)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-regression-shared)))
 "
-                       BSource))
+                       (native-test.basename BSource)))
          (native-test.write-file
           ADeclaration
-          (make-string "(shen.aot.module
+          (make-string "(shen.module
+  (version 1)
   (name native.test.precedence-a)
-  (mode sealed)
   (requires native.test.precedence-b)
-  (exports native-module-regression-shared)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-regression-shared)))
 "
-                       ASource))
+                       (native-test.basename ASource)))
          (native-test.write-file
           MainDeclaration
-          (make-string "(shen.aot.module
+          (make-string "(shen.module
+  (version 1)
   (name native.test.precedence-main)
-  (mode sealed)
   (requires native.test.precedence-a native.test.precedence-b)
-  (exports native-module-regression-main)
-  (sources ~S))
+  (sources tc- ~S)
+  (extension shen/scheme
+    (mode sealed)
+    (exports native-module-regression-main)))
 "
-                       MainSource))
+                       (native-test.basename MainSource)))
          (native-test.delete-file-if-exists BObject)
          (native-test.delete-file-if-exists AObject)
          (native-test.delete-file-if-exists MainObject)
@@ -117,7 +127,7 @@
                      0
                      (value *native-module-regression-effects*))
              (set *native-module-regression-effects* 0)
-             (shen-scheme.load-module MainDeclaration Dir)
+             (shen-scheme.load-module MainDeclaration Dir ObjectDir)
              (Assert "module load does not repeat transitive initializer"
                      1
                      (value *native-module-regression-effects*))

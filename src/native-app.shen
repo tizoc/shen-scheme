@@ -115,9 +115,7 @@
 (define native-module-app-requirements
   [] _ _ L Ds -> [L Ds]
   [M | Ms] Dir Stack L Ds
-  -> (let P (native-module-declaration-path Dir M)
-          P (native-require-existing-file P "required module declaration")
-          D (native-read-module-declaration P)
+  -> (let D (native-read-required-module-declaration M Dir)
           R (native-module-app-declarations* D Dir Stack L Ds)
        (native-module-app-requirements
         Ms Dir Stack
@@ -126,8 +124,9 @@
 
 (define native-module-app-sources
   [] -> []
-  [[module-declaration _ _ Ss _ _ _ _] | Ds]
-  -> (append Ss (native-module-app-sources Ds)))
+  [D | Ds]
+  -> (append (native-module-declaration-sources D)
+             (native-module-app-sources Ds)))
 
 (define native-module-app-key
   Ds Os WPO? -> ((foreign scm.shen-scheme-native-key)
@@ -194,8 +193,9 @@
           VM (append LM RM)
           Ds (native-compile-kl-forms app VM KL)
           Init (native-compile-kl-forms app VM Is)
+          CF (native-compiletime-forms app VM CT)
           RT (native-module-runtime-forms KL LM Xs MD Ps)
-          Meta (native-module-compiletime-forms KL CT MD)
+          Meta (native-module-compiletime-forms KL CF MD)
           Run (native-module-init-forms Init)
        [module M (native-app-exports XM RI CI II)
         | (append Ds [[define [RI] | RT]
@@ -214,19 +214,24 @@
 
 (define native-module-app-module-forms*
   [] _ _ Ms Fs -> [Ms Fs]
-  [[module-declaration N _ Ss Rs Xs MD _] | Ds] App I Ms Fs
-  -> (do (native-module-app-validate-required-exports Rs Ms)
-         (let RM (native-module-app-required-visible-map Rs Ms)
-              As (native-module-app-required-visible-arities Rs Ms)
-              U (native-sources->unit/with-arities Ss As)
-              KL (native-unit-kl U)
-              LM (native-app-local-map KL I)
-              CXs (native-validate-exports Xs LM)
-              XM (native-exported-local-map LM CXs)
-              AM (native-exported-arities KL CXs)
-              F (native-module-app-module-form App I CXs MD U LM XM RM)
-              MM [module-app-map N I XM AM]
-           (native-module-app-module-forms*
-            Ds App (+ I 1) [MM | Ms] [F | Fs]))))
+  [D | Ds] App I Ms Fs
+  -> (let N (native-module-declaration-name D)
+          Ss (native-module-declaration-source-specs D)
+          Rs (native-module-declaration-requires D)
+          Xs (native-module-declaration-exports D)
+          MD (native-module-declaration-metadata D)
+       (do (native-module-app-validate-required-exports Rs Ms)
+           (let RM (native-module-app-required-visible-map Rs Ms)
+                As (native-module-app-required-visible-arities Rs Ms)
+                U (native-module-sources->unit/with-arities Ss As)
+                KL (native-unit-kl U)
+                LM (native-app-local-map KL I)
+                CXs (native-validate-exports Xs LM)
+                XM (native-exported-local-map LM CXs)
+                AM (native-exported-arities KL CXs)
+                F (native-module-app-module-form App I CXs MD U LM XM RM)
+                MM [module-app-map N I XM AM]
+             (native-module-app-module-forms*
+              Ds App (+ I 1) [MM | Ms] [F | Fs])))))
 
 )

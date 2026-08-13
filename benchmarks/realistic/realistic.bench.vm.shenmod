@@ -1,17 +1,19 @@
-(shen.aot.module
+(shen.module
+  (version 1)
   (name realistic.bench.vm)
-  (mode sealed)
   (requires realistic.bench.core)
-  (exports realistic-bench.run-code
-           realistic-bench.push-const
-           realistic-bench.push-load
-           realistic-bench.add-values
-           realistic-bench.sub-values
-           realistic-bench.mul-values
-           realistic-bench.apply-add
-           realistic-bench.apply-sub
-           realistic-bench.apply-mul
-           realistic-bench.push-binding
-           realistic-bench.drop-binding
-           realistic-bench.exec)
-  (sources "benchmarks/realistic/vm.shen"))
+  (sources tc- "vm.shen")
+  (extension shen/scheme
+    (mode sealed)
+    (exports realistic-bench.run-code
+             realistic-bench.push-const
+             realistic-bench.push-load
+             realistic-bench.add-values
+             realistic-bench.sub-values
+             realistic-bench.mul-values
+             realistic-bench.apply-add
+             realistic-bench.apply-sub
+             realistic-bench.apply-mul
+             realistic-bench.push-binding
+             realistic-bench.drop-binding
+             realistic-bench.exec)))

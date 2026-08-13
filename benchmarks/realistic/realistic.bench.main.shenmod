@@ -1,15 +1,17 @@
-(shen.aot.module
+(shen.module
+  (version 1)
   (name realistic.bench.main)
-  (mode sealed)
   (requires realistic.bench.core
             realistic.bench.analysis
             realistic.bench.optimize
             realistic.bench.compile
             realistic.bench.vm)
-  (exports realistic-bench.pipeline
-           realistic-bench.pipeline-loop
-           realistic-bench.run-pipeline
-           realistic-bench.prepare-code
-           realistic-bench.bytecode-loop
-           realistic-bench.run-bytecode)
-  (sources "benchmarks/realistic/main.shen"))
+  (sources tc- "main.shen")
+  (extension shen/scheme
+    (mode sealed)
+    (exports realistic-bench.pipeline
+             realistic-bench.pipeline-loop
+             realistic-bench.run-pipeline
+             realistic-bench.prepare-code
+             realistic-bench.bytecode-loop
+             realistic-bench.run-bytecode)))

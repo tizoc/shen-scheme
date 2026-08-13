@@ -37,7 +37,8 @@ shen-scheme compile SOURCE -o OBJECT
 shen-scheme load-compiled OBJECT
 shen-scheme compile-module DECLARATION -o OBJECT
   [--emit-scheme SCHEME] [--module-dir DIR]
-shen-scheme load-module DECLARATION --module-dir DIR
+shen-scheme load-module DECLARATION
+  --module-dir MODULE_DIR --object-dir OBJECT_DIR
 shen-scheme build-app MAIN [--module SOURCE ...] -o OBJECT
   [--wpo] [--profile release|debug|wpo|unsafe]
 shen-scheme build-module-app DECLARATION --module-dir DIR -o OBJECT
@@ -142,13 +143,14 @@ They solve different problems:
 - A Shen `package` form is part of the Shen language. It qualifies internal
   symbols and records the package's external and internal names. Native
   compilation supports package forms and preserves package registration.
-- A `.shenmod` file is build metadata. It names a compilation unit, lists its
-  source files and dependencies, and controls native exports and metadata. It
-  does not qualify Shen symbols and does not replace `package`.
+- A `.shenmod` file is portable module metadata. Its core names a compilation
+  unit and lists source files, feature requirements, and module dependencies.
+  Namespaced extensions carry settings used by a particular implementation.
+  It does not qualify Shen symbols and does not replace `package`.
 
-A source listed by a module can contain one or more packages. The descriptor's
-`exports` are the native boundary; package externals are the Shen namespace
-boundary. Keep both when both concepts are useful.
+A source listed by a module can contain one or more packages. The Shen/Scheme
+extension's `exports` are the native boundary; package externals are the Shen
+namespace boundary. Keep both when both concepts are useful.
 
 See [package-effects.shen](../examples/native/package-effects.shen) for a
 package whose effects are restored when its compiled object is loaded.
@@ -158,32 +160,54 @@ package whose effects are restored when its compiled object is loaded.
 A declaration is one raw Shen form. It is read without macro expansion:
 
 ```shen
-(shen.aot.module
+(shen.module
+  (version 1)
   (name my.math)
-  (mode sealed)
   (requires my.core)
-  (exports my.add my.sum)
-  (metadata runtime compiletime source-kl)
-  (profile release)
-  (sources "src/math.shen"))
+  (requires-features shen/scheme)
+  (sources tc- "src/math.shen")
+  (extension shen/scheme
+    (mode sealed)
+    (exports my.add my.sum)
+    (metadata runtime compiletime source-kl)
+    (profile release)))
 ```
 
-| Field | Required/default | Meaning |
+Portable fields are order-independent. `extension` may occur once per
+extension name; Shen/Scheme preserves extensions it does not recognize.
+
+| Core field | Required/default | Meaning |
 | --- | --- | --- |
+| `version` | Required, exactly `1` | Portable descriptor format version |
 | `name` | Required | Symbolic module name used by `requires` and file lookup |
-| `sources` | Required, one or more paths | Source files forming one compilation unit |
-| `mode` | `compatible` | `compatible` or `sealed` for standalone `compile-module` |
 | `requires` | Empty | Symbolic module dependencies |
+| `requires-features` | Empty | Port or library features needed by the module |
+| `sources` | Required, one or more paths | Ordered source paths, each following a `tc+` or `tc-` marker |
+| `extension` | Optional, repeatable | Namespaced implementation settings |
+
+The `shen/scheme` extension has these fields:
+
+| Extension field | Default | Meaning |
+| --- | --- | --- |
+| `mode` | `compatible` | `compatible` or `sealed` for standalone `compile-module` |
 | `exports` | `infer-all` | Exported function names, or every definition |
 | `metadata` | `runtime compiletime` | Any of `runtime`, `compiletime`, and `source-kl` |
 | `profile` | `release` | `release`, `debug`, `wpo`, or `unsafe` for standalone compilation |
 
-Source paths are resolved from the process working directory, not from the
-descriptor's directory. The listed files are read in order and analyzed as one
-unit, so a definition may call another definition appearing in a later source.
-If a function is defined repeatedly, the final definition is compiled.
+Source paths must be relative and are resolved from the descriptor's
+directory. The listed files are compiled in order, so macros, declarations,
+datatypes, synonyms, registered pattern handlers, and arities established by
+one source are available to the sources that follow it. Put a definition
+before sources that need its arity. If a function is defined repeatedly, the
+final definition is compiled.
 
-An explicit export list requires `sealed` mode for a standalone module.
+`tc+` and `tc-` are stateful markers within `sources`; each applies until the
+next marker. A `tc+` source is typechecked and its inline function signatures
+are included in compile-time metadata. A `tc-` source is compiled without
+typechecking and does not contribute inline signatures. Explicit `declare`
+forms remain effective in either mode.
+
+An explicit Shen/Scheme export list requires `sealed` mode for a standalone module.
 `compatible` standalone modules use `infer-all`, because dynamically resolved
 top-level calls do not provide a private native boundary.
 
@@ -194,31 +218,31 @@ The example descriptors are:
 - [native-example.core.shenmod](../examples/native/modules/native-example.core.shenmod)
 - [native-example.app.shenmod](../examples/native/modules/native-example.app.shenmod)
 
-Compile each object under the name used by the resolver, then load the root:
+Keep declarations beside their sources, compile each object under the name used
+by the resolver, then load the root with separate module and object roots:
 
 ```sh
-mkdir -p _build/native-examples/modules
-cp examples/native/modules/*.shenmod _build/native-examples/modules/
+mkdir -p _build/native-examples/objects
 ./_build/bin/shen-scheme compile-module \
-  _build/native-examples/modules/native-example.core.shenmod \
-  -o _build/native-examples/modules/native-example.core.so
+  examples/native/modules/native-example.core.shenmod \
+  -o _build/native-examples/objects/native-example.core.so
 ./_build/bin/shen-scheme compile-module \
-  _build/native-examples/modules/native-example.app.shenmod \
-  --module-dir _build/native-examples/modules \
-  -o _build/native-examples/modules/native-example.app.so
+  examples/native/modules/native-example.app.shenmod \
+  --module-dir examples/native/modules \
+  -o _build/native-examples/objects/native-example.app.so
 ./_build/bin/shen-scheme eval \
-  -e '(shen-scheme.load-module "_build/native-examples/modules/native-example.app.shenmod" "_build/native-examples/modules")' \
+  -e '(shen-scheme.load-module "examples/native/modules/native-example.app.shenmod" "examples/native/modules" "_build/native-examples/objects")' \
   -e '(run-example 32)' \
   -e '(module-events)'
 ```
 
 The last two expressions return `42` and `[42]`.
 
-For a required module named `my.core`, `--module-dir DIR` resolves:
+For a required module named `my.core`, the two roots resolve:
 
 ```text
-DIR/my.core.shenmod
-DIR/my.core.so
+MODULE_DIR/my.core.shenmod
+OBJECT_DIR/my.core.so
 ```
 
 `compile-module` analyzes dependency declarations and source files in
@@ -232,6 +256,14 @@ available while compiling dependants.
 dependants and returns a list of the loaded module names. Cycles and missing
 declarations or objects are errors. If standalone direct requirements export
 the same function, the later direct requirement takes precedence.
+
+Top-level programmable-pattern-matching `register-handler` and
+`unregister-handler` calls take effect at the end of their source file. A
+handler is therefore available to later source files and dependent modules,
+but not to definitions in the file that registers it. Put custom-pattern
+consumers in a following source. Native objects replay these operations as
+compile-time metadata and as runtime initializers; a sealed handler may remain
+private because its compiled closure is carried by the registration operation.
 
 ## Application objects
 
@@ -301,7 +333,8 @@ Descriptor metadata controls what is restored in the loading Shen image:
 
 - `runtime` records exported arities and installs the needed exported
   top-level bindings for sealed modules and module apps.
-- `compiletime` replays declarations, macros, datatypes, and synonyms.
+- `compiletime` replays declarations, macros, datatypes, synonyms, and
+  programmable-pattern handler changes.
 - `source-kl` records KLambda for `ps` and user-definition introspection.
 
 Package external/internal registration is preserved independently of that
@@ -427,12 +460,13 @@ Each returns `O`.
 (shen-scheme.compile-module/emit F O Scm)
 (shen-scheme.compile-module/emit/in-dir F O Scm Dir)
 (shen-scheme.load-compiled O)
-(shen-scheme.load-module F Dir)
+(shen-scheme.load-module F ModuleDir ObjectDir)
 ```
 
 The compilation functions and `load-compiled` return `O`. `load-module`
 returns the loaded module-name list; dependencies are initialized before
-dependants.
+dependants. `ModuleDir` contains declarations and `ObjectDir` contains compiled
+module objects.
 
 ### Applications
 
@@ -548,6 +582,9 @@ The primitive workloads are vendored unchanged from `shen-sources`; see their
 - A dependency macro must be self-contained or use helpers already present in
   the compiler. Ordinary helpers defined only in dependency source are not
   installed during dependency analysis.
+- A pattern handler used during native compilation must likewise be
+  self-contained or use helpers already present in the compiler. The handler
+  itself may remain private to a sealed module.
 - Macro transformer names share the live compiler namespace and must not
   collide with existing bindings.
 - Unusual compile-time rewrites that depend on another module's `declare`

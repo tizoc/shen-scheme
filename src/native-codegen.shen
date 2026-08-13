@@ -3,7 +3,8 @@
 
 (package shen-scheme
  [compatible sealed infer-all runtime compiletime source-kl
-  native-unit defun define quote module import if begin define-top-level-value skip
+  native-unit native-compiletime-group
+  defun define quote module import if begin define-top-level-value skip
   update-lambda-table install-runtime! install-compiletime! install-init! loaded
   shen-scheme-native-load-init?
   _scm.prefix-op _scm.kl->scheme _scm.with-native-context
@@ -31,10 +32,18 @@
   [native-unit KL Is CT Ps] MD
   -> (let Ds (native-compile-kl-forms compatible [] KL)
           RT (native-runtime-metadata-forms KL MD)
-          Meta (native-compiletime-metadata-forms KL CT MD)
+          CF (native-compiletime-forms compatible [] CT)
+          Meta (native-compiletime-metadata-forms KL CF MD)
           Init (native-compile-kl-forms compatible [] Is)
        (append Ds RT Ps Meta
                [(native-load-init-form (append Init [[quote loaded]]))])))
+
+(define native-compiletime-forms
+  _ _ [] -> []
+  M LM [[native-compiletime-group CT Es] | Gs]
+  -> (append CT
+             (append (native-compile-kl-forms M LM Es)
+                     (native-compiletime-forms M LM Gs))))
 
 (define native-compile-mode
   compatible -> compatible
@@ -151,8 +160,9 @@
           CXs (native-validate-exports Xs LM)
           Ds (native-compile-kl-forms sealed LM KL)
           Init (native-compile-kl-forms sealed LM Is)
+          CF (native-compiletime-forms sealed LM CT)
           RT (native-module-runtime-forms KL LM CXs MD Ps)
-          Meta (native-module-compiletime-forms KL CT MD)
+          Meta (native-module-compiletime-forms KL CF MD)
           Run (native-module-init-forms Init)
        [(native-sealed-module-form M Ds RT Meta Run)
         [import M] [install-runtime!] [install-compiletime!]

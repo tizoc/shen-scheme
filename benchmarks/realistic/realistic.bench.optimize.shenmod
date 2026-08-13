@@ -1,12 +1,14 @@
-(shen.aot.module
+(shen.module
+  (version 1)
   (name realistic.bench.optimize)
-  (mode sealed)
   (requires realistic.bench.core
             realistic.bench.analysis)
-  (exports realistic-bench.normalise
-           realistic-bench.simplify
-           realistic-bench.simplify-add
-           realistic-bench.simplify-mul
-           realistic-bench.simplify-let
-           realistic-bench.optimise-ast)
-  (sources "benchmarks/realistic/optimize.shen"))
+  (sources tc- "optimize.shen")
+  (extension shen/scheme
+    (mode sealed)
+    (exports realistic-bench.normalise
+             realistic-bench.simplify
+             realistic-bench.simplify-add
+             realistic-bench.simplify-mul
+             realistic-bench.simplify-let
+             realistic-bench.optimise-ast)))

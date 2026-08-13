@@ -9,9 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Shen's programmable-pattern-matching extension, initialized at startup,
+  including native AOT support for handlers used by later source files and
+  dependent modules.
 - Native AOT compilation for Shen source files and declared modules, including
   top-level `defprolog` and `package` forms and arbitrary top-level Shen
   expression effects.
+- Versioned portable `shen.module` declarations with namespaced Shen/Scheme
+  native-compilation settings.
 - Compatible and sealed compilation modes, build profiles, dependency
   resolution, standalone app builds, and whole-program optimization support.
 - Port-style and realistic benchmark suites comparing dynamic loading,
@@ -24,6 +29,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated kernel to S41.3.
 - Compiler arity registrations are generated from compiled definitions instead
   of maintaining a parallel manual list.
+- Relative `.shenmod` source paths are resolved from the descriptor rather than
+  the process working directory. Portable module declarations require relative
+  source paths and verify the names of required declarations. Module loading
+  uses separate declaration and compiled-object roots.
+- Native module compilation honors per-source `tc+` and `tc-` transitions and
+  emits inline type metadata only for checked sources.
 - Shen/Scheme now starts from the stock Chez boot files and loads a combined
   runtime and launcher object instead of generating a custom `shen.boot`.
   `SHEN_SCHEME_RUNTIME=petite` selects a compiler-free runtime that can still
