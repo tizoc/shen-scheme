@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dictionary folding now follows Shen's argument order and curried callback
   convention; dictionary keys and values are returned as lists.
+- `(os)` now reports Chez Scheme's current machine type.
 
 ## [0.46] - 2026-08-13
 

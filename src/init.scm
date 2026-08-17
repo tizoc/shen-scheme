@@ -3,6 +3,7 @@
 
 (kl:set '*language* "Scheme")
 (kl:set '*implementation* "chez-scheme")
+(kl:set '*os* (symbol->string (machine-type)))
 (kl:set '*release* (call-with-values scheme-version-number (lambda (major minor patch) (format "~s.~s.~s" major minor patch))))
 (kl:set '*porters* "Bruno Deferrari")
 
