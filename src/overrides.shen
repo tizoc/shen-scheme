@@ -75,13 +75,15 @@
 
 \* hashtable-fold defined in prelude.scm *\
 (define shen.dict-fold
-  Dict F Init -> ((foreign scm.hashtable-fold) Dict F Init))
+  F Dict Init -> ((foreign scm.hashtable-fold) Dict F Init))
 
 (define shen.dict-keys
-  Dict -> ((foreign scm.hashtable-keys) Dict))
+  Dict -> ((foreign scm.vector->list)
+           ((foreign scm.hashtable-keys) Dict)))
 
 (define shen.dict-values
-  Dict -> ((foreign scm.hashtable-values) Dict))
+  Dict -> ((foreign scm.vector->list)
+           ((foreign scm.hashtable-values) Dict)))
 
 \* read-file-as-* defined in prelude.scm *\
 

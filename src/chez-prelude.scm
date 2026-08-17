@@ -106,4 +106,4 @@
             acc
             (let ((k (vector-ref keys i))
                   (v (vector-ref values i)))
-              (loop (fx+ i 1) (f k v acc))))))))
+              (loop (fx+ i 1) (((f k) v) acc))))))))

@@ -21,3 +21,27 @@
        Closed (close Stream)
        Deleted (delete-file File)
        [Direct HigherOrder]))
+
+(assert-kernel-equal
+  "empty dictionary keys and values are lists"
+  [[] []]
+  (let Dict (shen.dict 4)
+    [(shen.dict-keys Dict)
+     (shen.dict-values Dict)]))
+
+(assert-kernel-equal
+  "dictionary traversal follows the kernel contract"
+  [[answer] [42] [answer 42 seed]]
+  (let Dict (shen.dict 4)
+       Set (shen.dict-> Dict answer 42)
+    [(shen.dict-keys Dict)
+     (shen.dict-values Dict)
+     (shen.dict-fold (/. K V Acc [K V Acc]) Dict seed)]))
+
+(assert-kernel-equal
+  "dictionary fold threads its accumulator"
+  3
+  (let Dict (shen.dict 4)
+       First (shen.dict-> Dict one 1)
+       Second (shen.dict-> Dict two 2)
+    (shen.dict-fold (/. _ V Acc (+ V Acc)) Dict 0)))

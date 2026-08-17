@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Dictionary folding now follows Shen's argument order and curried callback
+  convention; dictionary keys and values are returned as lists.
+
 ## [0.46] - 2026-08-13
 
 ### Added
