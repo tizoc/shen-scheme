@@ -373,8 +373,10 @@
                 U ((foreign scm.dynamic-wind)
                    (freeze (set *property-vector* N))
                    (freeze
-                    (do (native-register-arities As)
-                        (native-process-module-sources Ss)))
+                    (with-native-compiletime-environment
+                     (freeze
+                      (do (native-register-arities As)
+                          (native-process-module-sources Ss)))))
                    (freeze (set *property-vector* O)))
              (do (native-record-package-forms (native-unit-packages U))
                  U)))

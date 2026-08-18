@@ -34,6 +34,9 @@
 
 (define native-module-regression-expand
   X -> [native-module-regression-shared X 2])
+
+(define native-module-regression-exported-expand
+  X -> [native-module-regression-shared X 2])
 ")
          (native-test.write-file
           BMacroSource
@@ -41,6 +44,10 @@
 (defmacro native-module-regression-call-shared-macro
   [native-module-regression-call-shared X]
   -> (native-module-regression-expand X))
+
+(defmacro native-module-regression-call-shared-fn-macro
+  [native-module-regression-call-shared/fn X]
+  -> ((fn native-module-regression-exported-expand) X))
 ")
          (native-test.write-file
           ASource
@@ -51,6 +58,9 @@
           MainSource
           "(define native-module-regression-main
   X -> (native-module-regression-call-shared X))
+
+(define native-module-regression-main/fn
+  X -> (native-module-regression-call-shared/fn X))
 ")
          (native-test.write-file
           BDeclaration
@@ -60,7 +70,8 @@
   (sources tc- ~S ~S)
   (extension shen/scheme
     (mode sealed)
-    (exports native-module-regression-shared)))
+    (exports native-module-regression-shared
+             native-module-regression-exported-expand)))
 "
                        (native-test.basename BSource)
                        (native-test.basename BMacroSource)))
@@ -85,7 +96,8 @@
   (sources tc- ~S)
   (extension shen/scheme
     (mode sealed)
-    (exports native-module-regression-main)))
+    (exports native-module-regression-main
+             native-module-regression-main/fn)))
 "
                        (native-test.basename MainSource)))
          (native-test.delete-file-if-exists BObject)
@@ -130,6 +142,11 @@
                      (trap-error
                       (eval [native-module-regression-expand 40])
                       (/. E unavailable)))
+             (Assert "module compile isolates exported macro helper"
+                     unavailable
+                     (trap-error
+                      (eval [native-module-regression-exported-expand 40])
+                      (/. E unavailable)))
              (Assert "module app rejects ambiguous direct exports"
                      failed
                      (trap-error
@@ -146,4 +163,7 @@
                      (value *native-module-regression-effects*))
              (Assert "module compile uses later dependency metadata"
                      42
-                     (eval [native-module-regression-main 40])))))))
+                     (eval [native-module-regression-main 40]))
+             (Assert "module macro can take an imported helper function"
+                     42
+                     (eval [native-module-regression-main/fn 40])))))))
