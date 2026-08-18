@@ -242,6 +242,28 @@
     (load object))
   object)
 
+;; Native source analysis needs ordinary Shen definitions while expanding
+;; compile-time forms from following sources and required modules.  Keep those
+;; temporary definitions out of the live Shen environment, and do not keep the
+;; temporary environment selected while compiling the generated runtime code.
+(define shen-scheme-native-compiletime-environment (make-parameter #f))
+
+(define (shen-scheme-native-call-with-new-compiletime-environment thunk)
+  (if (shen-scheme-native-compiletime-environment)
+      (thunk)
+      (parameterize
+          ([shen-scheme-native-compiletime-environment
+            (copy-environment (interaction-environment))])
+        (thunk))))
+
+(define (shen-scheme-native-call-with-compiletime-environment thunk)
+  (let ((environment (shen-scheme-native-compiletime-environment)))
+    (if environment
+        (parameterize ([interaction-environment environment])
+          (thunk))
+        (error 'shen-scheme-native-call-with-compiletime-environment
+               "native compiler has no active compile-time environment"))))
+
 (define shen-scheme-fnv64-offset 14695981039346656037)
 (define shen-scheme-fnv64-prime 1099511628211)
 (define shen-scheme-fnv64-modulus (expt 2 64))

@@ -7,11 +7,15 @@
 
 (package null []
 
-(define native-test-ppm-handler
-  Self AddTest Bind [@native-test-ppm-two A B]
+(define native-test-ppm-project
+  Self AddTest Bind A B
   -> (do (AddTest [tuple? Self])
          (Bind A [fst Self])
-         (Bind B [snd Self]))
+         (Bind B [snd Self])))
+
+(define native-test-ppm-handler
+  Self AddTest Bind [@native-test-ppm-two A B]
+  -> (native-test-ppm-project Self AddTest Bind A B)
   _ _ _ _ -> (fail))
 
 (shen.x.programmable-pattern-matching.register-handler

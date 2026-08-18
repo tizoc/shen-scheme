@@ -329,6 +329,13 @@ object is loaded, definitions and selected metadata are installed first, then
 effects run in their original relative source order. The same rule applies to
 effects inside packages.
 
+While native sources are analyzed, ordinary definitions are staged at each
+source-file boundary in an isolated compiler environment. Compile-time forms
+in following sources and required modules can therefore call ordinary Shen
+helpers without running any top-level initializer. The staged bindings are
+discarded after the build. A helper and a compile-time form which needs it
+should be placed in separate ordered sources.
+
 Descriptor metadata controls what is restored in the loading Shen image:
 
 - `runtime` records exported arities and installs the needed exported
@@ -579,12 +586,15 @@ The primitive workloads are vendored unchanged from `shen-sources`; see their
 
 ## Limitations and artifact compatibility
 
-- A dependency macro must be self-contained or use helpers already present in
-  the compiler. Ordinary helpers defined only in dependency source are not
-  installed during dependency analysis.
-- A pattern handler used during native compilation must likewise be
-  self-contained or use helpers already present in the compiler. The handler
-  itself may remain private to a sealed module.
+- Source-analysis helpers become available at source-file boundaries, not
+  midway through the source which defines them.
+- The isolated source-analysis environment follows Shen's ordinary global-name
+  and redefinition semantics. Package-qualified helper names avoid accidental
+  collisions.
+- Replaying a standalone compiled module's macro metadata does not package a
+  private helper into the macro transformer. Such a helper must also be
+  runtime-visible when that artifact is loaded for later compilation. Closed
+  module-app builds resolve helpers directly from their source graph.
 - Macro transformer names share the live compiler namespace and must not
   collide with existing bindings.
 - Unusual compile-time rewrites that depend on another module's `declare`

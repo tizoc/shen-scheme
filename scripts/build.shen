@@ -339,6 +339,8 @@
       read-file-as-bytelist
       read-file-as-string
       shen-scheme-native-load-init?
+      shen-scheme-native-call-with-new-compiletime-environment
+      shen-scheme-native-call-with-compiletime-environment
       error-location
       analyse-symbol?])
 

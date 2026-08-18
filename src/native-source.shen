@@ -9,6 +9,8 @@
   runtime compiletime source-kl quote eval update-lambda-table
   lambda fn
   _scm.prefix-op scm.dynamic-wind scm.hashtable-copy
+  scm.shen-scheme-native-call-with-new-compiletime-environment
+  scm.shen-scheme-native-call-with-compiletime-environment
   scm.read-file-as-bytelist]
 
 (set *native-compiler-state-depth* 0)
@@ -18,6 +20,10 @@
 
 (define with-native-compiler-state
   F -> (F) where (> (value *native-compiler-state-depth*) 0)
+  F -> ((foreign scm.shen-scheme-native-call-with-new-compiletime-environment)
+        (freeze (with-native-compiler-state* F))))
+
+(define with-native-compiler-state*
   F -> (let Old (value *property-vector*)
             New (native-copy-property-vector Old)
             Macros (value *macros*)
@@ -50,6 +56,9 @@
                (set shen.x.programmable-pattern-matching.*pattern-handlers-reg*
                     PatternHandlerNames)
                (set *native-compiler-state-depth* 0))))))
+
+(define with-native-compiletime-environment
+  F -> ((foreign scm.shen-scheme-native-call-with-compiletime-environment) F))
 
 (define native-register-pattern-handler
   F _ -> F where (element?
@@ -382,11 +391,17 @@
   [E | Es] -> (do (native-stage-pattern-effect E)
                   (native-stage-pattern-effects Es)))
 
+(define native-stage-defuns
+  [] -> skip
+  [D | Ds] -> (do (eval-kl D)
+                  (native-stage-defuns Ds)))
+
 (define native-forms->unit
   Fs CT Ps Types -> (let All (native-processed-defines Fs)
                          Ds (native-last-defines All)
                          KL (map (function native-shen->kl) Ds)
                       (do (native-record-defuns KL)
+                          (native-stage-defuns KL)
                           (let Is (native-processed-init-kl Fs)
                                Es (native-pattern-effect-kl-forms Fs)
                                Ts (native-type-declaration-forms Types)
@@ -433,14 +448,18 @@
 
 (define native-sources->unit
   Ss -> (with-native-compiler-state
-         (freeze (native-source-data->unit (native-read-sources Ss)))))
+         (freeze
+          (with-native-compiletime-environment
+           (freeze (native-source-data->unit (native-read-sources Ss)))))))
 
 (define native-module-sources->unit
   Ss -> (with-native-compiler-state
          (freeze (native-process-module-sources Ss))))
 
 (define native-process-module-sources
-  Ss -> (native-finalize-unit (native-process-module-sources* Ss)))
+  Ss -> (with-native-compiletime-environment
+         (freeze
+          (native-finalize-unit (native-process-module-sources* Ss)))))
 
 (define native-process-module-sources*
   [] -> (native-empty-unit)

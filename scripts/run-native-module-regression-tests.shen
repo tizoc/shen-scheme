@@ -5,6 +5,7 @@
   -> (let Dir "_build/native-tests"
           ObjectDir "_build/native-tests/module-regression-objects"
           BSource "_build/native-tests/module-precedence-b.shen"
+          BMacroSource "_build/native-tests/module-precedence-b-macro.shen"
           ASource "_build/native-tests/module-precedence-a.shen"
           MainSource "_build/native-tests/module-precedence-main.shen"
           BDeclaration "_build/native-tests/native.test.precedence-b.shenmod"
@@ -31,9 +32,15 @@
 (define native-module-regression-shared
   X Y -> (+ X Y))
 
+(define native-module-regression-expand
+  X -> [native-module-regression-shared X 2])
+")
+         (native-test.write-file
+          BMacroSource
+          "
 (defmacro native-module-regression-call-shared-macro
   [native-module-regression-call-shared X]
-  -> [native-module-regression-shared X 2])
+  -> (native-module-regression-expand X))
 ")
          (native-test.write-file
           ASource
@@ -50,12 +57,13 @@
           (make-string "(shen.module
   (version 1)
   (name native.test.precedence-b)
-  (sources tc- ~S)
+  (sources tc- ~S ~S)
   (extension shen/scheme
     (mode sealed)
     (exports native-module-regression-shared)))
 "
-                       (native-test.basename BSource)))
+                       (native-test.basename BSource)
+                       (native-test.basename BMacroSource)))
          (native-test.write-file
           ADeclaration
           (make-string "(shen.module
@@ -117,6 +125,11 @@
              (Assert "module compile leaves live function binding"
                      140
                      (eval [native-module-regression-shared 40]))
+             (Assert "module compile isolates private macro helper"
+                     unavailable
+                     (trap-error
+                      (eval [native-module-regression-expand 40])
+                      (/. E unavailable)))
              (Assert "module app rejects ambiguous direct exports"
                      failed
                      (trap-error

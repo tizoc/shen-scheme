@@ -86,13 +86,15 @@ static dependencies. Shen/Scheme compilation settings live in the shen/scheme
 extension. Standalone module compilation requires sealed mode for explicit
 exports. With --module-dir, symbolic requires are resolved as
 <DIR>/<module-name>.shenmod and analyzed from source without loading their
-compiled objects, installing ordinary definitions, or running initializers.
+compiled objects, changing live definitions, or running initializers. Ordinary
+definitions are staged in an isolated compiler environment at source-file
+boundaries, so compile-time forms in following sources and required modules may
+call them.
 Source paths must be relative and are resolved from the declaration file's
 directory.
 Sources following tc+ are typechecked; sources following tc- are not. The mode
 continues until the next marker in the ordered source list.
-Dependency macros must be self-contained or use helpers already loaded in the
-compiler, and their transformer names must not collide with live bindings.
+Macro transformer names must not collide with live bindings.
 Foreign Scheme definition-context forms are not supported as native
 initializers.
 "))
@@ -113,9 +115,9 @@ Module names resolve as <module-dir>/<module-name>.shenmod and
 Builds an application object from supported Shen source files.
 
 Module sources are compiled before MAIN. Later sources can statically call
-functions from earlier sources. Compile-time forms are available while the app
-is built, but dependency macros cannot call ordinary helpers defined only in an
-earlier source and their transformer names must not collide with live bindings.
+functions from earlier sources. Compile-time forms can call ordinary helpers
+from earlier sources while the app is built. Their transformer names must not
+collide with live bindings.
 Compile-time forms are not replayed when a raw source app object is loaded.
 Foreign Scheme definition-context forms are not supported as native
 initializers.
@@ -137,8 +139,9 @@ Dependencies use static app bindings. The command-line profile controls the app
 build; descriptor mode and profile apply to standalone compile-module builds.
 Direct requirements that export the same function are rejected.
 The graph is analyzed in topological order as one compiler environment.
-Dependency macros must be self-contained or use helpers already loaded in the
-compiler, and their transformer names must not collide with live bindings.
+Compile-time forms can call ordinary helpers from earlier source files and
+required modules without running their initializers. Macro transformer names
+must not collide with live bindings.
 Foreign Scheme definition-context forms are not supported as native
 initializers.
 "
