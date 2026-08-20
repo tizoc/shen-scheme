@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.46.1] - 2026-08-19
+
 ### Fixed
 
 - Dictionary folding now follows Shen's argument order and curried callback
@@ -356,7 +358,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.46...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.46.1...HEAD
+[0.46.1]: https://github.com/tizoc/shen-scheme/compare/v0.46...v0.46.1
 [0.46]: https://github.com/tizoc/shen-scheme/compare/v0.45...v0.46
 [0.45]: https://github.com/tizoc/shen-scheme/compare/v0.44...v0.45
 [0.44]: https://github.com/tizoc/shen-scheme/compare/v0.43...v0.44
