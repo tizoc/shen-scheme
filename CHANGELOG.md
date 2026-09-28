@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Enforce Shen's left-to-right evaluation order for function calls, list
+  construction, and primitive operations, including intermediate curried
+  applications. Previously, Chez Scheme could evaluate operands out of order.
+
 ## [0.47] - 2026-08-25
 
 ### Changed

@@ -212,6 +212,10 @@ to be wrapped with the `foreign` form in calls. For example,
 `((foreign scm.write) [1 2 3 4])` invokes Scheme's `write` function with a list
 as an argument.
 
+Direct `scm.*` forms retain Scheme's evaluation rules, since they can also name
+Scheme syntax. Use Shen `let` bindings to sequence effectful arguments before
+calling Scheme directly.
+
 Because Scheme functions can have variable numbers of arguments and the code
 passed to `scm.` is not preprocessed, any imported function that is intended to
 support partial application has to be wrapped with a `defun`:

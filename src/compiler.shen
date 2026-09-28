@@ -61,6 +61,41 @@
   Var -> (trap-error (element? Var (value *static-globals*))
                      (/. E false)))
 
+\* Scheme calls do not sequence their operator and operands. Bind each
+   computation that precedes another computation, leaving literals, lexical
+   variables and closure construction in place. The final call stays in tail
+   position. These helpers operate on already compiled Scheme expressions. *\
+(define simple-scheme-expression?
+  [quote _] -> true
+  [lambda _ | _] -> true
+  X -> (not (cons? X)))
+
+(define has-computation?
+  [] -> false
+  [X | Xs] -> (or (not (simple-scheme-expression? X))
+                  (has-computation? Xs)))
+
+(define fresh-call-variable
+  Used -> (let Name (gensym arg)
+            (if (= 0 (occurrences Name Used))
+                Name
+                (fresh-call-variable Used))))
+
+(define order-call-inputs
+  [] Reversed _ -> (reverse Reversed)
+  [X | Xs] Reversed Used
+  -> (order-call-inputs Xs [X | Reversed] Used)
+    where (or (simple-scheme-expression? X)
+              (not (has-computation? Xs)))
+  [X | Xs] Reversed Used
+  -> (let Var (fresh-call-variable Used)
+       (merge-nested-lets
+        [let [[Var X]]
+          (order-call-inputs Xs [Var | Reversed] [Var | Used])])))
+
+(define order-call
+  Call -> (order-call-inputs Call [] Call))
+
 (define compile-expression
   [] _ -> [quote []]
   Sym Scope -> (emit-symbol Sym) where (unbound-symbol? Sym Scope)
@@ -97,23 +132,29 @@
                                      (compile-expression Msg Scope)]
   [n->string N] Scope -> [string [integer->char (compile-expression N Scope)]]
   [string->n S] Scope -> [char->integer [string-ref (compile-expression S Scope) 0]]
-  [pos S N] Scope -> [string [string-ref (compile-expression S Scope)
-                                         (compile-expression N Scope)]]
+  [pos S N] Scope -> [string (order-call
+                              [string-ref (compile-expression S Scope)
+                                          (compile-expression N Scope)])]
   [tlstr S] Scope -> [let [[tmp (compile-expression S Scope)]]
                        [substring tmp 1 [string-length tmp]]]
-  [absvector N] Scope -> [make-vector (compile-expression N Scope)
-                                      (emit-static-application-fallback
+  [absvector N] Scope -> (order-call
+                          [make-vector (compile-expression N Scope)
+                                       (emit-static-application-fallback
                                        (native-mode)
                                        fail
                                        []
-                                       Scope)]
-  [<-address V N] Scope -> [vector-ref (compile-expression V Scope)
-                                       (compile-expression N Scope)]
-  [address-> V N X] Scope -> [let [[tmp (compile-expression V Scope)]]
-                               [vector-set! tmp
-                                            (compile-expression N Scope)
-                                            (compile-expression X Scope)]
-                               tmp]
+                                       Scope)])
+  [<-address V N] Scope -> (order-call
+                           [vector-ref (compile-expression V Scope)
+                                       (compile-expression N Scope)])
+  [address-> V N X] Scope
+  -> (let CV (compile-expression V Scope)
+          CN (compile-expression N Scope)
+          CX (compile-expression X Scope)
+          Var (fresh-call-variable [CV CN CX])
+       [let [[Var CV]]
+         (order-call [vector-set! Var CN CX])
+         Var])
   [scm.import | Rest] _ -> [import | Rest]
   [scm.letrec | Rest] Scope -> (emit-letrec Rest Scope)
   [scm.lambda Vars Body] Scope -> [lambda Vars (compile-expression Body (append Vars Scope))]
@@ -226,27 +267,27 @@ but not otherwise.
 *\
 (define emit-trap-error-optimize
   [value X] [lambda E Handler] Scope
-  -> (compile-expression [scm.value/or X [freeze Handler]] Scope)
+  -> (order-call (compile-expression [scm.value/or X [freeze Handler]] Scope))
   [<-vector X N] [lambda E Handler] Scope
-  -> (compile-expression [scm.<-vector/or X N [freeze Handler]] Scope)
+  -> (order-call (compile-expression [scm.<-vector/or X N [freeze Handler]] Scope))
   [<-address X N] [lambda E Handler] Scope
-  -> (compile-expression [scm.<-address/or X N [freeze Handler]] Scope)
+  -> (order-call (compile-expression [scm.<-address/or X N [freeze Handler]] Scope))
   [get X P D] [lambda E Handler] Scope
-  -> (compile-expression [scm.get/or X P D [freeze Handler]] Scope)
+  -> (order-call (compile-expression [scm.get/or X P D [freeze Handler]] Scope))
   _ _ _ -> (fail))
 
 (define emit-equality-check
-  V1 V2 Scope -> [eq? (compile-expression V1 Scope)
-                      (compile-expression V2 Scope)]
+  V1 V2 Scope -> (order-call [eq? (compile-expression V1 Scope)
+                                  (compile-expression V2 Scope)])
       where (or (unbound-symbol? V1 Scope)
                 (unbound-symbol? V2 Scope)
                 (= [fail] V1)
                 (= [fail] V2))
-  V1 V2 Scope -> [eqv? (compile-expression V1 Scope)
-                       (compile-expression V2 Scope)]
+  V1 V2 Scope -> (order-call [eqv? (compile-expression V1 Scope)
+                                   (compile-expression V2 Scope)])
       where (or (number? V1) (number? V2))
-  V1 V2 Scope -> [equal? (compile-expression V1 Scope)
-                         (compile-expression V2 Scope)]
+  V1 V2 Scope -> (order-call [equal? (compile-expression V1 Scope)
+                                     (compile-expression V2 Scope)])
       where (or (string? V1) (string? V2))
   [] V2 Scope -> [null? (compile-expression V2 Scope)]
   V1 [] Scope -> [null? (compile-expression V1 Scope)]
@@ -280,7 +321,12 @@ but not otherwise.
 
 (define emit-static-application-fallback
   _ Op Params Scope -> (let Args (map (/. P (compile-expression P Scope)) Params)
-                         [(prefix-op Op) | Args]))
+                           Call [(prefix-op Op) | Args]
+                         \* Scheme escapes may name arbitrary syntax, whose
+                            operands must not be lifted out of the form. *\
+                         (if (scm-prefixed? Op)
+                             Call
+                             (order-call Call))))
 
 (define emit-application
   Op Params Scope -> (emit-application* Op (arity Op) Params Scope))
@@ -367,8 +413,8 @@ but not otherwise.
                         (/. MappedOp
                             (let Args (map (/. P (compile-expression P Scope))
                                            Params)
-                              (listify-conses
-                               [MappedOp | Args]))))
+                              (order-call
+                               (listify-conses [MappedOp | Args])))))
   Op 1 Params Scope <- (not-fail
                         (unary-op-mapping Op)
                         (/. MappedOp
@@ -380,7 +426,7 @@ but not otherwise.
                         (/. LocalOp
                             (let Args (map (/. P (compile-expression P Scope))
                                            Params)
-                              [LocalOp | Args])))
+                              (order-call [LocalOp | Args]))))
   Op _ Params Scope -> (emit-static-application-fallback
                         (native-mode)
                         Op
@@ -399,7 +445,7 @@ but not otherwise.
 
 (define nest-call
   Op [] -> Op
-  Op [Arg | Args] -> (nest-call [Op Arg] Args))
+  Op [Arg | Args] -> (nest-call (order-call [Op Arg]) Args))
 
 (define compiling-function
   Name F -> (let S (set *compiling-function* [Name | (value *compiling-function*)])
