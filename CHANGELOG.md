@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.48] - 2026-09-28
+
 ### Fixed
 
 - Enforce Shen's left-to-right evaluation order for function calls, list
@@ -370,7 +372,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.47...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.48...HEAD
+[0.48]: https://github.com/tizoc/shen-scheme/compare/v0.47...v0.48
 [0.47]: https://github.com/tizoc/shen-scheme/compare/v0.46.1...v0.47
 [0.46.1]: https://github.com/tizoc/shen-scheme/compare/v0.46...v0.46.1
 [0.46]: https://github.com/tizoc/shen-scheme/compare/v0.45...v0.46
