@@ -12,6 +12,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       CHEZ_SCHEME_VERSION: '10.3.0'
+      # Keep in sync with release.yml; bump when Chez build flags or steps change.
+      CHEZ_BUILD_REVISION: '1'
     strategy:
       fail-fast: false
       matrix:
@@ -24,7 +26,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: _build/chez
-          key: ${{ matrix.os }}-chez-${{ env.CHEZ_SCHEME_VERSION }}
+          key: chez-${{ matrix.os }}-${{ runner.arch }}-${{ env.CHEZ_SCHEME_VERSION }}-r${{ env.CHEZ_BUILD_REVISION }}
       - name: Install deps (Ubuntu)
         run: |
           sudo apt-get update
