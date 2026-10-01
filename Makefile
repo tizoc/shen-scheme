@@ -55,7 +55,7 @@ ifeq ($(os), linux)
 	linkerflags = -lm -ldl -lpthread -luuid
 endif
 
-shenversion ?= 42.0
+shenversion ?= 42.1
 csversion ?= 10.3.0
 prebuilt_version ?= 0.26
 
@@ -63,6 +63,7 @@ chez_sha256_10.3.0 = d237d9874c6e8b0ccf7758daa8286a6e825528b13ce3b2bca56eb1f73cd
 kernel_sha256_41.2 = d2182d70453d3e93d13bc20f763efdc18cdb23b481f41afb9943f5e9a0798f61
 kernel_sha256_41.3 = 559beda9a5f710811a7cd9d2d85bf224060e9fc5118e847a1e95edbc7e2e4d26
 kernel_sha256_42.0 = 32e86f58a1f6bbc111712a777a04a592c474e5cd05c2db7be0125f25ba8f8e35
+kernel_sha256_42.1 = 87e0d5e795cd074bfec3975da2aaada22a78e13f44cf53f424cdaf205730c439
 prebuilt_sha256_0.26_linux = 2859384f3b16cd6cf596084cfff7e2d9d5b31a11df3d1f7c9e1f1746ed6ef798
 prebuilt_sha256_0.26_macOS = a9c321a286daf354dda8ab51eb2b191cbdc339c2087e4490488c88ce462f5dc6
 prebuilt_sha256_0.26_windows = 7c5ab365cdd42aa02bfba90f857fddc7b431672fe01928f14f2b0f1156042549
@@ -358,7 +359,15 @@ test-clean-parallel-build: chez_kernel
 	./$(exe) --version
 
 .PHONY: test
-test: test-shen test-ppm test-compiler test-native test-native-examples
+test: test-shen test-ppm test-compiler test-native test-native-examples test-namespaces
+
+.PHONY: test-namespaces
+test-namespaces: $(exe) $(runtime_artifacts)
+	mkdir -p _build/namespace-tests
+	./$(exe) script scripts/run-namespace-tests.shen
+	./$(exe) eval -q -e "(shen.x.namespace ns-test.cli (define answer -> 42))" -e "(if (= (ns-test.cli.answer) 42) ok (error \"namespace CLI eval failed\"))"
+	SHEN_SCHEME_RUNTIME=petite ./$(exe) eval -q -e "(shen.x.namespace ns-test.petite (define answer -> 42))" -e "(if (= (ns-test.petite.answer) 42) ok (error \"namespace Petite eval failed\"))"
+	SHEN_SCHEME_RUNTIME=petite ./$(exe) eval -q -e "(set ns-test-events [])" -e "(shen-scheme.load-compiled \"_build/namespace-tests/model.so\")" -e "(shen-scheme.load-compiled \"_build/namespace-tests/client.so\")" -e "(if (= (ns-test.client.answer 40) 42) ok (error \"namespace Petite native load failed\"))"
 
 .PHONY: test-external-runtime
 test-external-runtime: $(exe) $(runtime_artifacts)

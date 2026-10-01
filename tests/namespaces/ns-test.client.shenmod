@@ -1,0 +1,8 @@
+(shen.module
+  (version 1)
+  (name ns-test.client)
+  (requires ns-test.model)
+  (sources tc- "client.shen")
+  (extension shen/scheme
+    (mode sealed)
+    (exports ns-test.client.answer ns-test.client.scoped ns-test.client.reference)))

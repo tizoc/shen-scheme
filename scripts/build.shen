@@ -76,6 +76,7 @@
        "extension-launcher"
        \\"extension-factorise-defun"
        "extension-programmable-pattern-matching"
+       "extension-namespaces"
        ])
 
 (set *shen-scheme-files*
@@ -201,6 +202,7 @@
   [shen.x.features.initialise [cons (intern "shen/scheme") []]]
   \\[shen.x.factorise-defun.initialise]
   [shen.x.programmable-pattern-matching.initialise]
+  [shen.x.namespaces.initialise]
 ])
 
 (define store-init-code
@@ -421,6 +423,7 @@
 (include c#34;compiled/extension-launcher.scmc#34;)
 ;; (include c#34;compiled/extension-factorise-defun.scmc#34;)
 (include c#34;compiled/extension-programmable-pattern-matching.scmc#34;)
+(include c#34;compiled/extension-namespaces.scmc#34;)
 
 )
 "))

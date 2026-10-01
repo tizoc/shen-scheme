@@ -1,0 +1,7 @@
+(shen.module
+  (version 1)
+  (name ns-test.typed)
+  (sources tc+ "typed.shen")
+  (extension shen/scheme
+    (mode sealed)
+    (exports ns-test.typed.answer)))

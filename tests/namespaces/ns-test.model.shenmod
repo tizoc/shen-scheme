@@ -1,0 +1,8 @@
+(shen.module
+  (version 1)
+  (name ns-test.model)
+  (sources tc- "model.shen")
+  (extension shen/scheme
+    (mode sealed)
+    (exports ns-test.model.caller ns-test.model.later ns-test.model.tag
+             ns-test.model.identity)))

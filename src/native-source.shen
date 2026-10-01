@@ -27,6 +27,7 @@
   F -> (let Old (value *property-vector*)
             New (native-copy-property-vector Old)
             Macros (value *macros*)
+            SourceHandlers (value shen.*source-form-handlers*)
             SigF (value shen.*sigf*)
             Synonyms (value shen.*synonyms*)
             Demod (value shen.*demodulation-function*)
@@ -45,6 +46,7 @@
           (freeze
            (do (set *property-vector* Old)
                (set *macros* Macros)
+               (set shen.*source-form-handlers* SourceHandlers)
                (set shen.*sigf* SigF)
                (set shen.*synonyms* Synonyms)
                (set shen.*demodulation-function* Demod)
@@ -178,10 +180,23 @@
 
 (define native-package-forms
   [] -> []
+  [[native-namespace N Xs Is] | Ps]
+  -> [[(_scm.prefix-op shen.record-external) [quote N] [quote Xs]]
+      [(_scm.prefix-op native-record-namespace-internal) [quote N] [quote Is]]
+      | (native-package-forms Ps)]
   [[native-package N Xs Fs] | Ps]
   -> [[(_scm.prefix-op shen.record-external) [quote N] [quote Xs]]
       [(_scm.prefix-op shen.record-internal) [quote N] [quote Xs] [quote Fs]]
       | (native-package-forms Ps)])
+
+(define native-record-namespace-internal
+  N Is -> (put N shen.internal-symbols
+              (union Is (trap-error (internal N) (/. E [])))))
+
+(define native-source-form-packages
+  [shen.x.namespace N | _] Ps
+  -> [[native-namespace N (external N) (internal N)] | Ps]
+  _ Ps -> Ps)
 
 (define native-expand-forms
   Fs -> (native-expand-forms* Fs [] [] []))
@@ -194,15 +209,15 @@
 
 (define native-macroexpand
   F -> (let Ms (map (/. X (tl X)) (value *macros*))
-         (native-macroexpand* F Ms Ms [])))
+         (native-macroexpand* F Ms Ms [] (value shen.*source-form-handlers*))))
 
 (define native-macroexpand*
-  F [] _ Xs -> [native-macroexpanded F (reverse Xs)]
-  F [M | Ms] All Xs
-  -> (let X (shen.walk M F)
+  F [] _ Xs _ -> [native-macroexpanded F (reverse Xs)]
+  F [M | Ms] All Xs Handlers
+  -> (let X (shen.source-macro-walk M F Handlers)
        (if (= F X)
-           (native-macroexpand* F Ms All Xs)
-           (native-macroexpand* X All All [X | Xs]))))
+           (native-macroexpand* F Ms All Xs Handlers)
+           (native-macroexpand* X All All [X | Xs] Handlers))))
 
 (define native-expand-forms*
   [] Xs CTs Ps -> [native-expanded (reverse Xs) (reverse CTs)
@@ -219,10 +234,17 @@
   -> (error "native compiler expected top-level package with a name and externals, got: ~S~%"
             [package | X])
   [F | Fs] Xs CTs Ps
+  -> (let Handler (shen.source-form-handler F (value shen.*source-form-handlers*))
+          Expanded (shen.source-form-expansion F Handler)
+       (native-expand-forms* (append Expanded Fs) Xs CTs
+                            (native-source-form-packages F Ps)))
+      where (cons? (shen.source-form-handler F (value shen.*source-form-handlers*)))
+  [F | Fs] Xs CTs Ps
   -> (let MX (native-macroexpand F)
           M (native-macroexpanded-form MX)
           Ms (native-macroexpanded-steps MX)
-       (if (shen.packaged? M)
+       (if (or (shen.packaged? M)
+               (cons? (shen.source-form-handler M (value shen.*source-form-handlers*))))
            (native-expand-forms* [M | Fs] Xs CTs Ps)
            (native-expand-forms* Fs [M | Xs]
                                  [(native-compiletime-form F (append Ms [M])) | CTs] Ps))))

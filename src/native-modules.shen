@@ -353,6 +353,8 @@
                        (update-lambda-table F A)))
 
 (define native-record-package-form
+  [F [quote N] [quote Is]] -> (native-record-namespace-internal N Is)
+    where (= F (_scm.prefix-op native-record-namespace-internal))
   [F [quote N] [quote Xs]] -> (shen.record-external N Xs)
     where (= F (_scm.prefix-op shen.record-external))
   [F [quote N] [quote Xs] [quote Fs]] -> (shen.record-internal N Xs Fs)

@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.49] - 2026-10-01
+
+### Added
+
+- Shen's experimental namespaces extension, initialized at startup for dynamic
+  loading, CLI evaluation, and native file, module, and application compilation.
+  Native objects preserve namespace external and internal symbol metadata.
+
+### Changed
+
+- Updated kernel to S42.1.
+- Native source expansion now processes registered source-form containers before
+  ordinary macros, including containers produced by macros. Native compilation
+  restores the source-form handler registry on success and failure.
+
 ## [0.48] - 2026-09-28
 
 ### Fixed
@@ -372,7 +387,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.48...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.49...HEAD
+[0.49]: https://github.com/tizoc/shen-scheme/compare/v0.48...v0.49
 [0.48]: https://github.com/tizoc/shen-scheme/compare/v0.47...v0.48
 [0.47]: https://github.com/tizoc/shen-scheme/compare/v0.46.1...v0.47
 [0.46.1]: https://github.com/tizoc/shen-scheme/compare/v0.46...v0.46.1
