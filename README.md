@@ -1,6 +1,6 @@
 # Shen/Scheme
 
-[![Shen Version](https://img.shields.io/badge/shen-42.1-blue.svg)](https://github.com/Shen-Language)
+[![Shen Version](https://img.shields.io/badge/shen-42.2-blue.svg)](https://github.com/Shen-Language)
 [![build](https://github.com/tizoc/shen-scheme/workflows/build/badge.svg)](https://github.com/tizoc/shen-scheme/actions?query=workflow%3Abuild)
 
 * [Shen](https://shen-language.github.io/)
@@ -160,7 +160,7 @@ The experimental namespaces extension is initialized at startup. Use
 `example.client.answer` calls `example.model.answer`. The extension also supports
 `externals` and scoped `with-externals` vocabulary. Native compilation preserves
 the same name resolution and namespace metadata. See the
-[namespace guide](https://github.com/Shen-Language/shen-sources/blob/shen-42.1/doc/extensions/namespaces.md)
+[namespace guide](https://github.com/Shen-Language/shen-sources/blob/shen-42.2/doc/extensions/namespaces.md)
 for the syntax and [native compilation guide](docs/native-compilation.md) for
 module integration.
 
