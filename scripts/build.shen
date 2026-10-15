@@ -343,6 +343,9 @@
       shen-scheme-native-load-init?
       shen-scheme-native-call-with-new-compiletime-environment
       shen-scheme-native-call-with-compiletime-environment
+      remember-exception!
+      show-last-error
+      debug-last-error
       error-location
       analyse-symbol?])
 

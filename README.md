@@ -142,6 +142,34 @@ Use `--help` for the full launcher and native compilation command list:
 shen-scheme --help
 ```
 
+Debugging errors
+----------------
+
+Syntax errors include the offending Scheme form and any available source
+position. Typechecker cleanup preserves the original Chez exception.
+After an error, these commands work with type checking enabled:
+
+```shen
+(_scm.last-error)
+(_scm.debug-last-error)
+```
+
+`_scm.last-error` prints the saved condition and complete syntax forms. When
+the error came through `eval-kl`, it also prints the failing KLambda and
+generated Scheme. Successful evaluations leave that report available.
+`_scm.debug-last-error` opens Chez's debugger on the original exception. Use
+`?` for commands, `i` to inspect its continuation, and `q` to return to Shen.
+
+For useful runtime frames, locals, and generated Scheme source locations,
+rebuild with:
+
+```sh
+make SHEN_SCHEME_DEBUG_LEVEL=2 SHEN_SCHEME_INSPECTOR=true SHEN_SCHEME_SOURCE_INFO=true
+```
+
+Source positions refer to annotated Scheme when available. Dynamically
+generated Scheme does not currently carry original Shen file positions.
+
 Namespaces
 ----------
 

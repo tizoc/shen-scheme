@@ -35,18 +35,106 @@
          sym))
       sym))
 
+(define (syntax-error-details e)
+  (if (syntax-violation? e)
+      (let* ((form (syntax-violation-form e))
+             (subform (syntax-violation-subform e))
+             (annotation (or (syntax->annotation subform)
+                             (syntax->annotation form))))
+        (call-with-string-output-port
+          (lambda (out)
+            (parameterize ([print-level 6] [print-length 12])
+              (when subform
+                (fprintf out "\n  Bad syntax: ~s" (syntax->datum subform)))
+              (fprintf out "\n  In: ~s" (syntax->datum form)))
+            (when annotation
+              (let ((src (annotation-source annotation)))
+                (call-with-values
+                  (lambda () (locate-source-object-source src #t #f))
+                  (case-lambda
+                    [() (fprintf out "\n  At: ~a, char ~a"
+                          (source-file-descriptor-path (source-object-sfd src))
+                          (source-object-bfp src))]
+                    [(path line column)
+                     (fprintf out "\n  At: ~a:~a:~a" path line column)])))))))
+      ""))
+
 (define (error-message e)
-  (let* ((msg (condition-message e))
-         (irritants (if (irritants-condition? e) (condition-irritants e) '())))
-    (cond ((format-condition? e)
-           (apply format msg (map kl-var-clean irritants)))
-          ((null? irritants) msg)
-          (else (format "~a: ~{~s~}" msg irritants)))))
+  (if (message-condition? e)
+      (let* ((msg (condition-message e))
+             (irritants (if (irritants-condition? e) (condition-irritants e) '()))
+             (message (cond ((format-condition? e)
+                             (apply format msg (map kl-var-clean irritants)))
+                            ((null? irritants) msg)
+                            (else (format "~a: ~{~s~}" msg irritants)))))
+        (string-append message (syntax-error-details e)))
+      (call-with-string-output-port
+        (lambda (out) (display-condition e out)))))
 
 (define (error-location e)
   (if (who-condition? e)
       (condition-who e)
       '*unknown-location*))
+
+;; Keep the original condition, including its raise continuation. The optional
+;; context is the innermost failing eval-kl, not the most recent successful eval.
+(define last-exception (make-parameter #f))
+
+(define (remember-exception! e)
+  (let ((saved (last-exception)))
+    (unless (and saved (eq? e (vector-ref saved 0)))
+      (last-exception (vector e #f))))
+  e)
+
+(define (remember-eval-exception! e kl scm translated?)
+  (remember-exception! e)
+  (let ((saved (last-exception)))
+    (unless (vector-ref saved 1)
+      (vector-set! saved 1 (vector kl scm translated?)))))
+
+(define (show-last-error)
+  (let ((saved (last-exception))
+        (out (current-output-port)))
+    (if saved
+        (let ((e (vector-ref saved 0))
+              (context (vector-ref saved 1)))
+          (parameterize ([print-level #f] [print-length #f])
+            (display-condition e out)
+            (newline out)
+            (when (syntax-violation? e)
+              (let ((subform (syntax-violation-subform e)))
+                (when subform
+                  (display "Bad syntax:\n" out)
+                  (pretty-print (syntax->datum subform) out)))
+              (display "Containing form:\n" out)
+              (pretty-print (syntax->datum (syntax-violation-form e)) out))
+            (when context
+              (display "KLambda:\n" out)
+              (pretty-print (vector-ref context 0) out)
+              (if (vector-ref context 2)
+                  (begin
+                    (display "Generated Scheme:\n" out)
+                    (pretty-print (vector-ref context 1) out))
+                  (display "Scheme generation did not complete.\n" out))))
+          (flush-output-port out)
+          'ok)
+        (begin
+          (display "No exception has been saved.\n" out)
+          (flush-output-port out)
+          'no-error))))
+
+(define (debug-last-error)
+  (let ((saved (last-exception)))
+    (if saved
+        ;; Chez's debugger resets when it exits. Return to the Shen caller
+        ;; instead of resetting out of the application's scheme-start handler.
+        (call/cc
+          (lambda (return)
+            (parameterize ([debug-condition (vector-ref saved 0)]
+                           [reset-handler (lambda () (return 'ok))])
+              (debug)
+              'ok)))
+        (show-last-error))))
 
 (define (full-path-for-file filename)
   (if (path-absolute? filename)

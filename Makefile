@@ -244,6 +244,7 @@ test-ppm: $(exe) $(runtime_artifacts)
 .PHONY: test-compiler
 test-compiler: $(exe) $(runtime_artifacts)
 	./$(exe) script scripts/run-compiler-tests.shen
+	./$(exe) eval -q -e '(eval-kl [scm. "(load c#34;tests/error-diagnostics.ssc#34;)"])'
 	./$(exe) script scripts/run-build-library-tests.shen
 	"$(scmexe)" -q -b "$(psboot)" -b "$(csboot)" \
 		--script scripts/check-build-library.ss

@@ -132,10 +132,16 @@
 
 \* To print location of errors *\
 
-(package shen [scm.error-location]
+(package shen [scm.error-location scm.raise scm.remember-exception!]
+
+\\ Unwind temporary declarations without discarding Chez condition fields.
+(define unwind-types
+  E [F _ | Table] -> (do (destroy F) (unwind-types E Table))
+  E _ -> ((foreign scm.raise) E))
 
 (define toplevel-display-exception
-  E -> (let Msg (error-to-string E)
+  E -> (let Saved ((foreign scm.remember-exception!) E)
+            Msg (error-to-string E)
             Loc ((foreign scm.error-location) E)
         (if (interactive-error? E Loc Msg)
             (output "~A" Msg)
@@ -151,7 +157,7 @@
   E shen.toplineread_loop "line read aborted" -> true
   E shen.f_error "aborted" -> true
   E shen.typecheck-and-evaluate "type error" -> true
-  E shen.unwind-types _ -> true
+  E shen.type-error _ -> true
   _ _ _ -> false)
 
 )

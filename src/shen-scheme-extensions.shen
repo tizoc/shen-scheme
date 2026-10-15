@@ -343,3 +343,12 @@ initializers.
 
 (define thread
   Lazy -> ((foreign scm.fork-thread) Lazy))
+
+(define _scm.last-error
+  -> ((foreign scm.show-last-error)))
+
+(define _scm.debug-last-error
+  -> ((foreign scm.debug-last-error)))
+
+(declare _scm.last-error [--> symbol])
+(declare _scm.debug-last-error [--> symbol])
