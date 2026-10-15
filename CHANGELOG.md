@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.51] - 2026-10-15
+
+### Added
+
+- `_scm.last-error` and `_scm.debug-last-error` commands to inspect the original
+  Chez exception, failing KLambda, generated Scheme, and raise continuation.
+  Both commands work with type checking enabled.
+
+### Changed
+
+- Syntax errors now include the offending Scheme form, subform, and available
+  source position.
+
+### Fixed
+
+- Quote abstract-vector literals in generated Scheme, fixing `invalid syntax`
+  errors when datatype rules evaluate typechecker fresh-term placeholders, such
+  as THORN planner assumptions.
+- Preserve the original Chez exception through typechecker cleanup, retaining
+  syntax details and the continuation for debugging.
+
 ## [0.50] - 2026-10-01
 
 ### Changed
@@ -394,7 +415,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.50...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.51...HEAD
+[0.51]: https://github.com/tizoc/shen-scheme/compare/v0.50...v0.51
 [0.50]: https://github.com/tizoc/shen-scheme/compare/v0.49...v0.50
 [0.49]: https://github.com/tizoc/shen-scheme/compare/v0.48...v0.49
 [0.48]: https://github.com/tizoc/shen-scheme/compare/v0.47...v0.48
