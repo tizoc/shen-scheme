@@ -88,6 +88,11 @@
  (_scm.kl->scheme some-symbol)
  [quote some-symbol])
 
+(let Marker (shen.freshterm AC)
+     Result (eval-kl [cons Marker []])
+     Updated (address-> Marker 1 updated)
+  (assert-equal (<-address (hd Result) 1) updated))
+
 (assert-equal
  (_scm.kl->scheme [let A 1 [+ A A]])
  [let [[A 1]] [+ A A]])

@@ -166,6 +166,7 @@
   [fn Name] _ -> (native-local-name Name)
       where (not (= (native-local-name Name) (fail)))
   [Op | Args] Scope -> (emit-application Op Args Scope)
+  X _ -> [quote X] where (absvector? X)
   X _ -> X                      \* literal *\
   )
 
