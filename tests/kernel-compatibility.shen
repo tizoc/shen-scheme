@@ -7,8 +7,33 @@
 
 (assert-kernel-equal
   "kernel version"
-  "42.2"
+  "43.1"
   (version))
+
+(assert-kernel-equal
+  "public character stream arities"
+  [1 1 2]
+  (map (fn arity) [char-stream? read-unit-string write-string]))
+
+(assert-kernel-equal
+  "public character stream callable forms"
+  [false unsupported unsupported]
+  [((fn char-stream?) (stinput))
+   (trap-error ((fn read-unit-string) (stinput)) (/. E unsupported))
+   (trap-error ((fn write-string) "" (stoutput)) (/. E unsupported))])
+
+(assert-kernel-equal
+  "character stream API is exported and typed"
+  [[true true] [true true] [true true]]
+  (map (/. F [(element? F (external shen))
+              (not (empty? (assoc F (value shen.*sigf*))))])
+       [char-stream? read-unit-string write-string]))
+
+(assert-kernel-equal
+  "context macros splice list tails"
+  [[cons a tail] [+ [cons a tail]]]
+  [(macroexpand [shen.@c (cons a (cons (intern "bar!") (cons tail [])))])
+   (macroexpand [shen.@ch [+ (cons a (cons (intern "bar!") (cons tail [])))]])])
 
 (assert-kernel-equal
   "input+ macro expansion"
