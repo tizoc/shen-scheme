@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.52] - 2026-10-16
+
 ### Changed
 
 - Upgrade the kernel to S43.1, including list-tail fixes in context macros and
@@ -14,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Provide the public `char-stream?`, `read-unit-string`, and `write-string`
   hooks. Shen/Scheme retains byte-based I/O and reports unsupported character
   stream operations explicitly.
+- Document checksum-verified bootstrap commands for source checkouts.
 
 ## [0.51] - 2026-10-15
 
@@ -423,7 +426,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.51...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.52...HEAD
+[0.52]: https://github.com/tizoc/shen-scheme/compare/v0.51...v0.52
 [0.51]: https://github.com/tizoc/shen-scheme/compare/v0.50...v0.51
 [0.50]: https://github.com/tizoc/shen-scheme/compare/v0.49...v0.50
 [0.49]: https://github.com/tizoc/shen-scheme/compare/v0.48...v0.49
