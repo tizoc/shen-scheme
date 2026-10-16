@@ -97,20 +97,24 @@ To build on Windows, an environment with curl, 7zip, make, and Visual Studio
 This step is only necessary if cloning from this repository. The release tarballs
 include pre-generated `.scm` files.
 
-To build from source, obtain a
-[copy of the Shen kernel distribution](https://github.com/Shen-Language/shen-sources/releases)
-and copy the `.kl` files to the `kl/` directory of Shen/Scheme. Then with a
-working Shen implementation do:
+Fetch the checksum-verified kernel and configured bootstrap executable,
+precompile the sources, and build:
 
-```shen
-(load "scripts/build.shen")
-(build program "shen-scheme.scm")
+```sh
+make fetch-kernel
+make fetch-prebuilt
+make precompile-with-prebuilt
+make
 ```
 
-This produces `.scm` files in the `compiled/` directory plus
+If a working Shen executable is already available, replace the
+`fetch-prebuilt` and `precompile-with-prebuilt` steps with
+`make precompile SHEN=/path/to/working/shen`.
+
+Precompilation produces `.scm` files in the `compiled/` directory plus
 `shen-scheme.scm` and `shen-scheme-runtime.ss` in the current directory.
 
-After doing this the procedure is the same as building from the source distribution.
+The installation instructions above apply to this build as well.
 
 Running
 -------
@@ -141,6 +145,11 @@ Use `--help` for the full launcher and native compilation command list:
 ```sh
 shen-scheme --help
 ```
+
+Shen/Scheme uses byte streams: `char-stream?` returns `false`, and the public
+`read-unit-string` and `write-string` functions report unsupported character
+stream operations. Use `read-byte`, `write-byte`, and `pr` for byte input,
+byte output, and string output respectively.
 
 Debugging errors
 ----------------
