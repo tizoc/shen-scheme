@@ -105,11 +105,14 @@
             ZeroStamp (address-> Vector 0 N)
           Vector))
 
-(define shen.char-stinput? S -> false)
-(define shen.char-stoutput? S -> false)
+\\ Shen/Scheme uses byte streams; S43.1 exposes these hooks publicly.
+(define char-stream? S -> false)
 
-(define shen.read-unit-string
+(define read-unit-string
   _ -> (error "character input streams are not supported~%"))
+
+(define write-string
+  _ _ -> (error "character output streams are not supported~%"))
 
 \* Shen 42.0 expands source input+ calls to shen.input-h+, but its
    lambda table still refers to input+ directly. *\

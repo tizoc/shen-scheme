@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade the kernel to S43.1, including list-tail fixes in context macros and
+  consolidated public symbol registration.
+- Provide the public `char-stream?`, `read-unit-string`, and `write-string`
+  hooks. Shen/Scheme retains byte-based I/O and reports unsupported character
+  stream operations explicitly.
+
 ## [0.51] - 2026-10-15
 
 ### Added
