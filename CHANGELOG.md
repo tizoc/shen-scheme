@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Preserve byte strings in binary `pr` output and `read-file-as-string`,
+  matching the kernel's byte-based reader and writer without UTF-8 or newline
+  conversion. Reported by @pyrex41.
+
 ## [0.52] - 2026-10-16
 
 ### Changed
