@@ -169,8 +169,18 @@
         -1
         byte)))
 
+;; The kernel represents each input byte as a character with the same code.
+;; Latin-1 preserves that mapping without UTF-8 or newline conversion.
+(define shen-byte-transcoder
+  (make-transcoder (latin-1-codec) (eol-style none) (error-handling-mode raise)))
+
+(define (shen-string->bytevector s)
+  (string->bytevector s shen-byte-transcoder))
+
 (define (read-file-as-string filename)
-  (call-with-input-file (full-path-for-file filename)
+  (call-with-port
+    (open-file-input-port (full-path-for-file filename)
+                          (file-options) (buffer-mode block) shen-byte-transcoder)
     (lambda (in)
       (let ((s (get-string-all in)))
         (if (eof-object? s)
