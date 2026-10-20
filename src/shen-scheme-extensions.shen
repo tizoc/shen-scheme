@@ -322,7 +322,12 @@ initializers.
                                 Args (fail) (fail) false release))
   Exe _ -> [error (shen-scheme.build-module-app-help-text Exe)])
 
+\* Command-line arguments reach Scheme as Unicode strings; Shen sees them as
+   the byte strings its reader would have built (src/chez-prelude.scm). *\
 (define shen-scheme.run-shen
+  Args -> (shen-scheme.run-shen-args (map (/. A ((foreign scm.os-string->shen-string) A)) Args)))
+
+(define shen-scheme.run-shen-args
   [Exe "--help"] -> (shen-scheme.handle-launcher-result [show-help (shen-scheme.help-text Exe)])
   [Exe "compile" | Args]
   -> (shen-scheme.handle-launcher-result (shen-scheme.compile-command Exe Args))

@@ -166,6 +166,17 @@
                   (put-bytevector out (string->utf8 (string c))))))
           s)))))
 
+(define (bytevector->shen-string bv)
+  (let* ((n (bytevector-length bv))
+         (s (make-string n)))
+    (do ((i 0 (fx+ i 1)))
+        ((fx=? i n) s)
+      (string-set! s i (integer->char (bytevector-u8-ref bv i))))))
+
+;; Command-line arguments arrive as Unicode strings; Shen sees their bytes.
+(define (os-string->shen-string s)
+  (bytevector->shen-string (string->utf8 s)))
+
 (define strict-utf-8
   (make-transcoder (utf-8-codec) (eol-style none) (error-handling-mode raise)))
 
@@ -184,6 +195,9 @@
         (string-append (current-directory)
                        (string (directory-separator))
                        filename))))
+
+(define (shen-scheme-file-exists? filename)
+  (file-exists? (shen-string->os-string filename)))
 
 (define (open-binary-input-file filename)
   (open-file-input-port filename))
@@ -212,12 +226,12 @@
         byte)))
 
 (define (read-file-as-string filename)
-  (call-with-input-file (full-path-for-file filename)
-    (lambda (in)
-      (let ((s (get-string-all in)))
-        (if (eof-object? s)
-            ""
-            s)))))
+  (let* ((in (open-file-input-port (full-path-for-file filename)))
+         (bytes (get-bytevector-all in)))
+    (close-input-port in)
+    (if (eof-object? bytes)
+        ""
+        (bytevector->shen-string bytes))))
 
 (define (read-file-as-bytelist filename)
   (let* ((in (open-file-input-port (full-path-for-file filename)))

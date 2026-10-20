@@ -179,6 +179,22 @@ make SHEN_SCHEME_DEBUG_LEVEL=2 SHEN_SCHEME_INSPECTOR=true SHEN_SCHEME_SOURCE_INF
 Source positions refer to annotated Scheme when available. Dynamically
 generated Scheme does not currently carry original Shen file positions.
 
+Strings and bytes
+-----------------
+
+Shen/Scheme keeps the kernel's byte-based strings. The reader turns each byte
+of a source file into one character, so the UTF-8 literal `"λ"` is the two
+characters `(n->string 206)` and `(n->string 187)`.
+
+- Output to a binary stream (stdout, stderr, files from `open`) writes each
+  character below 256 as that byte, as the kernel's `pr` does, so text prints
+  as the bytes it was read from. A character at or above 256 can only come
+  from Scheme-side code; it is written as UTF-8.
+- File names, command-line arguments and `read-file-as-string` are converted
+  at the OS boundary. A file named by the literal `"naïve.shen"` gets that
+  UTF-8 name on disk.
+- Textual ports are made only by Scheme code and take strings as they are.
+
 Namespaces
 ----------
 

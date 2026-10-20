@@ -34,6 +34,15 @@
     Bytes))
 
 (assert-bytes-equal
+  "read-file-as-string returns the byte string the reader would build"
+  true
+  (let File "_build/byte-strings-read.txt"
+       Written (write-to-file File "λ雪 café")
+       String (read-file-as-string File)
+       Deleted (delete-file File)
+    (= String "λ雪 café")))
+
+(assert-bytes-equal
   "write-byte and read-byte round-trip every byte"
   [0 127 128 233 255]
   (let File "_build/byte-strings-bytes.bin"

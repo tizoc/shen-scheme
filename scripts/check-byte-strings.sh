@@ -16,8 +16,8 @@ check() {
   fi
 }
 
-# load also prints the value of what it ran; compare the bytes pr wrote,
-# which come first.
+# eval and load also print the value of what they ran; compare the bytes pr
+# wrote, which come first.
 prefix() {
   head -c "$(wc -c < "$tmp/expected")" "$1" > "$1.prefix"
   echo "$1.prefix"
@@ -28,6 +28,9 @@ printf 'λ雪 café' > "$tmp/expected"
 printf '(pr "λ雪 café" (stoutput))\n' > "$tmp/pr.shen"
 "$exe" script "$tmp/pr.shen" > "$tmp/script.out"
 check "script: pr writes a literal's bytes to stdout" "$tmp/expected" "$tmp/script.out"
+
+"$exe" eval -e '(pr "λ雪 café" (stoutput))' > "$tmp/eval.out"
+check "eval -e: an argument's bytes reach stdout unchanged" "$tmp/expected" "$(prefix "$tmp/eval.out")"
 
 printf '(pr (n->string 233) (stoutput))\n' > "$tmp/byte.shen"
 "$exe" script "$tmp/byte.shen" > "$tmp/byte.out"

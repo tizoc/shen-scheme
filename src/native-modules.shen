@@ -11,7 +11,7 @@
   scm.shen-scheme-load-compiled-for-compilation
   scm.shen-scheme-resolve-module-source
   scm.shen-scheme-relative-path?
-  scm.file-exists? scm.dynamic-wind]
+  scm.shen-scheme-file-exists? scm.dynamic-wind]
 
 (define native-single-form
   _ [F] -> F
@@ -313,7 +313,7 @@
   O -> ((foreign scm.shen-scheme-load-compiled-for-compilation) O))
 
 (define native-require-existing-file
-  F _ -> F where ((foreign scm.file-exists?) F)
+  F _ -> F where ((foreign scm.shen-scheme-file-exists?) F)
   F D -> (error "native module expected ~A to exist: ~A~%" D F))
 
 (define native-read-required-module-declaration

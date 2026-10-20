@@ -157,10 +157,17 @@
   object)
 
 (define (shen-scheme-compile-native-forms scheme-file object forms optimize debug inspector source-info wpo)
-  (shen-scheme-write-native-forms scheme-file forms)
-  (shen-scheme-compile-scheme-file scheme-file object optimize debug inspector source-info wpo))
+  (let ((os-scheme-file (shen-string->os-string scheme-file))
+        (os-object (shen-string->os-string object)))
+    (shen-scheme-write-native-forms os-scheme-file forms)
+    (shen-scheme-compile-scheme-file os-scheme-file os-object optimize debug inspector source-info wpo)
+    object))
 
 (define (shen-scheme-compile-native-forms-direct object forms optimize debug inspector source-info wpo)
+  (shen-scheme-compile-native-forms-direct* (shen-string->os-string object) forms optimize debug inspector source-info wpo)
+  object)
+
+(define (shen-scheme-compile-native-forms-direct* object forms optimize debug inspector source-info wpo)
   (parameterize ([optimize-level optimize]
                  [debug-level debug]
                  [generate-inspector-information inspector]
@@ -206,6 +213,12 @@
                      (cdr module-forms)))))))
 
 (define (shen-scheme-compile-native-app root-dir module-forms program-forms object optimize debug inspector source-info wpo)
+  (let ((result (shen-scheme-compile-native-app* (shen-string->os-string root-dir) module-forms program-forms
+                                                 (shen-string->os-string object) optimize debug inspector
+                                                 source-info wpo)))
+    (cons object (cdr result))))
+
+(define (shen-scheme-compile-native-app* root-dir module-forms program-forms object optimize debug inspector source-info wpo)
   (shen-scheme-ensure-directory-path root-dir)
   (let* ((program-file (string-append root-dir "/main.ss"))
          (program-object (if wpo
@@ -240,12 +253,12 @@
   (shen-scheme-native-load-init))
 
 (define (shen-scheme-load-compiled object)
-  (load object)
+  (load (shen-string->os-string object))
   object)
 
 (define (shen-scheme-load-compiled-for-compilation object)
   (parameterize ([shen-scheme-native-load-init #f])
-    (load object))
+    (load (shen-string->os-string object)))
   object)
 
 ;; Native source analysis needs ordinary Shen definitions while expanding
@@ -328,8 +341,9 @@
     shen-scheme-fnv64-offset)))
 
 (define (shen-scheme-delete-file-if-exists filename)
-  (when (file-exists? filename)
-    (delete-file filename))
+  (let ((filename (shen-string->os-string filename)))
+    (when (file-exists? filename)
+      (delete-file filename)))
   #t)
 
 ;; Streams and I/O

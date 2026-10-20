@@ -7,7 +7,7 @@
   scm.shen-scheme-compile-native-forms-direct
   scm.shen-scheme-compile-native-forms
   scm.shen-scheme-delete-file-if-exists
-  scm.file-exists?]
+  scm.shen-scheme-file-exists?]
 
 (define native-compile-forms/direct
   O Fs [Opt Debug Inspect Src WPO?]
@@ -156,6 +156,6 @@
   F -> ((foreign scm.shen-scheme-delete-file-if-exists) F))
 
 (define shen-scheme.file-exists?
-  F -> ((foreign scm.file-exists?) F))
+  F -> ((foreign scm.shen-scheme-file-exists?) F))
 
 )

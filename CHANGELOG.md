@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `pr` writes byte strings byte by byte, as the kernel's own `pr` does. Text
+  outside ASCII was encoded a second time on binary streams: `"λ雪 café"`
+  (11 bytes) printed as 18. A character at or above 256, which only
+  Scheme-side code can make, is written as UTF-8.
+- File names, command-line arguments and `read-file-as-string` convert
+  between byte strings and Chez's Unicode strings at the OS boundary. A
+  non-ASCII path named by a Shen string opens the file of that UTF-8 name, and
+  `read-file-as-string` returns the same byte string the reader builds.
+- `make test-byte-strings`, part of `make test`, checks this down to the bytes
+  written to stdout.
+
 ## [0.52] - 2026-10-16
 
 ### Changed
