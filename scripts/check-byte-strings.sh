@@ -2,7 +2,8 @@
 # Strings are byte strings (src/chez-prelude.scm): what a program prints must
 # be exactly the bytes of its string literals, as the kernel's pr writes them.
 set -u
-exe="$1"
+# An absolute launcher, so checks can run inside the temporary directory.
+exe=$(cd "$(dirname "$1")" && pwd)/$(basename "$1")
 status=0
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
@@ -41,12 +42,14 @@ printf '(pr "λ雪 café" (stoutput))\n' > "$tmp/naïve λ.shen"
 "$exe" script "$tmp/naïve λ.shen" > "$tmp/named.out"
 check "a script whose path is not ASCII loads" "$tmp/expected" "$tmp/named.out"
 
-printf '(load "%s")\n' "$tmp/naïve λ.shen" > "$tmp/load.shen"
-"$exe" script "$tmp/load.shen" > "$tmp/load.out"
+# Paths written inside Shen source are relative: on Windows the shell's
+# /tmp/... form is translated for arguments, never inside a file.
+printf '(load "naïve λ.shen")\n' > "$tmp/load.shen"
+(cd "$tmp" && "$exe" script load.shen) > "$tmp/load.out"
 check "load of a non-ASCII path named by a literal" "$tmp/expected" "$(prefix "$tmp/load.out")"
 
-printf '(write-to-file "%s" "x")\n' "$tmp/naïve λ.txt" > "$tmp/name.shen"
-"$exe" script "$tmp/name.shen" > /dev/null
+printf '(write-to-file "naïve λ.txt" "x")\n' > "$tmp/name.shen"
+(cd "$tmp" && "$exe" script name.shen) > /dev/null
 if [ -f "$tmp/naïve λ.txt" ]; then
   echo "[OK]    a file named by a literal gets that UTF-8 name on disk"
 else
