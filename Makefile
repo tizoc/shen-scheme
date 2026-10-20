@@ -362,7 +362,12 @@ test-clean-parallel-build: chez_kernel
 	./$(exe) --version
 
 .PHONY: test
-test: test-shen test-ppm test-compiler test-native test-native-examples test-namespaces
+test: test-shen test-ppm test-compiler test-native test-native-examples test-namespaces test-byte-strings
+
+.PHONY: test-byte-strings
+test-byte-strings: $(exe) $(runtime_artifacts)
+	./$(exe) script tests/byte-strings.shen
+	sh scripts/check-byte-strings.sh ./$(exe)
 
 .PHONY: test-namespaces
 test-namespaces: $(exe) $(runtime_artifacts)

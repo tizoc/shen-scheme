@@ -13,11 +13,13 @@
 (define integer?
   Val -> ((foreign scm.integer?) Val))
 
+\* Like the kernel's pr, one byte per character of the byte string
+   (src/chez-prelude.scm), written as one bytevector. *\
 (define pr
   String Sink -> (trap-error
                   (let P (if ((foreign scm.textual-port?) Sink)
                              ((foreign scm.or) (value *hush*) ((foreign scm.put-string) Sink String))
-                             ((foreign scm.or) (value *hush*) ((foreign scm.put-bytevector) Sink ((foreign scm.string->utf8) String))))
+                             ((foreign scm.or) (value *hush*) ((foreign scm.put-bytevector) Sink ((foreign scm.shen-string->bytevector) String))))
                        F ((foreign scm.and)
                             (not (value *hush*))
                             ((foreign scm.should-flush?) Sink)
