@@ -324,6 +324,8 @@
       (prefix-fn set)
       (prefix-fn value)
       (prefix-fn error-to-string)
+      unicode->shen-string
+      shen-string->unicode
       (prefix-fn =)
       (prefix-fn eval-kl)
       (prefix-fn open)
@@ -480,7 +482,7 @@
 (scheme-start
   (lambda fns
     (initialize-shen)
-    (kl:shen-scheme.run-shen fns)
+    (kl:shen-scheme.run-shen (map unicode->shen-string fns))
     (exit 0)))")
 
 (define program-definition

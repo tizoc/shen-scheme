@@ -3,7 +3,7 @@
 
 (package _scm [begin quote string->symbol null? car cdr pair? else
                      vector-ref vector-set! make-vector string non-rational-/
-                     string-append integer->char char->integer
+                     string-append integer->char char->integer shen-string->unicode
                      string-ref string-length substring list kl
                      eq? eqv? equal? scm. scm.import import *sterror* *toplevel*
                      letrec let* scm.letrec scm.with-input-from-string scm.read
@@ -129,7 +129,7 @@
   [intern S] _ -> [quote (intern S)] where (string? S)
   [type Exp _] Scope -> (compile-expression Exp Scope)
   [simple-error Msg] Scope -> [error [quote (hd (value *compiling-function*))]
-                                     (compile-expression Msg Scope)]
+                                   [shen-string->unicode (compile-expression Msg Scope)]]
   [n->string N] Scope -> [string [integer->char (compile-expression N Scope)]]
   [string->n S] Scope -> [char->integer [string-ref (compile-expression S Scope) 0]]
   [pos S N] Scope -> [string (order-call

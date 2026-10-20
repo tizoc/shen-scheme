@@ -367,6 +367,9 @@ test: test-shen test-ppm test-compiler test-native test-native-examples test-nam
 .PHONY: test-byte-strings
 test-byte-strings: $(exe) $(runtime_artifacts)
 	./$(exe) eval -q -e '(eval-kl [scm. "(load c#34;tests/byte-strings.ssc#34;)"])'
+	./$(exe) eval -q -e '(eval-kl [scm. "(load c#34;tests/string-boundaries.ssc#34;)"])'
+	SHEN_SCHEME_RUNTIME=petite ./$(exe) eval -q -e '(eval-kl [scm. "(load c#34;tests/string-boundaries.ssc#34;)"])'
+	sh scripts/check-byte-strings.sh ./$(exe)
 
 .PHONY: test-namespaces
 test-namespaces: $(exe) $(runtime_artifacts)

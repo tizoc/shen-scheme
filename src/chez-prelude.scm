@@ -139,15 +139,18 @@
 (define (full-path-for-file filename)
   (if (path-absolute? filename)
       filename
-      (string-append (current-directory)
+      (string-append (unicode->shen-string (current-directory))
                      (string (directory-separator))
                      filename)))
 
+(define (shen-scheme-file-exists? filename)
+  (file-exists? (shen-string->unicode filename)))
+
 (define (open-binary-input-file filename)
-  (open-file-input-port filename))
+  (open-file-input-port (shen-string->unicode filename)))
 
 (define (open-binary-output-file filename)
-  (open-file-output-port filename (file-options no-fail)))
+  (open-file-output-port (shen-string->unicode filename) (file-options no-fail)))
 
 (define (time->float t)
   (+ (time-second t)
@@ -177,10 +180,24 @@
 (define (shen-string->bytevector s)
   (string->bytevector s shen-byte-transcoder))
 
+;; Shen strings contain bytes; Chez strings at the OS boundary contain Unicode.
+;; Conversions are explicit: paths remain byte strings until the filesystem call.
+(define shen-utf8-transcoder
+  (make-transcoder (utf-8-codec) (eol-style none) (error-handling-mode raise)))
+
+(define (unicode->shen-string s)
+  (bytevector->string (string->utf8 s) shen-byte-transcoder))
+
+(define (shen-string->unicode s)
+  ;; Prefix a byte so the UTF-8 codec preserves a leading U+FEFF as data.
+  (let ((text (bytevector->string
+               (shen-string->bytevector (string-append "." s)) shen-utf8-transcoder)))
+    (substring text 1 (string-length text))))
+
 (define (read-file-as-string filename)
   (call-with-port
-    (open-file-input-port (full-path-for-file filename)
-                          (file-options) (buffer-mode block) shen-byte-transcoder)
+    (transcoded-port (open-binary-input-file (full-path-for-file filename))
+                     shen-byte-transcoder)
     (lambda (in)
       (let ((s (get-string-all in)))
         (if (eof-object? s)
@@ -188,7 +205,7 @@
             s)))))
 
 (define (read-file-as-bytelist filename)
-  (let* ((in (open-file-input-port (full-path-for-file filename)))
+  (let* ((in (open-binary-input-file (full-path-for-file filename)))
          (bytes (get-bytevector-all in)))
     (close-input-port in)
     (if (eof-object? bytes)

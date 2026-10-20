@@ -151,6 +151,17 @@ Shen/Scheme uses byte streams: `char-stream?` returns `false`, and the public
 stream operations. Use `read-byte`, `write-byte`, and `pr` for byte input,
 byte output, and string output respectively.
 
+Source literals and `read-file-as-string` contain one character per byte;
+binary `pr` writes those bytes unchanged. Command-line arguments enter Shen as
+UTF-8 bytes. Filenames and error messages must contain valid UTF-8. Filenames
+are decoded only when calling the filesystem; file contents can contain
+arbitrary bytes.
+
+Scheme FFI code can use the exported `unicode->shen-string` and
+`shen-string->unicode` helpers to convert explicitly between Unicode text and
+Shen byte strings. Characters above 255 require conversion to UTF-8 bytes
+before binary output.
+
 Debugging errors
 ----------------
 

@@ -61,7 +61,8 @@
 ;; Error Handling
 ;;
 
-(define kl:error-to-string error-message)
+(define (kl:error-to-string e)
+  (unicode->shen-string (error-message e)))
 
 ;; Generic Functions
 ;;
@@ -126,9 +127,8 @@
             result)))))
 
 (define (shen-scheme-write-forms scheme-file forms include-chez-import?)
-  (when (file-exists? scheme-file)
-    (delete-file scheme-file))
-  (call-with-output-file scheme-file
+  (shen-scheme-delete-file-if-exists scheme-file)
+  (call-with-output-file (shen-string->unicode scheme-file)
     (lambda (out)
       (when include-chez-import?
         (display "(import (chezscheme))" out)
@@ -153,7 +153,7 @@
                  [generate-procedure-source-information source-info]
                  [generate-wpo-files wpo]
                  [compile-file-message (shen-scheme-compile-file-message?)])
-    (compile-file scheme-file object))
+    (compile-file (shen-string->unicode scheme-file) (shen-string->unicode object)))
   object)
 
 (define (shen-scheme-compile-native-forms scheme-file object forms optimize debug inspector source-info wpo)
@@ -167,7 +167,8 @@
                  [generate-procedure-source-information source-info]
                  [generate-wpo-files wpo]
                  [compile-file-message (shen-scheme-compile-file-message?)])
-    (compile-to-file (cons '(import (chezscheme)) forms) object))
+    (compile-to-file (cons '(import (chezscheme)) forms)
+                     (shen-string->unicode object)))
   object)
 
 (define (shen-scheme-parent-directory directory)
@@ -179,11 +180,11 @@
             (else (loop (- i 1)))))))
 
 (define (shen-scheme-ensure-directory-path directory)
-  (unless (file-exists? directory)
+  (unless (shen-scheme-file-exists? directory)
     (let ((parent (shen-scheme-parent-directory directory)))
       (when parent
         (shen-scheme-ensure-directory-path parent)))
-    (mkdir directory)))
+    (mkdir (shen-string->unicode directory))))
 
 (define (shen-scheme-replace-suffix filename suffix)
   (let* ((len (string-length filename))
@@ -229,9 +230,11 @@
                     (cons (cons (get-shen-scheme-home-path)
                                 (get-shen-scheme-home-path))
                           (library-directories))])
-      (compile-program program-file program-object)
+      (compile-program (shen-string->unicode program-file)
+                       (shen-string->unicode program-object))
       (if wpo
-          (list object (compile-whole-program program-wpo object))
+          (list object (compile-whole-program (shen-string->unicode program-wpo)
+                                             (shen-string->unicode object)))
           (list object '())))))
 
 (define shen-scheme-native-load-init (make-parameter #t))
@@ -240,12 +243,12 @@
   (shen-scheme-native-load-init))
 
 (define (shen-scheme-load-compiled object)
-  (load object)
+  (load (shen-string->unicode object))
   object)
 
 (define (shen-scheme-load-compiled-for-compilation object)
   (parameterize ([shen-scheme-native-load-init #f])
-    (load object))
+    (load (shen-string->unicode object)))
   object)
 
 ;; Native source analysis needs ordinary Shen definitions while expanding
@@ -328,8 +331,8 @@
     shen-scheme-fnv64-offset)))
 
 (define (shen-scheme-delete-file-if-exists filename)
-  (when (file-exists? filename)
-    (delete-file filename))
+  (when (shen-scheme-file-exists? filename)
+    (delete-file (shen-string->unicode filename)))
   #t)
 
 ;; Streams and I/O
@@ -341,9 +344,9 @@
 (define (kl:open filename direction)
   (let ((full-path (full-path-for-file (with-home-directory filename))))
     (case direction
-      ((in) (if (file-exists? full-path)
+      ((in) (if (shen-scheme-file-exists? full-path)
                 (open-binary-input-file full-path)
-                (raise-error 'open "File does not exist" full-path)))
+                (raise-error 'open "File does not exist" (shen-string->unicode full-path))))
       ((out) (open-binary-output-file full-path))
       (else (raise-error 'open "Invalid direction" direction)))))
 
