@@ -339,7 +339,9 @@ initializers.
   Args -> (shen-scheme.handle-launcher-result (shen.x.launcher.launch-shen Args)))
 
 (define shen-scheme.find-library
-  Name -> ((foreign scm.string-append) ((foreign scm.get-shen-scheme-home-path)) "/libraries/" Name))
+  Name -> ((foreign scm.string-append)
+           ((foreign scm.unicode->shen-string) ((foreign scm.get-shen-scheme-home-path)))
+           "/libraries/" Name))
 
 (define thread
   Lazy -> ((foreign scm.fork-thread) Lazy))

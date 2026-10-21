@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Preserve byte strings in binary `pr` output and `read-file-as-string`,
   matching the kernel's byte-based reader and writer without UTF-8 or newline
   conversion. Reported by @pyrex41.
+- Convert Unicode command-line arguments to UTF-8 byte strings on entry and
+  decode filenames at filesystem calls, including native builds and loads.
+  Path-building helpers retain byte strings, avoiding repeated decoding.
+  Reported by @pyrex41.
+- Convert error messages between Shen UTF-8 bytes and Chez Unicode text.
 
 ## [0.52] - 2026-10-16
 
