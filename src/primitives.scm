@@ -15,10 +15,11 @@
 (define (kl:intern name)
   (cond ((equal? name "true") #t)
         ((equal? name "false") #f)
-        (else (or (and (> (string-length name) 1)
-                      (char-numeric? (string-ref name 0))
-                      (string->number name))
-                  (string->symbol name)))))
+        (else
+         (let ((n (and (> (string-length name) 1)
+                       (char-numeric? (string-ref name 0))
+                       (string->number name))))
+           (if (and n (real? n)) n (string->symbol name))))))
 
 ;; Numbers
 ;;
