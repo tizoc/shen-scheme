@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Precompile Scheme sources on Linux x64 so native builds can use the pinned
   x64 bootstrap executable's output.
 
+### Changed
+
+- Upgrade the kernel to S43.2, including typechecker dereferencing improvements
+  and portable Prolog variable handling in the type annotations extension.
+
 ### Fixed
 
 - Preserve byte strings in binary `pr` output and `read-file-as-string`,
