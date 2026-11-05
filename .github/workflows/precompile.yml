@@ -7,7 +7,7 @@ jobs:
   precompile:
     # The pinned bootstrap executable is Linux x64. Its generated Scheme
     # sources are portable; each build job compiles them with its native Chez.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
       - name: Precompile with bootstrap executable

@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Pin CI and release runners to Ubuntu 24.04 (x64 and ARM64), macOS 15, and
+  Windows 2022, including Ubuntu 24.04 for bootstrap and release creation jobs.
 - Upgrade the kernel to S43.2, including typechecker dereferencing improvements
   and portable Prolog variable handling in the type annotations extension.
 

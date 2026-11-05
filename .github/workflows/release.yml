@@ -12,7 +12,7 @@ jobs:
 
   create_release:
     name: Create Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
       version_tag: ${{ steps.version_tag.outputs.version_tag }}
@@ -64,13 +64,13 @@ jobs:
         config:
           - os: macos
             arch: arm64
-            runs_on: macos-latest
+            runs_on: macos-15
             BUNDLE_EXT: tar.gz
             ASSET_CONTENT_TYPE: application/gzip
             OSNAME: macOS
           - os: ubuntu
             arch: x64
-            runs_on: ubuntu-latest
+            runs_on: ubuntu-24.04
             BUNDLE_EXT: tar.gz
             ASSET_CONTENT_TYPE: application/gzip
             OSNAME: linux
