@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Native Linux ARM64 builds and release binaries, with CI coverage on ARM64.
+  Precompile Scheme sources on Linux x64 so native builds can use the pinned
+  x64 bootstrap executable's output.
+
 ### Fixed
 
 - Preserve byte strings in binary `pr` output and `read-file-as-string`,

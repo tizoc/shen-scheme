@@ -7,7 +7,11 @@ on:
     branches: [ master ]
 
 jobs:
+  precompile:
+    uses: ./.github/workflows/precompile.yml
+
   build:
+    needs: precompile
     name: Build and test
     runs-on: ${{ matrix.os }}
     env:
@@ -17,10 +21,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-2022]
+        os: [macos-latest, ubuntu-latest, ubuntu-24.04-arm, windows-2022]
 
     steps:
       - uses: actions/checkout@v5
+      - name: Download Scheme sources
+        uses: actions/download-artifact@v4
+        with:
+          name: precompiled-scheme
       - name: Chez cache
         id: shen-scheme-chez10-cache
         uses: actions/cache@v5
@@ -38,8 +46,6 @@ jobs:
         run: |
           echo "Using Chez Scheme version ${{ env.CHEZ_SCHEME_VERSION }}"
           make fetch-kernel
-          make fetch-prebuilt
-          make precompile-with-prebuilt
           make csversion=${{ env.CHEZ_SCHEME_VERSION }}
           make test
       - name: Test clean parallel build

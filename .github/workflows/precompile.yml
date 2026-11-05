@@ -1,0 +1,26 @@
+name: Precompile Scheme sources
+
+on:
+  workflow_call:
+
+jobs:
+  precompile:
+    # The pinned bootstrap executable is Linux x64. Its generated Scheme
+    # sources are portable; each build job compiles them with its native Chez.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Precompile with bootstrap executable
+        run: |
+          make fetch-kernel
+          make fetch-prebuilt
+          make precompile-with-prebuilt
+      - name: Upload Scheme sources
+        uses: actions/upload-artifact@v4
+        with:
+          name: precompiled-scheme
+          path: |
+            compiled/*.scm
+            shen-scheme.scm
+            shen-scheme-runtime.ss
+          if-no-files-found: error

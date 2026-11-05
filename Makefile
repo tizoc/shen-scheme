@@ -14,6 +14,8 @@ else
 	uname_m := $(shell uname -m)
 	ifeq ($(uname_m), aarch64)
 		m ?= tarm64le
+	else ifeq ($(uname_m), arm64)
+		m ?= tarm64le
 	else ifeq ($(uname_m), riscv64)
 		m ?= trv64le
 	else
@@ -132,8 +134,10 @@ endif
 archive_name = shen-scheme-$(git_tag)-src
 
 ifneq ($(uname_m), aarch64)
+ifneq ($(uname_m), arm64)
 ifneq ($(uname_m), riscv64)
 	CFLAGS += -m64
+endif
 endif
 endif
 

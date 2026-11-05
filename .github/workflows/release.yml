@@ -7,6 +7,9 @@ on:
 name: Make release
 
 jobs:
+  precompile:
+    uses: ./.github/workflows/precompile.yml
+
   create_release:
     name: Create Release
     runs-on: ubuntu-latest
@@ -50,7 +53,7 @@ jobs:
           prerelease: false
 
   build:
-    needs: create_release
+    needs: [create_release, precompile]
     env:
       CHEZ_SCHEME_VERSION: '10.3.0'
       # Keep in sync with build.yml; bump when Chez build flags or steps change.
@@ -71,6 +74,12 @@ jobs:
             BUNDLE_EXT: tar.gz
             ASSET_CONTENT_TYPE: application/gzip
             OSNAME: linux
+          - os: ubuntu
+            arch: arm64
+            runs_on: ubuntu-24.04-arm
+            BUNDLE_EXT: tar.gz
+            ASSET_CONTENT_TYPE: application/gzip
+            OSNAME: linux
           - os: windows
             arch: x64
             runs_on: windows-2022
@@ -81,7 +90,11 @@ jobs:
     runs-on: ${{ matrix.config.runs_on }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
+      - name: Download Scheme sources
+        uses: actions/download-artifact@v4
+        with:
+          name: precompiled-scheme
       - name: Chez cache
         id: shen-scheme-chez-cache
         uses: actions/cache@v5
@@ -96,14 +109,12 @@ jobs:
       - name: Build and test
         run: |
           make fetch-kernel
-          make fetch-prebuilt
-          make precompile-with-prebuilt
           make csversion=${{ env.CHEZ_SCHEME_VERSION }}
           make test
       - name: Create binary release for ${{ matrix.config.OSNAME }} ${{ matrix.config.arch }}
         run: make binary-release
       - name: Create source release
-        if: runner.os == 'Linux'
+        if: matrix.config.os == 'ubuntu' && matrix.config.arch == 'x64'
         run: make source-release
       - name: Upload Release Asset (binary for ${{ matrix.config.OSNAME }} ${{ matrix.config.arch }})
         uses: actions/upload-release-asset@v1
@@ -115,7 +126,7 @@ jobs:
           asset_name: shen-scheme-${{ needs.create_release.outputs.version_tag }}-${{ matrix.config.OSNAME }}-${{ matrix.config.arch }}-bin.${{ matrix.config.BUNDLE_EXT }}
           asset_content_type: ${{ matrix.config.ASSET_CONTENT_TYPE }}
       - name: Upload Release Asset (sources)
-        if: runner.os == 'Linux'
+        if: matrix.config.os == 'ubuntu' && matrix.config.arch == 'x64'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
