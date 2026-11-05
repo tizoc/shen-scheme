@@ -233,7 +233,8 @@
   Clauses Scope -> [cond | (emit-cond-clauses Clauses Scope)])
 
 (define emit-cond-clauses
-  [] _ -> []
+  [] Scope -> [[else (compile-expression [simple-error "condition failure"] Scope)]]
+  [[true Body] | _] Scope -> [[true (compile-expression Body Scope)]]
   [[Test Body] | Rest] Scope
   -> (let CompiledTest (compile-expression (force-boolean Test) Scope)
           CompiledBody (compile-expression Body Scope)
@@ -284,9 +285,6 @@ but not otherwise.
                 (unbound-symbol? V2 Scope)
                 (= [fail] V1)
                 (= [fail] V2))
-  V1 V2 Scope -> (order-call [eqv? (compile-expression V1 Scope)
-                                   (compile-expression V2 Scope)])
-      where (or (number? V1) (number? V2))
   V1 V2 Scope -> (order-call [equal? (compile-expression V1 Scope)
                                      (compile-expression V2 Scope)])
       where (or (string? V1) (string? V2))
