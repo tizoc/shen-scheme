@@ -1,6 +1,6 @@
 # Shen/Scheme
 
-[![Shen Version](https://img.shields.io/badge/shen-43.1-blue.svg)](https://github.com/Shen-Language)
+[![Shen Version](https://img.shields.io/badge/shen-43.2-blue.svg)](https://github.com/Shen-Language)
 [![build](https://github.com/tizoc/shen-scheme/workflows/build/badge.svg)](https://github.com/tizoc/shen-scheme/actions?query=workflow%3Abuild)
 
 * [Shen](https://shen-language.github.io/)
@@ -31,6 +31,7 @@ Binaries
 --------
 
 Starting with version 0.18, binaries are provided for Windows, Linux, and macOS.
+Release builds target Linux x64 and ARM64, macOS ARM64, and Windows x64.
 See [releases](https://github.com/tizoc/shen-scheme/releases).
 
 Nix users can use the community-maintained package at
@@ -55,6 +56,10 @@ Running `make` should do the job. It downloads and compiles Chez under the
 `_build` directory, then builds the `shen-scheme` binary and a Shen/Scheme
 runtime object. Shen/Scheme starts from the stock Chez boot files and loads its
 runtime separately; it does not generate a custom boot file.
+
+On Linux ARM64 (`aarch64` or `arm64`), `make` automatically selects Chez's
+`tarm64le` target. Install a C toolchain and `uuid-dev` (on Debian/Ubuntu)
+before building.
 
 ```sh
 make prefix=/opt/shen-scheme # optional prefix, defaults to /usr/local
@@ -110,6 +115,11 @@ make
 If a working Shen executable is already available, replace the
 `fetch-prebuilt` and `precompile-with-prebuilt` steps with
 `make precompile SHEN=/path/to/working/shen`.
+
+The pinned Linux bootstrap binary is x64. For Linux ARM64, build from the
+source distribution or precompile with a working Shen executable. CI
+precompiles on Linux x64 and shares the generated Scheme sources with each
+native build, including Linux ARM64.
 
 Precompilation produces `.scm` files in the `compiled/` directory plus
 `shen-scheme.scm` and `shen-scheme-runtime.ss` in the current directory.
@@ -208,7 +218,7 @@ The experimental namespaces extension is initialized at startup. Use
 `example.client.answer` calls `example.model.answer`. The extension also supports
 `externals` and scoped `with-externals` vocabulary. Native compilation preserves
 the same name resolution and namespace metadata. See the
-[namespace guide](https://github.com/Shen-Language/shen-sources/blob/shen-43.1/doc/extensions/namespaces.md)
+[namespace guide](https://github.com/Shen-Language/shen-sources/blob/shen-43.2/doc/extensions/namespaces.md)
 for the syntax and [native compilation guide](docs/native-compilation.md) for
 module integration.
 
