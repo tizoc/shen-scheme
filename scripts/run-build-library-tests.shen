@@ -51,3 +51,22 @@
               RuntimeBody))))))
 
 (build-library-test.run)
+
+(map (/. Expr
+       (build-library-test.assert-equal
+         "Scheme escapes stay opaque in the shared initializer pass"
+         Expr (precompile-initializer Expr)))
+     [[quote [update-lambda-table not 1]]
+      [quote [declare example [cons number []]]]
+      [(intern "scm.") [lambda [declare] [declare [quote example] [quote number]]]]
+      [(intern "scm.letrec") [[update-lambda-table local-function]]
+        [update-lambda-table not 1]]])
+
+(let Opaque [(intern "scm.") [update-lambda-table not 1]]
+     Expanded (precompile-initializer [do Opaque [update-lambda-table not 1]])
+  (do
+    (build-library-test.assert-equal
+      "Scheme callback preserves the whole host expression" Opaque (hd (tl Expanded)))
+    (build-library-test.assert-equal
+      "ordinary KL beside a Scheme escape is still expanded" 1
+      (occurrences shen.update-lambda-table/precompiled Expanded))))

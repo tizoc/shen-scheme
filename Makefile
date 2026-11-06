@@ -57,7 +57,7 @@ ifeq ($(os), linux)
 	linkerflags = -lm -ldl -lpthread -luuid
 endif
 
-shenversion ?= 43.2
+shenversion ?= 43.4
 csversion ?= 10.3.0
 prebuilt_version ?= 0.26
 
@@ -69,6 +69,7 @@ kernel_sha256_42.1 = 87e0d5e795cd074bfec3975da2aaada22a78e13f44cf53f424cdaf20573
 kernel_sha256_42.2 = 1d02273003654d34ec020ae67cb214ecec410dee3350419ff807d82b652678d8
 kernel_sha256_43.1 = 900eedef44f440af78f9395ed06e689ce1604546fc309f5bc7c8bc84cc651920
 kernel_sha256_43.2 = 23c71508f0de24785e1f127ea4fab440081904d81c463090bc642ee840417f32
+kernel_sha256_43.4 = 15e7972e6bf0cd65d37c2eba85750b8839d2dbadda41027eae0c88e5017a2756
 prebuilt_sha256_0.26_linux = 2859384f3b16cd6cf596084cfff7e2d9d5b31a11df3d1f7c9e1f1746ed6ef798
 prebuilt_sha256_0.26_macOS = a9c321a286daf354dda8ab51eb2b191cbdc339c2087e4490488c88ce462f5dc6
 prebuilt_sha256_0.26_windows = 7c5ab365cdd42aa02bfba90f857fddc7b431672fe01928f14f2b0f1156042549
@@ -252,6 +253,8 @@ test-compiler: $(exe) $(runtime_artifacts)
 	./$(exe) script scripts/run-compiler-tests.shen
 	./$(exe) eval -q -e '(eval-kl [scm. "(load c#34;tests/error-diagnostics.ssc#34;)"])'
 	./$(exe) eval -q -e '(eval-kl [scm. "(load c#34;tests/primitive-specialization.ssc#34;)"])'
+	./$(exe) eval -q -e '(eval-kl [scm. "(load c#34;tests/kernel-initialization.ssc#34;)"])'
+	./$(exe) eval -q -e '(eval-kl [scm. "(load c#34;tests/trap-error.ssc#34;)"])'
 	./$(exe) script scripts/run-build-library-tests.shen
 	"$(scmexe)" -q -b "$(psboot)" -b "$(csboot)" \
 		--script scripts/check-build-library.ss

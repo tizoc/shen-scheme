@@ -62,6 +62,13 @@
 (define (kl:value var)
   (shen-global-get var get-failure-error))
 
+;; The portable initializer pass asks whether its adapter can use this binding.
+(define (shen-precompiled-function? name original)
+  (let ((binding (string->symbol (string-append "kl:" (symbol->string name)))))
+    (and (top-level-bound? binding)
+         (not (top-level-mutable? binding))
+         (eq? (top-level-value binding) original))))
+
 ;; Error Handling
 ;;
 
@@ -393,6 +400,22 @@
     (if (eq? result *hash-table-default*)
         (default)
         result)))
+
+;; Checked variants can serve user trap-error forms whose operands are already
+;; evaluated and whose handlers do not inspect the condition. Invalid types
+;; and indices have the same default result as a caught primitive exception.
+(define (shen-value/or var default)
+  (if (symbol? var) (value/or var default) (default)))
+
+(define (shen-address/or vector n default)
+  (if (and (vector? vector) (fixnum? n) (fx>=? n 0))
+      (<-address/or vector n default)
+      (default)))
+
+(define (shen-vector/or vector n default)
+  (if (and (vector? vector) (fixnum? n) (fx>=? n 0))
+      (<-vector/or vector n default)
+      (default)))
 
 (define (get/or var prop dict default)
   (let* ((entry (hashtable-ref dict var '()))

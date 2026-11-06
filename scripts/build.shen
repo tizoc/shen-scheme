@@ -134,10 +134,11 @@
    to be able to generate that list. *\
 
 (set *functions* [])
+(set *function-names* [])
 
 (define register-export
-  [defun Name | _] -> (set *functions*
-                            [(prefix-fn Name) | (value *functions*)])
+  [defun Name | _] -> (do (set *function-names* [Name | (value *function-names*)])
+                          (set *functions* [(prefix-fn Name) | (value *functions*)]))
   _ -> skip)
 
 (define sexp->string
@@ -210,13 +211,25 @@
                 (append (value *init-code*) Code)))
 
 (define compile-defun
-  Defun -> (_scm.kl->scheme Defun))
+  Defun -> (_scm.kl->scheme (precompile-initializer Defun)))
+
+(define scheme-initializer-escape?
+  [quote _] -> true
+  [Op | _] -> (_scm.scm-prefixed? Op)
+  _ -> false)
+
+(define precompile-initializer
+  KL -> (shen.x.expand-dynamic.expand-initializer KL (value *function-names*)
+          (fn scheme-initializer-escape?)))
 
 (define read-file-unprocessed
   File -> (let Bytelist (read-file-as-bytelist File)
                S-exprs  (trap-error (compile (/. X (shen.<s-exprs> X)) Bytelist)
                                     (/. E (shen.reader-error (value shen.*residue*))))
             S-exprs))
+
+\\ Load the portable build pass into the bootstrap host.
+(map (fn eval-kl) (read-file-unprocessed "kl/extension-expand-dynamic.kl"))
 
 (define compile-kl-file
   Prelude From To
@@ -269,7 +282,7 @@
 (define compile-init-code
   -> (let Out (open "compiled/shen-scheme-init.scm" out)
           Cmds (value *init-code*)
-          Scm (map (function _scm.kl->scheme) Cmds)
+          Scm (map (/. X (_scm.kl->scheme (precompile-initializer X))) Cmds)
           ScmS (map (function sexp->string) Scm)
           P (pr (shen-license) Out)
           F (for-each (/. S (pr (make-string "~A~%~%" S) Out) ) ScmS)
@@ -320,6 +333,11 @@
   -> [register-globals
       shen-boolean-error
       shen-equal-slow
+      shen-precompiled-function?
+      shen-scheme-original-primitive?
+      shen-value/or
+      shen-address/or
+      shen-vector/or
       (prefix-fn _scm.assert-boolean)
       (prefix-fn intern)
       (prefix-fn str)

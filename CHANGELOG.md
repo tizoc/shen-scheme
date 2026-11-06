@@ -16,11 +16,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Reported by @pyrex41.
 - Keep complex-number syntax as symbols in `intern`.
   Reported by @pyrex41.
+- Preserve the condition when a kernel `trap-error` handler uses it.
+- Install compiler dependencies before replacing the compiler in mutable
+  bootstrap runtimes, and expose the binding probe to source-loaded compilers.
 
 ### Changed
 
+- Upgrade the kernel to S43.4, including checked precompilation of stlib and
+  extension signatures, shared currying-adapter initialization, and corrected
+  factorisation of explicit conditions without a default clause.
 - Emit Boolean checks directly and keep common equality tests outside the
   recursive worker. Preserve primitive redefinitions when specializing user code.
+- Use the kernel's shared initializer expansion for precompiled currying
+  adapters and static type declarations. Retain only the Scheme binding probe;
+  mutable or shadowed registrations keep their dynamic lookup behavior.
+- Use checked global and vector lookups for eligible user `trap-error` forms
+  whose handlers ignore the condition. Preserve guarded handling for computed
+  operands, ambiguous bindings, Scheme scopes, and compatible native units.
 
 ## [0.53] - 2026-11-05
 

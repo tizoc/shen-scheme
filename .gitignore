@@ -8,3 +8,4 @@
 *.o
 /_build
 /_dist
+/local/

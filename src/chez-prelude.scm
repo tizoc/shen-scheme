@@ -13,6 +13,12 @@
     ((=) (eq? (top-level-value 'kl:=) kl:=))
     ((_scm.assert-boolean)
      (eq? (top-level-value 'kl:_scm.assert-boolean) kl:_scm.assert-boolean))
+    ((value) (and (not (top-level-mutable? 'kl:value))
+                  (eq? (top-level-value 'kl:value) kl:value)))
+    ((<-vector) (and (not (top-level-mutable? 'kl:<-vector))
+                     (eq? (top-level-value 'kl:<-vector) kl:<-vector)))
+    ((scm.vector-ref) (and (not (top-level-mutable? 'vector-ref))
+                         (eq? (top-level-value 'vector-ref) vector-ref)))
     (else #f)))
 
 (define *shen-globals* (make-hashtable symbol-hash eq?))

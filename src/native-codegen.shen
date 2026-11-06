@@ -8,6 +8,7 @@
   update-lambda-table install-runtime! install-compiletime! install-init! loaded
   shen-scheme-native-load-init?
   _scm.prefix-op _scm.kl->scheme _scm.with-native-context
+  _scm.scheme-scope
   scm.shen-scheme-native-key]
 
 (define native-scheme-forms
@@ -25,8 +26,13 @@
   M U sealed Xs MD -> (native-sealed-scheme-forms* M U Xs MD))
 
 (define native-compile-kl-forms
-  M LM KL -> (_scm.with-native-context
-              M LM (freeze (map (function _scm.kl->scheme) KL))))
+  M LM KL -> (let Scope (if (= M compatible)
+                           [[_scm.scheme-scope _scm.scheme-scope] | LM]
+                           LM)
+               \* Compatible units can introduce mutable top-level bindings
+                  after lowering. Keep primitive trap shortcuts out of them. *\
+               (_scm.with-native-context
+                M Scope (freeze (map (function _scm.kl->scheme) KL)))))
 
 (define native-compatible-scheme-forms
   [native-unit KL Is CT Ps] MD

@@ -11,7 +11,9 @@
                      compatible sealed app
                      scm.dynamic-wind
                      scm.shen-scheme-original-primitive?
-                     shen-boolean-error
+                     shen-boolean-error shen-precompiled-function?
+                     shen-value/or shen-address/or shen-vector/or
+                     scm.vector-ref
                      scm.value/or scm.get/or scm.<-vector/or scm.<-address/or]
 
 (define initialize-compiler
@@ -98,9 +100,39 @@
 (define order-call
   Call -> (order-call-inputs Call [] Call))
 
+(define native-mode
+  -> (trap-error (value *native-mode*) (/. E compatible)))
+
+(define native-local-map
+  -> (trap-error (value *native-local-map*) (/. E [])))
+
+(define native-local-name*
+  _ [] -> (fail)
+  Op [[Op Local] | _] -> Local
+  Op [_ | Rest] -> (native-local-name* Op Rest))
+
+(define native-local-name-for-mode
+  sealed Op -> (native-local-name* Op (native-local-map))
+  app Op -> (native-local-name* Op (native-local-map))
+  _ _ -> (fail))
+
+(define native-local-name
+  Op -> (native-local-name-for-mode (native-mode) Op))
+
+\* Older bootstrap runtimes have no binding probe. Keep ordinary calls there
+   until compiling the kernel, whose own primitive bindings stay fixed. Define
+   this before replacing compile-expression in those mutable runtimes. *\
+(define original-primitive?
+  _ -> true where (value *compiling-shen-sources*)
+  Name -> (trap-error ((foreign scm.shen-scheme-original-primitive?) Name)
+                     (/. E false)))
+
 (define compile-expression
   [] _ -> [quote []]
   Sym Scope -> (emit-symbol Sym) where (unbound-symbol? Sym Scope)
+  [shen.precompiled-function? Name] Scope
+  -> [shen-precompiled-function? [quote Name] (prefix-op Name)]
+      where (and (value *compiling-shen-sources*) (unbound-symbol? Name Scope))
   [set Var Value] Scope -> [let [[tmp (compile-expression Value Scope)]]
                               [(prefix-global Var) tmp]
                               tmp]
@@ -160,10 +192,10 @@
          (order-call [vector-set! Var CN CX])
          Var])
   [scm.import | Rest] _ -> [import | Rest]
-  [scm.letrec | Rest] Scope -> (emit-letrec Rest Scope)
-  [scm.lambda Vars Body] Scope -> [lambda Vars (compile-expression Body (append Vars Scope))]
-  [scm.define [Name | Vars] Body] Scope -> [define [Name | Vars] (compile-expression Body (append Vars Scope))]
-  [scm.define Name Expr] Scope -> [define Name (compile-expression Expr Scope)] where (symbol? Name)
+  [scm.letrec | Rest] Scope -> (emit-letrec Rest [[scheme-scope] | Scope])
+  [scm.lambda Vars Body] Scope -> [lambda Vars (compile-expression Body [[scheme-scope] | (append Vars Scope)])]
+  [scm.define [Name | Vars] Body] Scope -> [define [Name | Vars] (compile-expression Body [[scheme-scope] | (append Vars Scope)])]
+  [scm.define Name Expr] Scope -> [define Name (compile-expression Expr [[scheme-scope] | Scope])] where (symbol? Name)
   [scm. Code] _ -> ((foreign scm.with-input-from-string) Code (freeze ((foreign scm.read)))) where (string? Code)
   [scm. Form] _ -> (emit-scm-form Form)
   [scm. kl : Name] _ -> (intern (cn "kl:" (str Name))) where (symbol? Name)
@@ -186,13 +218,6 @@
 (define force-boolean
   X -> X where (yields-boolean? X)
   X -> [assert-boolean X])
-
-\* Older bootstrap runtimes have no binding probe. Keep ordinary calls there
-   until compiling the kernel, whose own primitive bindings stay fixed. *\
-(define original-primitive?
-  _ -> true where (value *compiling-shen-sources*)
-  Name -> (trap-error ((foreign scm.shen-scheme-original-primitive?) Name)
-                     (/. E false)))
 
 (define emit-boolean-check
   Exp Scope -> (let Code (compile-expression Exp Scope)
@@ -262,7 +287,14 @@
 (define emit-trap-error
   [F | Rest] Handler Scope <- (emit-trap-error-optimize [F | Rest] Handler Scope)
       where (and (value *compiling-shen-sources*)
-                 (element? F [value <-vector <-address get]))
+                 (and (element? F [value <-vector <-address get])
+                      (and (not (element? [scheme-scope] Scope))
+                           (handler-ignores-error? Handler Scope))))
+
+  [F | Rest] Handler Scope <- (emit-trap-error-checked [F | Rest] Handler Scope)
+      where (and (element? F [value <-vector <-address])
+                 (and (not (element? [scheme-scope] Scope))
+                      (handler-ignores-error? Handler Scope)))
 
   Exp [lambda E Handler] Scope
   -> [(intern "guard") [E [else (compile-expression Handler [E | Scope])]]
@@ -273,6 +305,60 @@
        [(intern "guard") [(intern "?exn") [else [(intern "?handler")
                                                  (intern "?exn")]]]
         (compile-expression Exp Scope)]])
+
+\* Scheme syntax can hide lexical references, so leave it on the general path.
+   Inspect source only: compiling nested handlers here would duplicate work. *\
+(define handler-ignores-error?
+  [lambda E Handler] _
+  -> (and (symbol? E)
+          (and (variable? E)
+               (and (= 0 (occurrences E Handler))
+                    (and (not (contains-scheme-syntax? Handler))
+                         (not (scheme-binding-shadowed? E []))))))
+  _ _ -> false)
+
+(define contains-scheme-syntax?
+  [X | Xs] -> (or (contains-scheme-syntax? X) (contains-scheme-syntax? Xs))
+  X -> (scm-prefixed? X))
+
+\* Atomic operands cannot raise before reaching the checked primitive. More
+   complex operands need the general handler to catch their own exceptions. *\
+(define emit-trap-error-checked
+  [value X] [lambda _ Handler] Scope
+  -> [shen-value/or (compile-expression X Scope)
+        [lambda [] (compile-expression Handler Scope)]]
+    where (and (not (scheme-binding-shadowed? shen-value/or Scope))
+               (and (not (cons? X)) (checked-primitive? value Scope)))
+  [<-address X N] [lambda _ Handler] Scope
+  -> [shen-address/or (compile-expression X Scope) (compile-expression N Scope)
+        [lambda [] (compile-expression Handler Scope)]]
+    where (and (not (scheme-binding-shadowed? shen-address/or Scope))
+               (and (checked-primitive? scm.vector-ref Scope)
+                    (and (not (cons? X)) (not (cons? N)))))
+  [<-vector X N] [lambda _ Handler] Scope
+  -> [shen-vector/or (compile-expression X Scope) (compile-expression N Scope)
+        [lambda [] (compile-expression Handler Scope)]]
+    where (and (not (scheme-binding-shadowed? shen-vector/or Scope))
+               (and (checked-primitive? <-vector Scope)
+                    (and (not (cons? X)) (not (cons? N)))))
+  _ _ _ -> (fail))
+
+(define checked-primitive?
+  Name Scope -> (and (not (element? Name Scope))
+                    (and (not (scheme-binding-shadowed? (prefix-op Name) Scope))
+                         (and (= (native-local-name Name) (fail))
+                              (original-primitive? Name)))))
+
+(define scheme-binding-shadowed?
+  Name Scope -> (or (element? Name Scope)
+                   (let Bindings (native-local-map)
+                     (or (native-binding? scheme-scope Bindings)
+                         (native-binding? Name Bindings)))))
+
+(define native-binding?
+  Name [[_ Name] | _] -> true
+  Name [_ | Rest] -> (native-binding? Name Rest)
+  _ [] -> false)
 
 \*
 NOTE: This transformation assumes that:
@@ -347,11 +433,13 @@ but not otherwise.
   _               -> (fail))
 
 (define emit-static-application-fallback
-  _ Op Params Scope -> (let Args (map (/. P (compile-expression P Scope)) Params)
+  _ Op Params Scope -> (let Foreign (scm-prefixed? Op)
+                           InnerScope (if Foreign [[scheme-scope] | Scope] Scope)
+                           Args (map (/. P (compile-expression P InnerScope)) Params)
                            Call [(prefix-op Op) | Args]
                          \* Scheme escapes may name arbitrary syntax, whose
                             operands must not be lifted out of the form. *\
-                         (if (scm-prefixed? Op)
+                         (if Foreign
                              Call
                              (order-call Call))))
 
@@ -389,12 +477,6 @@ but not otherwise.
 (define prefix-global
   Sym -> (concat (value *global-prefix*) Sym))
 
-(define native-mode
-  -> (trap-error (value *native-mode*) (/. E compatible)))
-
-(define native-local-map
-  -> (trap-error (value *native-local-map*) (/. E [])))
-
 (define with-native-context
   Mode LocalMap F -> (let OldMode (native-mode)
                           OldLocalMap (native-local-map)
@@ -406,19 +488,6 @@ but not otherwise.
                         (freeze
                          (do (set *native-mode* OldMode)
                              (set *native-local-map* OldLocalMap))))))
-
-(define native-local-name*
-  _ [] -> (fail)
-  Op [[Op Local] | _] -> Local
-  Op [_ | Rest] -> (native-local-name* Op Rest))
-
-(define native-local-name-for-mode
-  sealed Op -> (native-local-name* Op (native-local-map))
-  app Op -> (native-local-name* Op (native-local-map))
-  _ _ -> (fail))
-
-(define native-local-name
-  Op -> (native-local-name-for-mode (native-mode) Op))
 
 (define definition-name
   Name -> (native-local-name Name)
