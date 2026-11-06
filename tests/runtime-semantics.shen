@@ -51,6 +51,25 @@
 (define semantics-pattern 1 -> matched _ -> missed)
 (assert-equal (semantics-pattern (+ 0.5 0.5)) matched)
 
+\\ Exercise the worker as well as numeric-literal specialization.
+(assert-equal (semantics-eq-params 1 2) false)
+(assert-equal (semantics-eq-params [1 2] [1 (+ 0.5 1.5)]) true)
+(assert-equal (semantics-eq-params (@v 1 2 <>) (@v (+ 0.5 0.5) 2 <>)) true)
+(assert-equal (semantics-eq-params (@v 1 2 <>) (@v 1 3 <>)) false)
+
+(define semantics-check-boolean X -> (if X yes no))
+(assert-equal (semantics-check-boolean true) yes)
+(assert-equal (semantics-check-boolean false) no)
+(assert-equal
+ (trap-error (semantics-check-boolean 42) (/. E (error-to-string E)))
+ "expected a boolean in if/and/or expression, got: 42")
+(set *semantics-boolean-calls* 0)
+(assert-equal
+ (if (do (set *semantics-boolean-calls* (+ 1 (value *semantics-boolean-calls*))) true)
+     yes no)
+ yes)
+(assert-equal (value *semantics-boolean-calls*) 1)
+
 (define semantics-intern Name -> (intern Name))
 (assert-equal
  (map (/. Name (number? (semantics-intern Name)))

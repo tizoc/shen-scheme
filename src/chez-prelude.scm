@@ -6,6 +6,15 @@
     ((_ location message obj ...)
      (error location message obj ...))))
 
+;; Specialize only calls that still resolve to the runtime's original binding.
+;; interaction-environment also respects native compilation's temporary scope.
+(define (shen-scheme-original-primitive? name)
+  (case name
+    ((=) (eq? (top-level-value 'kl:=) kl:=))
+    ((_scm.assert-boolean)
+     (eq? (top-level-value 'kl:_scm.assert-boolean) kl:_scm.assert-boolean))
+    (else #f)))
+
 (define *shen-globals* (make-hashtable symbol-hash eq?))
 
 (define (shen-global-parameter-set! var parameter)

@@ -99,15 +99,20 @@
 
 (assert-equal
  (_scm.kl->scheme [lambda X [= X 1]])
- [lambda [X] [(_scm.prefix-op =) X 1]])
+ [lambda [X] [let [[Tmp X]]
+               [or [eq? Tmp 1] [and [number? Tmp] [= Tmp 1]]]]])
 
 (assert-equal
  (_scm.compile-expression [and [some-func X] [= 1 2]] [X])
- [and [(_scm.prefix-op _scm.assert-boolean) [(_scm.prefix-op some-func) X]] [(_scm.prefix-op =) 1 2]])
+ [and [let [[Tmp [(_scm.prefix-op some-func) X]]]
+        [if [boolean? Tmp] Tmp [shen-boolean-error Tmp]]]
+      [let [[Num 2]] [or [eq? Num 1] [and [number? Num] [= Num 1]]]]])
 
 (assert-equal
  (_scm.compile-expression [or [some-func X] [= 1 2]] [X])
- [or [(_scm.prefix-op _scm.assert-boolean) [(_scm.prefix-op some-func) X]] [(_scm.prefix-op =) 1 2]])
+ [or [let [[Tmp [(_scm.prefix-op some-func) X]]]
+       [if [boolean? Tmp] Tmp [shen-boolean-error Tmp]]]
+     [let [[Num 2]] [or [eq? Num 1] [and [number? Num] [= Num 1]]]]])
 
 (assert-equal
  (_scm.kl->scheme [trap-error [+ 1 2] [lambda E 0]])

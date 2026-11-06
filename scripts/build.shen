@@ -318,6 +318,8 @@
 
 (define runtime-primitive-exports
   -> [register-globals
+      shen-boolean-error
+      shen-equal-slow
       (prefix-fn _scm.assert-boolean)
       (prefix-fn intern)
       (prefix-fn str)

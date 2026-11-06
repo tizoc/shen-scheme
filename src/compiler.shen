@@ -10,6 +10,8 @@
                      scm.define scm.goto-label scm.begin
                      compatible sealed app
                      scm.dynamic-wind
+                     scm.shen-scheme-original-primitive?
+                     shen-boolean-error
                      scm.value/or scm.get/or scm.<-vector/or scm.<-address/or]
 
 (define initialize-compiler
@@ -126,6 +128,8 @@
   [freeze Exp] Scope -> [lambda [] (compile-expression Exp Scope)]
   [thaw Exp] Scope -> [(compile-expression Exp Scope)]
   [= A B] Scope -> (emit-equality-check A B Scope)
+  [assert-boolean Exp] Scope -> (emit-boolean-check Exp Scope)
+      where (original-primitive? assert-boolean)
   [intern S] _ -> [quote (intern S)] where (string? S)
   [type Exp _] Scope -> (compile-expression Exp Scope)
   [simple-error Msg] Scope -> [error [quote (hd (value *compiling-function*))]
@@ -182,6 +186,19 @@
 (define force-boolean
   X -> X where (yields-boolean? X)
   X -> [assert-boolean X])
+
+\* Older bootstrap runtimes have no binding probe. Keep ordinary calls there
+   until compiling the kernel, whose own primitive bindings stay fixed. *\
+(define original-primitive?
+  _ -> true where (value *compiling-shen-sources*)
+  Name -> (trap-error ((foreign scm.shen-scheme-original-primitive?) Name)
+                     (/. E false)))
+
+(define emit-boolean-check
+  Exp Scope -> (let Code (compile-expression Exp Scope)
+                    Var (fresh-call-variable [Code | Scope])
+                 [let [[Var Code]]
+                   [if [boolean? Var] Var [shen-boolean-error Var]]]))
 
 (define emit-symbol
   S -> [quote S])
@@ -279,6 +296,10 @@ but not otherwise.
   _ _ _ -> (fail))
 
 (define emit-equality-check
+  N Exp Scope -> (emit-numeric-equality N Exp Scope)
+      where (and (number? N) (original-primitive? =))
+  Exp N Scope -> (emit-numeric-equality N Exp Scope)
+      where (and (number? N) (original-primitive? =))
   V1 V2 Scope -> (order-call [eq? (compile-expression V1 Scope)
                                   (compile-expression V2 Scope)])
       where (or (unbound-symbol? V1 Scope)
@@ -295,6 +316,13 @@ but not otherwise.
                   =
                   [V1 V2]
                   Scope))
+
+(define emit-numeric-equality
+  N Exp Scope -> (let Code (compile-expression Exp Scope)
+                      Var (fresh-call-variable [Code | Scope])
+                   [let [[Var Code]]
+                     [or [eq? Var N]
+                         [and [number? Var] [= Var N]]]]))
 
 (define binary-op-mapping
   +               -> +

@@ -7,7 +7,10 @@
 (define (kl:_scm.assert-boolean value)
   (if (boolean? value)
       value
-      (raise-error '_scm.assert-boolean "expected a boolean in if/and/or expression, got" value)))
+      (shen-boolean-error value)))
+
+(define (shen-boolean-error value)
+  (raise-error '_scm.assert-boolean "expected a boolean in if/and/or expression, got" value))
 
 ;; Symbols
 ;;
@@ -73,17 +76,24 @@
     (and (= len (vector-length b))
          (do ((i 0 (+ i 1)))
              ((or (= i len)
-                  (not (kl:= (vector-ref a i)
-                             (vector-ref b i))))
+                  (not (shen-equal-slow (vector-ref a i)
+                                       (vector-ref b i))))
               (= i len))))))
 
 (define (kl:= a b)
+  (cond ((eq? a b) #t)
+        ((and (fixnum? a) (fixnum? b)) #f)
+        (else (shen-equal-slow a b))))
+
+;; Keep the public fast path outside the worker's recursive component, including
+;; vector comparisons. Identity is still useful for equal substructures here.
+(define (shen-equal-slow a b)
   (cond ((eq? a b) #t) ;; fast path
         ((number? a) (and (number? b) (= a b)))
         ((pair? a)
          (and (pair? b)
-              (kl:= (car a) (car b))
-              (kl:= (cdr a) (cdr b))))
+              (shen-equal-slow (car a) (car b))
+              (shen-equal-slow (cdr a) (cdr b))))
         ((string? a) (and (string? b) (string=? a b)))
         ((vector? a) (and (vector? b) (vector=? a b)))
         ;; the first eq? test already covers for null and symbols

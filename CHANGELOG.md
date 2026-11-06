@@ -11,11 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Raise a catchable error when an explicit `cond` has no matching clause.
   Reported by @pyrex41.
-- Use runtime numeric equality for comparisons against numeric literals,
+- Use guarded numeric equality for comparisons against numeric literals,
   preserving equality across exact and inexact representations.
   Reported by @pyrex41.
 - Keep complex-number syntax as symbols in `intern`.
   Reported by @pyrex41.
+
+### Changed
+
+- Emit Boolean checks directly and keep common equality tests outside the
+  recursive worker. Preserve primitive redefinitions when specializing user code.
 
 ## [0.53] - 2026-11-05
 
