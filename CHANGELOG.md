@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.55] - 2026-11-19
+
+### Changed
+
+- Upgrade the bundled kernel to Shen 43.7. The standard library exposes the
+  S43 exports, including `read-data` and `eval-data`, and `for N = 1 to ...`
+  expands inside packages.
+
 ## [0.54] - 2026-11-06
 
 ### Fixed
@@ -481,7 +489,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dropped support for Gauche Scheme and Chibi Scheme.
 
-[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.54...HEAD
+[Unreleased]: https://github.com/tizoc/shen-scheme/compare/v0.55...HEAD
+[0.55]: https://github.com/tizoc/shen-scheme/compare/v0.54...v0.55
 [0.54]: https://github.com/tizoc/shen-scheme/compare/v0.53...v0.54
 [0.53]: https://github.com/tizoc/shen-scheme/compare/v0.52...v0.53
 [0.52]: https://github.com/tizoc/shen-scheme/compare/v0.51...v0.52
